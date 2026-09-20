@@ -1,23 +1,30 @@
 # STATUS
 
-單行狀態：專案骨架建立完成，等待 2026-09-21 黑客松開賽。
+單行狀態：2026-09-21 開賽日。賽事事實已重新查證，專案更名為 `ai-se-hack-2026`。
 
-最後驗證：2026-09-20（`bash bin/verify.sh` → GREEN）
+最後驗證：2026-09-21（`bash bin/verify.sh` → GREEN）
 
 ## 進行中
 
-- 無。賽前準備階段。
+- 開賽日收尾：分支 `docs/update-event-facts-2026-09-21` 待推送。
 
 ## 已知問題
 
-- 尚未設定 git remote，工作只存在於這台機器。
-- 明天的技術堆疊未定，`bin/verify.sh` 目前只做骨架層級檢查（shell 語法、STATUS 存在、無超大追蹤檔）。
+- 技術堆疊未定，`bin/verify.sh` 目前只做骨架層級檢查（shell 語法、STATUS 存在、無超大追蹤檔）。
+
+## 更名紀錄（2026-09-21）
+
+- GitHub repo：`AI_Social_Enterprise_Hackathon_2026` → `ai-se-hack-2026`
+  （https://github.com/minchiaHuang/ai-se-hack-2026，PRIVATE）
+- 本地資料夾同步更名為 `ai-se-hack-2026`。
+- GitHub 會 redirect 舊 URL，但隊友若已 clone 應改用新 URL。
+- `.claude/orca-flow.json` 的 `"project"` 仍是賽事全名，那是顯示字串不是路徑，刻意不動。
 
 ## 下一步
 
 1. 確認賽前技術預備：AI 助手登入、prototyping 工具或 API 存取。
-2. 9/21 開賽後確定題目與堆疊，於 `bin/verify.sh` 的標記區段補上真正的測試。
-3. 視需要建立 remote 並推送。
+2. 開賽後確定題目與堆疊，於 `bin/verify.sh` 的標記區段補上真正的測試。
+3. 通知設計與資料科學隊友新的 repo URL。
 
 ## 背景
 
