@@ -17,6 +17,7 @@
     判定**不併入方向 3**。
   - 兩者的碰撞風險分別是 Recycle Mate 與 Social Enterprise Australia 的 shared data system，
     都已寫在交接文件對應章節，pitch 前必須能一句話講清差異。
+
   **交接文件：`docs/research-brief-2026-09-21.md`** —— 給接手研究的 agent，自足可讀。
 - 社群研究原始資料在 `reddit-x-research/`（兩輪 Reddit＋X 掃描，共 1,100 篇熱門貼文）。
 
