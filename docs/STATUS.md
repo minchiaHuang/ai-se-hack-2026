@@ -64,6 +64,7 @@
 - 三份框架（同一個七格模板的三個實例）：`docs/frameworks/direction-{2,3,6}-*.md`
 - **現場提案者辨識表**：`docs/frameworks/onsite-matching-sheet.md`
 - 技術骨架：`skeleton/`，跑法 `python3 skeleton/app.py` → http://127.0.0.1:8000
+  （`python3 -m skeleton.app` 也可；`--check` 為離線煙霧測試，不起伺服器）
   - 一個殼、三個可插拔方向模組、一條共用管線
   - **零外部套件、單次模型呼叫、不做 RAG／agent／vector DB**（`AI_CONTEXT.md`「Avoid」）
   - stub 模型使黃金路徑可離線跑完，這同時就是 demo 備援

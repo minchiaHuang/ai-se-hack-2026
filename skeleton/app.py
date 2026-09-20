@@ -6,9 +6,15 @@ confirms every row before anything counts.
 """
 import html
 import json
+import sys
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
+
+# Run by path (python3 skeleton/app.py) and sys.path holds skeleton/, not the
+# repo root, so the package imports below fail. Put the root back.
+if __package__ in (None, ""):
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from skeleton.core.model import CANNED, StubModel
 from skeleton.core.pipeline import run
@@ -120,6 +126,15 @@ class Handler(BaseHTTPRequestHandler):
         pass
 
 
+def check():
+    """Offline smoke check: render every scenario, print nothing on success."""
+    for key in SCENARIOS:
+        render_result(key)
+
+
 if __name__ == "__main__":
-    print("http://127.0.0.1:8000")
-    HTTPServer(("127.0.0.1", 8000), Handler).serve_forever()
+    if "--check" in sys.argv:
+        check()
+    else:
+        print("http://127.0.0.1:8000")
+        HTTPServer(("127.0.0.1", 8000), Handler).serve_forever()
