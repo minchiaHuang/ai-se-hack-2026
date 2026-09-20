@@ -61,6 +61,7 @@
 | **買方端 RFQ→社企供應商媒合** | Social Traders 政府買方入口網站標語已是「Connect with the right social enterprises, identify opportunities, **track outcomes and produce reports**」—— 正是這一整包 |
 | **「把訓練教材變成 AI 語音」** | **ElevenLabs 自己就在賣**（Learning and Development Conversational Agents） |
 | **志工排班** | Rosterfy、Deputy 慈善版、Vollie 已佔據市場 |
+| **NDIS 文件編排（方向 1）** | 2026-09-21 競品盤點：免費端有 PlanMind（免註冊、含 ReAssess 書面陳述產生器）、Novida 範本庫、PWdWA＋Legal Aid WA 內部覆議工具包；付費端 MagMindLab 以 **$89** 販售幾乎等同的「證據對齊＋缺口檢查＋I-CANv6 草擬評分」；申訴階段另有聯邦 **NDIS Appeals Program** 免費倡議者與法律代理（2026–27 起再撥 1,470 萬澳幣）。詳表見 §5 方向 1 末 |
 | **補助核銷（慈善機構版）** | 證據最厚（生產力委員會 2024-05-10 終報、聯邦補助架構 2024-10-01 修訂、ANAO 2025–26、Justice Connect：46% 機構年收 <25 萬），**但服務對象是受補助慈善機構，不是社會企業** —— 主題不符。僅在現場明顯以慈善機構為主時作為備案 |
 
 ---
@@ -99,6 +100,8 @@ X 的主流是「經費失控、詐騙猖獗」（互動量高一個量級）。
 - 「9 成社區組織說缺經費是衡量成效的主要障礙」—— 找不到原始出處
 - NDS 2024 職場普查的「50% 流動率、每名新進 2,130–3,320 澳幣」—— 那是**支薪支持人員**，
   不是 WISE 的受支持員工，別混用
+- PlanMind 官網自述的「觸及 160,000 名參與者」「平均為計畫爭取到 5,000 澳幣」——
+  純行銷自述，無第三方佐證，**不得引用**
 - Reddit 分數（Arctic Shift 多在貼文早期擷取，系統性低估）。
   例：r/nonprofit《Grant writing is just rewriting the same information 40 different ways》
   年度排名第 4，但抓取顯示 score=1 且已被版主移除。**引用排名，不要引用分數。**
@@ -109,14 +112,17 @@ X 的主流是「經費失控、詐騙猖獗」（互動量高一個量級）。
 - CSI《State of the Social Economy in Australia》完整 PDF 的百分比細分
 - 維州社會採購框架買方指引 FAQ／Big Build 申報頁
 - Inclusion Australia／CSI《ADE Snapshot》
+- NDIA 官方 I-CAN 公告（2026-09-21 自動抓取回 HTTP 403）：
+  `https://www.ndis.gov.au/news/10927-new-tool-deliver-simpler-pathway-disability-supports`
 
 ---
 
 ## 5. 六個要研究的方向
 
 依優先序。每個都**必須**做競品盤點與付費方分析。
+**2026-09-21 更新**：方向 1 已完成競品盤點並淘汰，實際待研究的剩五個（方向 2–6）。
 
-### 方向 1 — NDIS 文件編排 ⭐ 最高優先
+### 方向 1 — NDIS 文件編排 ✂️ **已於 2026-09-21 競品盤點後淘汰**（理由見本節末）
 
 **問題形狀**：身障者必須自己蒐集、編排、辯護證據，對抗削減其經費的機構。
 
@@ -157,6 +163,53 @@ X 的主流是「經費失控、詐騙猖獗」（互動量高一個量級）。
 
 **社群搜尋設計**：r/NDIS 改用 `sort=new`（找工具討論而非情緒宣洩）、r/AusLegal、r/disability；
 X 追 @criprights 等倡議帳號在推薦什麼工具。
+
+**競品盤點結果（2026-09-21 完成）→ 判定：✂️ 清掉，不要在賽事當天做這條線**
+
+規則 4 的競品檢查已執行（純桌面研究，未聯絡任何人）。結論：這個問題空間同時被
+**免費產品**、**已上市的付費產品**、以及**政府免費申訴代理**三層佔據。
+依本方向自訂的判準（「如果已有成熟或免費的產品，這條線當場清掉」），**本方向淘汰**。
+
+**EVIDENCE — 直接競品（皆於 2026-09-21 查證）**
+
+| 產品 | 做什麼 | 價格 | 與本構想重疊 |
+|---|---|---|---|
+| **PlanMind** https://planmind.com.au/ | ReAssess（產出 Reassessment Brief PDF＋會議提問＋書面陳述）、Plan Decoder、Goal Planner、Support Letter Generator、Budget Calculator、Jargon Buster | 官網原話：「**No signup required · No plan data stored · Free to start**」，計算機與辭典「always free」 | 極高。ReAssess 自述「**aligned to the new I-CAN v6 framework**」，連制度轉換都已覆蓋 |
+| **MagMindLab** https://magmindlab.com/ | 上傳既有醫療／評估報告 → 約 25 頁 Support Needs Evidence Report、**I-CANv6 草擬評分**、六大 impairment 類別對映、Reasonable and Necessary 結構化報告、**Evidence Gap Checklist**、給治療師的草擬信 | 「**$89 inc. GST**」（自述原價 $109 的促銷價） | **幾乎等同**。「證據索引＋缺口檢查」正是本構想的核心，已經有人做完並在賣 |
+| **Novida** https://www.novida.com.au/resources | NDIS 表單白話解釋、信件與陳述範本、逐步檢核表、辭典、資格檢查器 | 官網原話：「**everything here is free**」／「The letters and statements are **free to copy, adapt and use**」 | 中高（範本層） |
+| **PWdWA + Legal Aid WA《WA Advocates Internal Review Toolkit》** https://pwdwa.org/how-we-help/ndis/ | 內部覆議工具包＋申請範例＋定期線上說明會 | 免費 | 中（覆議階段的流程指引） |
+| **NDIS Appeals Program**（聯邦 Department of Health, Disability and Ageing） https://www.health.gov.au/our-work/ndis-appeals-program | ART 申訴階段配置**受訓身障倡議者**作為支持人，必要時提供**法律代理** | 官方原話：supports are **free of charge**。National Legal Aid：2026–27 起兩年 **1,470 萬澳幣** 續撥 https://nationallegalaid.org.au/news/fed-budget-202627-ndis | 高。這是申訴階段的免費在位者，且剛加碼 |
+| **NexLaw ChronoVault** https://www.nexlaw.ai/au/products/chronovault/ | AI 案件時序表／證據編排，產出 court-ready chronology | 商業付費 | 中，但**面向律師**，不是參與者 |
+
+**EVIDENCE — 制度層面的結構性打擊**
+
+自 2026 年中起，NDIA 改以受訓評估者執行 **I-CAN v6** 半結構式訪談（最長約三小時），
+由**電腦程式**依評估資料計算預算，取代規劃師裁量。
+多個第三方解讀指出，獨立醫療證據**不再是必須被納入考量的項目**，重心轉向功能性描述。
+→ 若屬實，「把醫療報告編排得更好以贏得經費」這個前提本身正在被制度拆掉；
+而即使轉向功能性紀錄，PlanMind 與 MagMindLab 都已宣稱對齊 I-CAN v6。
+
+**NEEDS MANUAL VERIFICATION**：NDIA 官方頁 https://www.ndis.gov.au/news/10927-new-tool-deliver-simpler-pathway-disability-supports
+自動抓取回 **HTTP 403**。上述「獨立醫療證據不再必須被考量」目前只有第三方（plan manager／provider 部落格）
+與參議員 Steele-John 提交的 APH 文件 https://www.aph.gov.au/-/media/Estimates/ca/supp2526/Health_Disability_and_Ageing/15_TabledDoc_SenatorSteeleJohn.pdf 支撐，
+**尚未從官方原文確認，不得當作事實引用**。
+
+**NOT FOUND**
+- MagMindLab 的公司登記／ABN、使用者評價、實際用量（官網僅自述由一位雪梨社工建立）
+- PlanMind 的營運者身分（官網僅聲明「fully independent，與 NDIA、政府、任何 NDIS 服務商無關聯」）
+- DANA 或其 80 個會員倡議組織實際使用哪套軟體做申訴文件編排
+  （查得的只有 NCDA 的 Disability Advocacy Portal，定位是資源庫與系統性倡議資料蒐集，不是文件編排工具）
+
+**剩下的縫隙（評估後認為不值得在 48 小時內押注）**
+
+嚴格說，沒有任何一家在賣「tribunal 階段、帶頁碼的跨文件證據索引」——
+也就是 ↑46 那篇致勝貼文真正用的那招。但這條縫隙同時踩到三個地雷：
+①申訴階段已有政府免費倡議者＋法律代理在位；②往前一步就是提供法律意見（方向 1 自列的第 4 個風險）；
+③付費方問題仍未解（參與者現金吃緊，而 support coordinator 的痛點屬「小組織後台」型，
+依 §4.1 的規律在社群上無法取得佐證）。
+
+**給下一位 agent 的指示**：不要重查本方向。若現場有身障領域的真實提案者出現，
+可把本表當作「已被佔據的格子」清單使用，但起點必須是對方的問題，不是這個構想。
 
 ---
 
