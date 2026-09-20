@@ -1,0 +1,35 @@
+{
+  "project": "AI Social Enterprise Hackathon 2026",
+  "language": "English",
+  "base_branch": "origin/main",
+
+  "worker": {
+    "model": "opus",
+    "checks": [],
+    "test_command": null,
+    "test_slots": 1,
+    "full_check_command": "bash bin/verify.sh",
+    "migrations_dir": null,
+    "run_command": null,
+    "extra_rules": [
+      "Read AGENTS.md and AI_CONTEXT.md before changing anything. The AI operating instructions in AI_CONTEXT.md are binding for this project.",
+      "Separate official requirements, evidence, inference and recommendation. Never claim an interview, validation or test happened without evidence for it.",
+      "Never contact interviewees, organisers or partners.",
+      "Rendered PNG/PDF under work/ is gitignored build output. Regenerate it from work/*.py or work/*.swift instead of committing it."
+    ]
+  },
+
+  "merge_queue": {
+    "worktree_name": "merge-queue",
+    "state_file": "docs/STATUS.md",
+    "targets": []
+  },
+
+  "main_checkout": {
+    "guard": true,
+    "allow_files": [],
+    "allow_prefixes": [".claude/"]
+  },
+
+  "keep_worktrees": []
+}
