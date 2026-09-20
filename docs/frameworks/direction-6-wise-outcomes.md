@@ -1,15 +1,24 @@
 # 框架 — 方向 6：WISE 就業成效申報
 
-競品盤點：**通過**（2026-09-21），且判定**不併入方向 3**。
-詳見 `docs/research-brief-2026-09-21.md` 第 5 節方向 6 末。
+競品盤點已完成（2026-09-21），盤到的東西在下方「競爭態勢與我們必須回答的問題」一節，
+原始紀錄見 `docs/research-brief-2026-09-21.md` 第 5 節方向 6 末。
+（與方向 3 的關係也記在同一處：兩者付費方不同，各自獨立成題。）
 本檔填的是 `docs/superpowers/specs/2026-09-21-direction-frameworks-design.md` 的七格模板。
 
 > ## ⛔ 倫理紅線 —— 這條寫進程式，不只寫在文件
 >
 > **只做彙總。不得對個別受支持員工評分、監控或做工作能力推論。**
 >
-> 骨架在資料結構層強制：個人層級欄位不得出現在輸出，
-> 且彙總群體小於最小規模時必須拒絕輸出（見 `skeleton/core/schema.py`）。
+> **這不是文件裡的承諾，是程式裡的檢查。** EVIDENCE —— 本倉庫的程式碼：
+>
+> - 強制點是 `skeleton/core/schema.py` 的 `check_aggregate()`：
+>   欄位名含個人層級標記（`name`／`employee_id`／`dob`／`email`／`address`／`phone`）
+>   就 `raise AggregationError`；群體人數小於 `MIN_GROUP_SIZE = 5` 同樣 `raise`。
+>   **是拋例外，不是回傳旗標** —— 呼叫端沒有「忽略」這個選項。
+> - `skeleton/directions/d6_outcomes.py` 的 `guard()` 呼叫它，
+>   而 `skeleton/core/pipeline.py` **在呼叫模型之前**就先跑 `guard()`。
+>   違規的資料根本到不了模型。
+> - 回歸測試：`tests/test_aggregation_guard.py`。
 >
 > 這條同時對應 `AI_CONTEXT.md`「Avoid」的
 > 「Automated welfare, medical, crisis, or eligibility decisions」。
@@ -99,7 +108,7 @@
 ⚠️ **誠實的但書**：Outcomes Fund 是 1 億澳幣分 10 年、跨三個領域；
 SEDI 是 900+ 份意向書只選出 56 家。錢是真的，但可觸及的規模不大，被問到要直說。
 
-## 碰撞的一句話答案
+## 競爭態勢與我們必須回答的問題
 
 > **Social Enterprise Australia 在建的是「整個部門有多大、長什麼樣」的統計基礎設施；
 > 我們做的是「這一家 WISE 這一次申報要交什麼」。**
@@ -109,6 +118,24 @@ SEDI 是 900+ 份意向書只選出 56 家。錢是真的，但可觸及的規�
 **那套是為 work-first 的就業服務體系設計的，而聯邦就業服務經費「largely not been available
 to WISEs」——WISE 基本上不在那個體系裡，所以那套服務不到他們。**
 ⚠️ 要預期追問「那為什麼不是 ReadyTech 順手做」，目前沒有已驗證的答案。
+
+### 如果評審問「已經有人做了，為什麼還要做」
+
+**RECOMMENDATION** —— 這是我們選的答法，不是已驗證的事實。誠實版本是三句：
+
+1. **有人做，但做的不是同一格。** ReadyTech 做的是就業服務體系內的成效申報，
+   而 WISE 基本上不在那個體系裡；SEA 的共享資料系統做的是部門層級統計，
+   不是單一 WISE 這一次要交的那份表。EVIDENCE 見上方兩段。
+2. **我們不知道他們會不會補上這一格，而且不打算假裝知道。**
+   「為什麼不是 ReadyTech 順手做」沒有已驗證的答案；
+   SEA 那邊有 peak body、大學與 Minderoo 的多年期支持，資源比我們多。
+   如果他們要做，他們做得到。
+3. **所以我們不靠「沒人做過」站著。** 本場評分是 quality／impact reasoning／viability，
+   **沒有新穎性這一項**。我們主張的是這一格該怎麼做才對：
+   倫理紅線寫進程式（拋例外、擋在模型之前，不是條款）、
+   對映關係存檔可沿用（Outcomes Fund 參數 2026 年初仍在共同設計，申報要求是移動中的標靶）、
+   以及「申報準備工時」這個組織自己量得出來的數字。
+   這三件事就算被大廠做掉，也仍然是該被做對的事。
 
 ## 量化證據缺口 —— 尚未補上
 
