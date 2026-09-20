@@ -1,0 +1,26 @@
+[
+  {
+    "field": "retention_6m",
+    "value": "0.75",
+    "reason": "Retained at 6 months divided by placements.",
+    "confidence": 0.9,
+    "sources": [
+      [
+        "attendance summary",
+        "Q3 aggregate"
+      ]
+    ]
+  },
+  {
+    "field": "hours_growth",
+    "value": "+18%",
+    "reason": "Mean rostered hours, Q1 aggregate to Q3 aggregate.",
+    "confidence": 0.64,
+    "sources": [
+      [
+        "roster summary",
+        "Q1 and Q3 aggregates"
+      ]
+    ]
+  }
+]

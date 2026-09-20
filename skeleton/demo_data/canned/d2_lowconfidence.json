@@ -1,0 +1,14 @@
+[
+  {
+    "field": "destination",
+    "value": "unclear",
+    "reason": "Fabric type cannot be read from the photo and the label is missing.",
+    "confidence": 0.24,
+    "sources": [
+      [
+        "shop route list",
+        "row 7 - textile recycler"
+      ]
+    ]
+  }
+]

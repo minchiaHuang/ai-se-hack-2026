@@ -37,9 +37,14 @@ run_step "shell scripts parse"              check_shell_syntax
 run_step "docs/STATUS.md present"           check_status_doc
 run_step "no tracked file over 5 MB"        check_no_large_tracked_files
 
-# --- Hackathon build checks go here, e.g.
-# run_step "python tests" python3 -m pytest -q
-# run_step "node tests"   npm test --silent
+# --- Hackathon build checks
+check_skeleton_tests() {
+  python3 -m unittest discover -s tests -q
+}
+
+run_step "skeleton tests"                   check_skeleton_tests
+
+# Add further build checks here once the event-day stack is fixed.
 
 if [ "$failed" -ne 0 ]; then
   printf '\nVERIFY: RED\n'

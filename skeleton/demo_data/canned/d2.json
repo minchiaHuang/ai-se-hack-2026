@@ -1,0 +1,26 @@
+[
+  {
+    "field": "destination",
+    "value": "repair",
+    "reason": "Electric kettle, cord intact, scale build-up only. Local repair station takes small appliances on Tuesdays.",
+    "confidence": 0.82,
+    "sources": [
+      [
+        "shop route list",
+        "row 3 - repair station, Tue"
+      ]
+    ]
+  },
+  {
+    "field": "condition",
+    "value": "working, needs clean",
+    "reason": "No visible damage to cord or plug.",
+    "confidence": 0.71,
+    "sources": [
+      [
+        "shop route list",
+        "row 3 - repair station, Tue"
+      ]
+    ]
+  }
+]
