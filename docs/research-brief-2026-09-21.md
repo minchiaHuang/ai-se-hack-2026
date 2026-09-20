@@ -63,6 +63,7 @@
 | **買方端 RFQ→社企供應商媒合** | Social Traders 政府買方入口網站標語已是「Connect with the right social enterprises, identify opportunities, **track outcomes and produce reports**」—— 正是這一整包 |
 | **「把訓練教材變成 AI 語音」** | **ElevenLabs 自己就在賣**（Learning and Development Conversational Agents） |
 | **志工排班** | Rosterfy、Deputy 慈善版、Vollie 已佔據市場 |
+| **食品詐標／食物系統（方向 5）** | 2026-09-21 競品盤點：詐標端的缺口是鑑識檢測與執法權（Source Certain 實驗室、**ACCC 已於 2026-08-07 啟動調查**），不是軟體；食物救助端 Foodbank／OzHarvest／SecondBite 合計佔全澳 **80%+**，OzHarvest 免費配送覆蓋 1,500+ 機構，真瓶頸是供給、冷鏈經費與捐贈稅制；且同型澳洲社企 **Yume Food 已於 2024-11 進入自願管理並清算**。詳表見 §5 方向 5 末 |
 | **租屋權益（方向 4）** | 2026-09-21 競品盤點：Justice Connect《Dear Landlord》免費自助工具（2020 年起逾 **10 萬**名維州租客使用，含 VCAT 準備）、Tenants' Union NSW《Rent Increase Negotiation Kit》內建 Letter Generator（可作仲裁庭佐證）、商業端有 Rent AI 與 Renters Rights AI；付費方已是法定基金且買的是「對租客免費」；**NSW 租客工會已公開警告 AI 做租務建議的風險**。詳表見 §5 方向 4 末 |
 | **NDIS 文件編排（方向 1）** | 2026-09-21 競品盤點：免費端有 PlanMind（免註冊、含 ReAssess 書面陳述產生器）、Novida 範本庫、PWdWA＋Legal Aid WA 內部覆議工具包；付費端 MagMindLab 以 **$89** 販售幾乎等同的「證據對齊＋缺口檢查＋I-CANv6 草擬評分」；申訴階段另有聯邦 **NDIS Appeals Program** 免費倡議者與法律代理（2026–27 起再撥 1,470 萬澳幣）。詳表見 §5 方向 1 末 |
 | **補助核銷（慈善機構版）** | 證據最厚（生產力委員會 2024-05-10 終報、聯邦補助架構 2024-10-01 修訂、ANAO 2025–26、Justice Connect：46% 機構年收 <25 萬），**但服務對象是受補助慈善機構，不是社會企業** —— 主題不符。僅在現場明顯以慈善機構為主時作為備案 |
@@ -117,6 +118,22 @@ X 的主流是「經費失控、詐騙猖獗」（互動量高一個量級）。
 - Inclusion Australia／CSI《ADE Snapshot》
 - NDIA 官方 I-CAN 公告（2026-09-21 自動抓取回 HTTP 403）：
   `https://www.ndis.gov.au/news/10927-new-tool-deliver-simpler-pathway-disability-supports`
+
+---
+
+### 4.6 競品可能是死的 —— 而死的競品是不利證據（2026-09-21 新增）
+
+這一輪競品盤點意外撞到兩具屍體：
+
+- **Amplify Social Impact Online**（方向 3）：CSI 1,200 萬澳幣專案的一部分，**免費**、學術驗證，
+  因「lower than anticipated take-up」關閉
+- **Yume Food Australia**（方向 5）：自我定位社會企業，十年重新分配 1,150 萬公斤食物、
+  客戶含 Mars 與 Unilever，2024 年 11 月進入自願管理並清算
+
+**教訓**：查競品時不能只查「有沒有人在做」，必須查「做的人還活著嗎、為什麼死的」。
+而且——**發現競品已死不等於發現空缺**。在只有 quality／impact reasoning／**viability**
+三項評分標準的場子，一個做得更大更有資源的前人倒了，是對 viability 的直接不利證據。
+要用這種發現，唯一誠實的方式是正面回答「你憑什麼不一樣」，不是把它說成市場機會。
 
 ---
 
@@ -466,7 +483,7 @@ https://www.tenants.org.au/blog/ai-and-tenancy-advice-helpful-tool-or-hidden-ris
 
 ---
 
-### 方向 5 — 食品詐標／食物系統
+### 方向 5 — 食品詐標／食物系統 ✂️ **2026-09-21 競品盤點後淘汰**（判定見本節末）
 
 **問題形狀**：待定。目前只有議題熱度，沒有可操作的營運問題。
 
@@ -485,6 +502,57 @@ https://www.tenants.org.au/blog/ai-and-tenancy-advice-helpful-tool-or-hidden-ris
 2. 若走食物救助：真正瓶頸是**供給**（0.2% 捐出率）不是資訊，
    一張需求熱點地圖回答不了「所以問題解決了嗎」。要想清楚。
 3. 為什麼排最後：熱度最高但可行性最低
+
+**競品盤點結果（2026-09-21 完成）→ 判定：✂️ 清掉（兩條支線都不通）**
+
+規則 4 的競品檢查已執行。兩條支線分開檢查，結論都是不要做。
+
+**支線 A：食品詐標 —— 缺口是實驗室與執法權，不是軟體**
+
+- ABC Four Corners 2026-07-27〈Food fraud investigation reveals the disturbing truth behind the labels〉
+  https://www.abc.net.au/news/2026-07-27/food-fraud-investigation-reveals-truth-behind-labels/106960116
+  委託 **Source Certain** 實驗室做鑑識檢測：**超過 80%** 受測 Leggo's 番茄糊的化學特徵與**中國產**番茄一致；
+  三個薑黃品牌驗出**鉻酸鉛與氧化鐵**；另涉及「籠外蛋」與澳洲海鮮標示
+- **關鍵原話**：食品體系「largely built to protect consumers from **unsafe** food… **not fraud**」；
+  前 NSW 食品局執法人員表示澳洲**不例行檢查食品詐標**
+- **ACCC 已於 2026-08-07 啟動初步調查**，對象包括 Aldi、Coles、Leggo，FSANZ 表態支持
+  https://www.accc.gov.au/about-us/news/media-updates/accc-looking-into-four-corners-food-claims
+
+→ 判定：產地驗證靠的是**同位素與微量元素鑑識**（Source Certain 做的事），不是資訊工具能補的缺口。
+而且**監理機關已經接手**。公民端的空缺在兩個月內被填掉了。
+兩天做一個「揭露標示不實」的軟體，既無法驗證任何事，也會與已在進行的法定調查重疊。
+（呼應原文件已記錄的 ↑512「**Because we're all tired**」——憤怒疲勞加上監理已動作，這題的公民動能只會更低。）
+
+**支線 B：食物救助 —— 在位者佔八成，而瓶頸是供給、物流與稅制**
+
+| 玩家 | 規模 | 狀態 |
+|---|---|---|
+| **OzHarvest** | 自 **2,000+** 家商業據點收運，**免費**直送 **1,500+** 家慈善機構；自有 Food App | 成熟且免費 |
+| **Foodbank ＋ OzHarvest ＋ SecondBite** | 三家合計提供澳洲 **超過 80%** 的食物救助 | 高度集中 |
+
+- **OzHarvest Frontline Report 2026**：每月**超過 74,000 人**被食物支援拒於門外；
+  約三分之一的慈善機構表示需要更多食物；70% 表示過去 12 個月求助人數增加；
+  **若沒有 OzHarvest 的免費配送，43% 的慈善機構必須縮減服務，超過一半將完全無法取貨**
+- **稅制才是槓桿**：目前澳洲**沒有**全國性的捐贈剩食誘因，捐贈與丟棄在稅務上待遇相同，
+  實質上在勸退捐贈
+- 成本衝擊：燃料、柴油、肥料成本飆升與荷莫茲海峽封鎖造成的供應限制，使需求再增 **31%**
+
+→ 判定：證實原文件第 2 點的擔憂。瓶頸是**供給、冷鏈物流經費與稅制**，不是媒合資訊。
+一張需求熱點地圖回答不了「所以問題解決了嗎」，而媒合這一層已由免費且規模化的在位者佔住。
+
+**⚠️ 決定性的一筆：這個領域最像我們的那家澳洲社企已經倒了**
+
+**Yume Food Australia**（2014 年由 Katy Barfield OAM 創辦）——B2B 剩食交易平台，
+**自我定位為社會企業**，企業客戶包括 Mars、Unilever、Kellanova、General Mills，
+曾募得 **200 萬澳幣**。十年成績：重新分配 **1,150 萬公斤**食物、為製造商回收 **3,000 萬澳幣**。
+**2024 年 11 月進入自願管理，其後清算並尋求出售**，媒體記述為「在艱困市場中資金耗盡」。
+https://www.smartcompany.com.au/startupsmart/yume-food-collapses-into-liquidation-decade-of-fighting-food-waste/
+
+→ 與方向 3 的 Amplify 同一個形狀：**不是沒人做過，是做過的人做到這個規模仍然倒了。**
+評審問 viability 時，這是本領域最相關的澳洲先例。
+
+**給下一位 agent**：不要重查本方向。若現場有食物系統提案者，把支線 B 的瓶頸清單
+（供給、冷鏈經費、捐贈稅制）交給對方，那是真問題——但解法是政策與資金，不是我們兩天能做的軟體。
 
 ### 方向 6 — WISE 就業成效申報與 Outcomes Fund
 
