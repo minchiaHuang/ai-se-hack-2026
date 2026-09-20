@@ -116,6 +116,12 @@ X 的主流是「經費失控、詐騙猖獗」（互動量高一個量級）。
 - CSI《State of the Social Economy in Australia》完整 PDF 的百分比細分
 - 維州社會採購框架買方指引 FAQ／Big Build 申報頁
 - Inclusion Australia／CSI《ADE Snapshot》
+- **《Understanding the Impact Costs of Work Integration Social Enterprises》**（CSI Swinburne／
+  Social Enterprise Australia／Westpac Foundation，2023-11-30）——登陸頁無數字，全文在 Google Drive：
+  `https://www.socialenterpriseaustralia.org.au/wise-impact-costs-report`
+  **這份可能直接補上方向 6 的量化缺口，優先開啟**
+- DSS Commonwealth Outcomes Fund 頁（2026-09-21 自動抓取逾時）：
+  `https://www.dss.gov.au/social-impact-investing/commonwealth-outcomes-fund`
 - NDIA 官方 I-CAN 公告（2026-09-21 自動抓取回 HTTP 403）：
   `https://www.ndis.gov.au/news/10927-new-tool-deliver-simpler-pathway-disability-supports`
 
@@ -140,8 +146,10 @@ X 的主流是「經費失控、詐騙猖獗」（互動量高一個量級）。
 ## 5. 六個要研究的方向
 
 依優先序。每個都**必須**做競品盤點與付費方分析。
-**2026-09-21 更新**：方向 1 **淘汰**；方向 2 **通過**（收窄為「店內進貨端分流」，目前領先）；
-方向 3 **降級**（直接競品 Amplify 已因無人採用而關閉）。方向 4–6 尚未做競品盤點。
+**2026-09-21 更新 —— 六個方向的競品盤點全部完成**：
+方向 1 **淘汰**、方向 4 **淘汰**、方向 5 **淘汰**；方向 3 **降級**（直接競品 Amplify 因無人採用而關閉）。
+**通過的只有兩個：方向 2**（收窄為「店內進貨端分流」）**與方向 6**（WISE 成效申報，付費方證據最硬）。
+方向 6 判定為**不併入方向 3**，理由見該節末。
 
 ### 方向 1 — NDIS 文件編排 ✂️ **已於 2026-09-21 競品盤點後淘汰**（理由見本節末）
 
@@ -554,7 +562,7 @@ https://www.smartcompany.com.au/startupsmart/yume-food-collapses-into-liquidatio
 **給下一位 agent**：不要重查本方向。若現場有食物系統提案者，把支線 B 的瓶頸清單
 （供給、冷鏈經費、捐贈稅制）交給對方，那是真問題——但解法是政策與資金，不是我們兩天能做的軟體。
 
-### 方向 6 — WISE 就業成效申報與 Outcomes Fund
+### 方向 6 — WISE 就業成效申報與 Outcomes Fund ✅ **2026-09-21 競品盤點通過**（判定見本節末）
 
 **問題形狀**：WISE（工作整合型社會企業）營運主管，要把僱用受就業障礙者所產生的成效，
 彙整成資助方或 Outcomes Fund 要求的格式。
@@ -597,6 +605,59 @@ https://www.smartcompany.com.au/startupsmart/yume-food-collapses-into-liquidatio
 
 **資料可得性**：無公開的員工層級資料（本應如此，屬隱私敏感）。
 Demo 只能用合成或彙總資料 —— 這是本方向最大的弱點，要先想清楚怎麼誠實呈現。
+
+**競品盤點結果（2026-09-21 完成）→ 判定：✅ 通過，且維持獨立，不併入方向 3**
+
+**先回答重疊問題（原第 1 題）：不要併。**
+理由不是使用者不同（那是原本的假設），而是**付費方的性質完全不同，且只有這邊有錢**：
+方向 3 的付費方要從頭說服，而本方向的付費方是**已撥款、有法定用途的政府資金**，見下。
+方向 3 的工具層剛死（Amplify），本方向的工具層從來沒被填過。合併會讓好的那半被壞的那半拖下水。
+
+**EVIDENCE — 付費方（本輪所有方向中最硬的一組）**
+
+- **Commonwealth Outcomes Fund**：**1 億澳幣**、自 2024–25 年起、最長 10 年，由**社會服務部（DSS）**管理。
+  依成效付款，**直接支付給服務提供者與社會企業**，也透過州與領地政府支付。
+  三個重點領域之一正是「**people facing barriers to employment**」——就是 WISE 的定義族群。
+  各投資組合的參數於 **2026 年初**進行跨轄區共同設計。
+  https://www.dss.gov.au/social-impact-investing/commonwealth-outcomes-fund
+- **SEDI（Social Enterprise Development Initiative）**：2023–24 至 2026–27。
+  Impact Investing Australia 於 2024–2026 執行 **8 輪**競爭型撥款，
+  收到 **900+ 份意向書、400+ 份申請**，選出 **56 家**社企，每家最高 **12 萬澳幣**。
+  ⭐ **補助用途明文包含「evaluation and impact measurement」**——這是政府直接出錢讓社企去買影響力衡量服務。
+  已延長一年，約 **260 萬澳幣**；另有 **294 萬澳幣**的第一民族專責管理方。
+- **顧問市場存在＝付費意願存在**（原第 2 點的論證成立）：SVA Consulting 自 2007 年起完成
+  400+ 專案、服務 200+ 組織。其 **Social Value & SROI 培訓**早鳥價 **2,095 澳幣**
+  （非營利 1,569 澳幣），標準價 2,305 澳幣（非營利 1,727 澳幣）。
+  ⚠️ **SROI 顧問專案本身的收費未公開（NOT FOUND）**，官網只寫「contact consulting team」。
+  培訓價格只能當下限訊號，不得當作專案報價引用。
+
+**EVIDENCE — 競品與碰撞**
+
+| 玩家 | 做什麼 | 對我們的意義 |
+|---|---|---|
+| **ReadyTech《Job Ready》** https://readytech.io/what-we-do/employment-services/products/job-ready/overview | DES 與 Workforce Australia 提供者專用：集中管理成效、**成效申報預測**、**證據文件管理**、個案量管理、就業後支持 | ⚠️ 成效申報這層**在就業服務體系內已被佔住**。但文件既有證據指出聯邦就業服務經費「largely not been available to WISEs」——**WISE 基本上不在那個體系內**，所以 ReadyTech 服務不到他們。**這就是楔子，但也要準備好被問「那為什麼不是 ReadyTech 順手做」** |
+| **Social Enterprise Australia 的「shared data system」** https://www.socialenterpriseaustralia.org.au/news/a-shared-data-system-for-the-sector-etcxr | 與墨爾本大學 Melbourne Social Equity Institute、Social Enterprise World Forum 合作建立部門共享資料系統；Lord Mayor's Charitable Foundation 種子資金、**Minderoo Foundation 多年期支持** | ⚠️ **最大碰撞風險**。peak body 加大學加慈善基金已在建「部門層級」資料基礎設施。差異必須講清楚：他們做**部門統計**，我們做**單一 WISE 的成效申報**。講不清楚就是重複投資 |
+| **NDIS／身障個案管理軟體**（SupportAbility、Lumary、Carelink） | 合規文件、排班、計費 | 文件原本就判定已飽和，**維持不碰**。本輪未發現改變 |
+
+**量化證據缺口：有進展，但還不能宣稱補上**
+
+原文件第 3 點說「找不到任何 WISE 專屬的督導工時、員工流動率或到職成本數字」。
+本輪找到一份**專門在講這件事**的報告：
+**《Understanding the Impact Costs of Work Integration Social Enterprises》**
+CSI Swinburne 研究、Social Enterprise Australia 委託、Westpac Foundation 資助，2023-11-30 發表。
+主題正是 WISE 因「prioritise their social purpose」而比一般企業多負擔的「impact costs」。
+https://www.socialenterpriseaustralia.org.au/wise-impact-costs-report
+⚠️ **登陸頁沒有任何數字**，全文放在 Google Drive。**尚未開啟，因此仍不得引用任何數字。**
+已加入 §4.5 待人工開啟清單。**在讀到全文之前，第 3 點的「有記載但未量化」仍然成立。**
+
+**維持不變的硬性限制**
+- **倫理紅線（原第 4 點）不因本判定而放寬**：只能做彙總，不得做個別受支持員工的評分、監控或能力推論
+- **無公開員工層級資料**（本應如此）：demo 只能用合成或彙總資料，且必須明說是合成的
+- **Outcomes Fund 的參數 2026 年初還在共同設計**——申報要求是移動中的標靶，
+  不要把產品綁死在任何一組尚未定案的指標上
+
+**判定**：本方向是方向 2 之外唯一通過的方向，且付費方證據比方向 2 更硬。
+兩者的取捨在賽事當天決定，判準見第 7 節。
 
 ---
 
