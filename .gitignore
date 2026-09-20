@@ -1,0 +1,34 @@
+# macOS
+.DS_Store
+
+# Office lock/temp files
+~$*
+
+# Machine-local assistant config (never shared)
+CLAUDE.local.md
+.claude/settings.local.json
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Rendered proof output from the docx pipeline — reproducible from work/*.py
+work/render_*/
+work/quicklook_*/
+work/email_update_qa/*/
+*.png
+*.pdf
+
+# Compiled Swift helpers — rebuild from the .swift sources
+work/test_apple_translation
+work/translate_zh_to_ko
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Node
+node_modules/
