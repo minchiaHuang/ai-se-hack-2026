@@ -63,6 +63,7 @@
 | **買方端 RFQ→社企供應商媒合** | Social Traders 政府買方入口網站標語已是「Connect with the right social enterprises, identify opportunities, **track outcomes and produce reports**」—— 正是這一整包 |
 | **「把訓練教材變成 AI 語音」** | **ElevenLabs 自己就在賣**（Learning and Development Conversational Agents） |
 | **志工排班** | Rosterfy、Deputy 慈善版、Vollie 已佔據市場 |
+| **租屋權益（方向 4）** | 2026-09-21 競品盤點：Justice Connect《Dear Landlord》免費自助工具（2020 年起逾 **10 萬**名維州租客使用，含 VCAT 準備）、Tenants' Union NSW《Rent Increase Negotiation Kit》內建 Letter Generator（可作仲裁庭佐證）、商業端有 Rent AI 與 Renters Rights AI；付費方已是法定基金且買的是「對租客免費」；**NSW 租客工會已公開警告 AI 做租務建議的風險**。詳表見 §5 方向 4 末 |
 | **NDIS 文件編排（方向 1）** | 2026-09-21 競品盤點：免費端有 PlanMind（免註冊、含 ReAssess 書面陳述產生器）、Novida 範本庫、PWdWA＋Legal Aid WA 內部覆議工具包；付費端 MagMindLab 以 **$89** 販售幾乎等同的「證據對齊＋缺口檢查＋I-CANv6 草擬評分」；申訴階段另有聯邦 **NDIS Appeals Program** 免費倡議者與法律代理（2026–27 起再撥 1,470 萬澳幣）。詳表見 §5 方向 1 末 |
 | **補助核銷（慈善機構版）** | 證據最厚（生產力委員會 2024-05-10 終報、聯邦補助架構 2024-10-01 修訂、ANAO 2025–26、Justice Connect：46% 機構年收 <25 萬），**但服務對象是受補助慈善機構，不是社會企業** —— 主題不符。僅在現場明顯以慈善機構為主時作為備案 |
 
@@ -406,7 +407,7 @@ measurement tools」並「offer feedback to tool developers」，對 SECNA 會�
 
 ---
 
-### 方向 4 — 租屋權益
+### 方向 4 — 租屋權益 ✂️ **2026-09-21 競品盤點後淘汰**（判定見本節末）
 
 **問題形狀**：租客面對仲介／房東時，需要知道並援引法條才能守住權利。
 
@@ -425,6 +426,43 @@ measurement tools」並「offer feedback to tool developers」，對 SECNA 會�
 2. 競品：各州租客工會（Tenants' Union NSW 等）已提供什麼？是否已數位化？
 3. 法律邊界：提供法條資訊 vs 提供法律意見
 4. 為什麼這比方向 1、2、3 低優先：**不是社企形狀**，且政治風險高
+
+**競品盤點結果（2026-09-21 完成）→ 判定：✂️ 清掉**
+
+規則 4 的競品檢查已執行。這是四個方向裡被佔得最滿的一個：
+免費、成熟、法定經費支撐，而且**租客工會自己已公開對「AI 做租務建議」提出警告**。
+
+**EVIDENCE — 直接競品（皆於 2026-09-21 查證）**
+
+| 產品 | 做什麼 | 狀態 |
+|---|---|---|
+| **Dear Landlord**（Justice Connect Homeless Law） https://apps.justiceconnect.org.au/dear-landlord/ | 免費線上自助工具：協助維州租客了解權利、**草擬給房東的信**（協商分期或減租）、**準備 VCAT 或申請覆審**、找財務與法律協助 | **2020 年上線至今超過 10 萬名租客使用**，由法律慈善機構營運 |
+| **Tenants' Union of NSW《Rent Increase Negotiation Kit》** https://www.tenants.org.au/resource/rink | **Letter Generator**：查詢所在區域租金行情，產出個人化信件與郵遞區號資料摘要，「可用於協商**或作為仲裁庭的佐證**」。資料來自 NSW Fair Trading | 免費，peak body 營運 |
+| **Rent AI** https://www.fluidic.io/rent-ai | 澳洲 iOS＋Android 上架，白話拆解租約、標示風險，**與本地律師事務所合作** | 商業產品，已上線 |
+| **Renters Rights AI** https://www.rentersrights.ai/ | 選州別後就租金調漲、維修、通知、押金對話；自述資料存放澳洲、不用於訓練公開模型 | 商業產品，有免費層 |
+| **TAAS 體系** | NSW 有 15 個綜合型租客建議與倡議服務、4 個原住民專責服務；南澳 RentRight SA 由州政府 4 年 **140 萬澳幣** 支應 | **對租客免費** |
+
+**付費方問題無解（原第 1 題的答案）**
+
+NSW Tenants' Union 的主要經費來自 **NSW Fair Trading 管理的租賃押金委員會利息帳戶**與
+物業服務法定利息帳戶，加上 Legal Aid NSW 的社區法律中心計畫。
+→ 這個領域的付費方**已經是法定基金，而且它買的是「對租客免費」**。
+沒有空間插進一個要收費的產品，而要做免費的就得先解決「誰出錢」——答案已經被佔走了。
+
+**⚠️ 最刺的一筆：peak body 已公開警告 AI 做租務建議**
+
+Tenants' Union of NSW 部落格〈AI & tenancy advice: Helpful tool or hidden risk?〉
+https://www.tenants.org.au/blog/ai-and-tenancy-advice-helpful-tool-or-hidden-risk
+原話大意：LLM 取材自不同來源與時期，回應快，但可能產出**過時、不完整或根本錯誤**的資訊；
+租務案件的結果往往取決於脈絡、證據與親身經歷。
+→ 在一個有社會部門評審的場子提「AI 租客權益助手」，等於直接對上該領域 peak body 的公開立場。
+這不是可以靠 demo 做得好就繞過的風險。
+
+**加上文件原本就記錄的兩點**
+- **不是社企形狀**（原第 4 點）：服務對象是個人租客，不是社會企業
+- **政治第三軌**：X 上此議題與移民政治深度綑綁（已驗證，見上方證據）
+
+**給下一位 agent**：不要重查本方向。若現場有住房領域提案者，上表可當「已被佔據的格子」清單使用。
 
 ---
 
