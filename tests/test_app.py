@@ -1,7 +1,23 @@
 """The demo shell must render every scenario, including the refusals."""
+import os
 import unittest
+from unittest import mock
 
 from skeleton.app import SCENARIOS, render_index, render_result
+
+# extract() goes live when ANTHROPIC_API_KEY is set, and these tests pin the
+# stub's canned answers; without this a developer's key makes them network calls.
+_offline = mock.patch.dict(os.environ)
+
+
+def setUpModule():
+    _offline.start()
+    os.environ.pop("ANTHROPIC_API_KEY", None)
+    os.environ.pop("ELEVENLABS_API_KEY", None)
+
+
+def tearDownModule():
+    _offline.stop()
 
 
 class DemoShell(unittest.TestCase):
@@ -76,6 +92,16 @@ class IntakeEndpoint(unittest.TestCase):
         self.assertEqual(body["qualification_source"]["code"], "MEM31925")
         self.assertEqual(body["qualification_source"]["superseded_code"], "MEM31922")
         self.assertFalse(body["qualification_source"]["reachable"])
+
+
+    def test_the_live_model_answers_only_when_a_key_is_set(self):
+        """With a key the stub becomes the fallback; without one nothing changes."""
+        from skeleton.app import model_for_occupation
+        from skeleton.core.live import LiveModel
+        from skeleton.core.model import StubModel
+        self.assertIsInstance(model_for_occupation("cookery"), StubModel)
+        with mock.patch.dict(os.environ, {"ANTHROPIC_API_KEY": "k"}):
+            self.assertIsInstance(model_for_occupation("cookery"), LiveModel)
 
 
 if __name__ == "__main__":

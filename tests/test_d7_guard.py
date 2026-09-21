@@ -1,4 +1,5 @@
 """Direction 7 red lines, enforced in code before the model is called."""
+import json
 import unittest
 
 from skeleton.directions import d7_credentials as d7
@@ -61,7 +62,28 @@ class Shape(unittest.TestCase):
 
     def test_prepare_sends_exactly_the_transcript_and_the_occupational_frame(self):
         prepared = d7.prepare(payload(label="demo"))
-        self.assertEqual(set(prepared), {"transcript", "candidate_units", "anzsco", "osca"})
+        self.assertEqual(set(prepared),
+                         {"transcript", "candidate_units", "anzsco", "osca", "qualification"})
+
+    def test_prepare_carries_the_seeded_qualification_code_and_title_only(self):
+        """The live model checks a cited qualification against this; the rest of
+        the registry record (status, PDF, packaging) is not the model's business."""
+        prepared = d7.prepare(payload())
+        self.assertEqual(prepared["qualification"],
+                         {"code": "SIT30821", "title": "Certificate III in Commercial Cookery"})
+
+    def test_the_live_model_keeps_a_qualification_prepare_offers(self):
+        """The seam: before prepare() carried it, every qualification was dropped."""
+        from skeleton.core import live
+        item = {"field": "qualification", "value": "SIT30821 Certificate III in Commercial Cookery",
+                "reason": "Both food safety units sit in its core.", "confidence": 0.5,
+                "sources": [["transcript", "t=00:12"]]}
+
+        def answer(url, headers, body):
+            return {"content": [{"type": "text", "text": json.dumps([item])}]}
+
+        model = live.LiveModel(fallback=None, api_key="k", post=answer)
+        self.assertEqual(model.suggest(d7.KEY, d7.prepare(payload())), [item])
 
 
 if __name__ == "__main__":
