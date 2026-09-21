@@ -288,6 +288,138 @@ QLD Social Enterprise Jobs Fund、VIC 設備補助、地方議會小額補助。
 - demo **只能用合成或彙總資料**，且畫面上必須明說是合成的
 - 合成資料要刻意包含一個**群體過小**的切面，好讓失敗路徑 2 能被展示
 
+## 評審三題的答法（Problem Validation 10% ＋ Fit 20% ＋ Usability 15% ＝ 45%）
+
+通則：**主張 → 證據 → 自己先講出弱點**。本場七項標準裡沒有新穎性，
+所以不要花力氣證明「沒人做過」（而且那句話已被推翻）；要證明的是
+**問題是真的、解法對得上、使用者真的用得動**。
+被抓到誇大比承認限制扣更多分——尤其 James Hornitzky 來自 Social Traders，
+White Box 與 Seedkit 他一定知道。**先講，不要等他問。**
+
+### 一、Problem Validation（10%）
+
+**一句話問題陳述（照著講）**：
+
+> A WISE operations lead has rosters, attendance and supervision notes.
+> Every funder wants placements, retention and hours — each in a different format.
+> Nobody is paid to sit between those two things.
+
+**證據，由強到弱：**
+
+1. ⭐ **最硬的一條**：CSI Swinburne《Understanding the Impact Costs of WISE》
+   （SEA 委託、Westpac Foundation 資助，2023）把「為滿足資助方申報需求而做的、
+   比一般組織更細的影響力衡量」**列為一項 Impact Cost**。可直接念的原話（WISE #1）：
+   > "The reporting is different. If you're just producing financial reports,
+   > that's pretty easy but to look at environmental and social outcomes, that does take more."
+
+   **這不是我們說申報有成本，是部門自己的研究把它算成成本。**
+2. **格式多重性是查出來的，不是講出來的**（每一份格式都不一樣，全部同時存在）：
+   Social Traders 認證（200+ 資料點、兩年財報、影響力指標＋社會成本、每 1 或 3 年重認證）、
+   ACNC AIS（每年強制，員工與志工人數必填）、DSS 的 AWP／AWPR（協議 Item E，每欄 ≤300 字）、
+   SEDI（EOI→申請→專家小組）、PBO／WorkFoundations（6／12／18 個月里程碑）
+3. **使用者真的沒有能力做這件事**：Impact Costs 報告樣本 **4–26 FTE、年收入 0.2–4.0 百萬澳幣**。
+   沒有資料團隊
+4. **規模**：Social Traders 認證社企中 53% 以就業／訓練為主要模式＝**294 家**，
+   直接僱用 **14,013 名**受支持員工（Pace 2023）。
+   ⚠️ **不要用 SECNA 的「almost 7,000 家」**，那是倡議估計
+5. **需求在變大不是變小**：1 億澳幣 Outcomes Fund、SEDI 最高 12 萬澳幣明文買影響力衡量、
+   WorkFoundations、EPRI——錢正在往「依成效付款」移動，申報要求只會更多
+
+**我們自己先講的三個限制（照講，不要被問出來）：**
+
+- **我們沒有訪談過任何一家 WISE。** 以上全是桌面研究。
+  （現場若有 WISE 提案者，第一件事就是拿「現場要問的三個問題」去問）
+- **沒有任何澳洲研究量化過「花幾小時申報」。** 我們找過。
+  唯一主題吻合的 Misbauddin (2026) 是孟加拉樣本且只有摘要，**我們不拿它當證據**
+- ⛔ **最重要的一條，一定要自己講**：CSI 的 PBO3 評估發現，參與的社企形容第二年是 **"BAU"**，
+  因為 White Box 這個聚合者幫他們扛掉了行政負擔。
+  **所以「WISE 被申報壓垮」不是普遍成立的。**
+
+  **但這反而讓問題更精確**——照著講：
+  > The burden is real, but conditional. Where an aggregator exists, it is absorbed by people.
+  > White Box does this by hand for 17 enterprises, and 8 in WorkFoundations.
+  > The same evaluation calls that model a "pathway for scaling and replication".
+  > Our question is not whether WISEs are drowning. It is what happens to the
+  > 294 that do not have a White Box.
+
+### 二、Problem–Solution Fit（20%）—— 權重最高，答得最具體
+
+**核心主張**：我們只解一個步驟，而且是成本最高的那一步。
+
+> We do not collect the data. We do not write the grant application.
+> We do one step: turn the records they already keep into the format this funder asks for.
+
+**對位表（照著講，一條問題對一條解法）：**
+
+| 問題的哪一面 | 解法的哪一塊 |
+|---|---|
+| 兩邊對不上（營運紀錄 vs 申報格式） | AI 的唯一任務：**彙總層級的格式對映**。輸出每個申報欄位對應哪些原始欄位、怎麼算、信心值 |
+| 資料根本沒有 | **明確列出無法對映的欄位**——標示空缺，不是編一個數字 |
+| 每年重做一次 | **對映關係存檔可沿用**：第二次的成本低於第一次。⭐ 這才是對上「**週期性**」問題的關鍵 |
+| 申報有法律與資金後果 | **送出前人逐欄確認**，AI 輸出一律是草稿 |
+| 極易滑向監控個別員工 | **倫理紅線寫進程式**，見下 |
+
+**明確不做**（講出來，界線本身就是 fit 的證據）：
+不預測成效、不評估個別員工、不判定資格、不生成沒有資料支撐的數字。
+
+**兩條失敗路徑就是 fit 的證明**（demo 一定要跑）：
+1. **無法對映** → 標示空缺
+2. **群體過小**（某切面只有 3 人）→ **拒絕輸出**
+
+**倫理紅線不是投影片上的承諾，是程式裡的例外**（可以直接指給評審看）：
+- `skeleton/core/schema.py` 的 `check_aggregate()`：欄位含個人層級標記
+  （`name`／`employee_id`／`dob`／`email`／`address`／`phone`）或群體人數
+  `< MIN_GROUP_SIZE = 5` 一律 `raise AggregationError`
+- **是拋例外，不是回傳旗標**——呼叫端沒有「忽略」這個選項
+- `skeleton/core/pipeline.py` **在呼叫模型之前**就先跑 `guard()`，違規資料到不了模型
+- 回歸測試：`tests/test_aggregation_guard.py`
+
+**先發制人的競品回答（不要等被問）：**
+> Three things already exist and we should say so.
+> Sopact and Knack advertise funder-template mapping — but not Australian formats.
+> Seedkit is free and university-hosted — but it has no funder templates at all.
+> White Box does this well — with people, for 17 enterprises.
+> We are not claiming the idea is new. We are claiming this is how it should be built:
+> the ethical limit enforced in code, and the mapping saved so the second report is cheaper.
+
+**接到 Pathway to Sustainability（10%）的橋**：
+SEDI 2026–27 輪最高 **12 萬澳幣**，用途**明文包含 evaluation and impact measurement**，
+且**獲補助者必須建立 Impact Measurement Framework**。
+**存檔的對映關係就是那份 framework 的草稿。**
+→ 付費意願不需要論證，它寫在補助條款裡。
+
+### 三、Usability（15%）
+
+**先界定使用者，再讓每個設計決定都從那裡推出來：**
+
+> The user is the operations lead of an organisation with between 4 and 26 staff
+> and revenue between $200,000 and $4 million. There is no data team.
+> Every design decision follows from that one fact.
+
+| 設計決定 | 從哪個證據推出來 |
+|---|---|
+| **沒有導入專案、沒有資料遷移**：輸入是他們已經有的彙總匯出檔 | 4–26 FTE 撐不起導入期 |
+| **每欄輸出 ≤300 字** | DSS 的 AWP／AWPR 範本明訂建議 |
+| **每個欄位都顯示來源與算式** | 人本來就要逐欄複核，把複核時間壓到幾秒 |
+| **零外部套件、單次模型呼叫** | 小機構維運得了；同時是 demo 的離線備援 |
+| **紅線觸發時用白話解釋**（「群體過小，無法在不可識別個人的前提下彙總」） | 拒絕如果無法理解，使用者只會去找方法繞過 |
+
+⭐ **最能說服人的一句 usability 論證，是拿 Amplify 當設計約束而不是當競品：**
+> Amplify Social Impact Online was free, academically backed, part of a $12 million
+> programme — and it closed for lower than anticipated take-up.
+> Free and correct is not enough. That is why we refuse to ask the user to adopt a new
+> system, migrate data, or learn a framework before they get their first output.
+
+**我們自己先講的三個 usability 風險：**
+- **沒有做過使用者測試。** demo 用的是合成資料，畫面上會明說是合成的
+- **目標格式庫要一份一份建。** 今天只做一份（Social Traders 認證）
+- **如果組織連彙總紀錄都沒有**，第一步不是 AI，是一張紙上的對映表——
+  框架第 3 節第 4 步本來就寫了「這一步不需要 AI」
+
+**Ramana Kirubagaran（AI 治理）會問「AI 答錯會怎樣」**，可引用：
+臨床語音轉文字錯誤率 7.4%、其中 5.7% 具臨床顯著性，但**人工複核後降到 0.3%**
+（JAMA Network Open）→ **人審是設計的一部分，不是補丁。**
+
 ## 現場要問提案者的三個問題
 
 1. 這次申報要交哪幾個數字？是誰規定的格式？
