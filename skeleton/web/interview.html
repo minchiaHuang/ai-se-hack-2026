@@ -69,6 +69,16 @@ button:disabled { background: #d1d5db; border-color: #9ca3af; color: #333; curso
 .start h2 { color: var(--primary); }
 .consent { display: flex; gap: .55rem; align-items: flex-start; margin: 1rem 0; cursor: pointer; }
 .consent input { width: 22px; height: 22px; flex: none; margin-top: .15rem; accent-color: var(--primary); }
+.phone { margin-top: 1.5rem; padding-top: 1.2rem; border-top: 1px solid var(--line); }
+.phone h3 { color: var(--primary); margin: 0 0 .3rem; font-size: 1rem; }
+.phone-row { display: flex; gap: .6rem; flex-wrap: wrap; }
+.phone-row label { flex-basis: 100%; font-size: .85rem; }
+.phone-row input { flex: 1 1 12rem; min-height: 44px; padding: 0 .7rem; font: inherit;
+                   border: 2px solid var(--line); border-radius: 6px; }
+.turns { list-style: none; padding: 0; margin: 1rem 0; max-height: 50vh; overflow-y: auto; }
+.turns li { margin: .4rem 0; padding: .5rem .7rem; border-radius: 8px; background: var(--panel); }
+.turns li.agent { background: var(--bg); color: var(--muted); }
+.turns .who { display: block; font-size: .75rem; font-weight: 700; color: var(--accent); }
 
 /* Figma: "Current Question" in accent, then the question in primary, English on
    the left and Mandarin right-aligned on the right, both the same size and weight. */
@@ -167,6 +177,24 @@ button:disabled { background: #d1d5db; border-color: #9ca3af; color: #333; curso
       <span>The jobseeker agrees that their answers are recorded, transcribed by a speech service and translated into English.</span>
     </label>
     <button id="begin" class="go" disabled>Start the interview</button>
+
+    <div class="phone">
+      <h3>Or: an AI interviewer phones the jobseeker</h3>
+      <p class="muted">It asks the same seven questions in Mandarin. When the call ends, the answers come back here,
+        sorted by question, for you to check on the next page.</p>
+      <div class="phone-row">
+        <label for="phone-number" class="muted">Phone number, international format</label>
+        <input id="phone-number" type="tel" placeholder="+61400000000" autocomplete="off">
+        <button id="call" class="secondary" disabled>Call</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="call-panel" class="start" hidden>
+    <h2>Phone interview</h2>
+    <p id="call-status" class="muted" aria-live="polite"></p>
+    <ol id="call-turns" class="turns" lang="zh-Hans"></ol>
+    <button id="call-review" class="go" hidden>Review the answers &rarr;</button>
   </section>
 
   <section id="interview" hidden>
@@ -466,6 +494,96 @@ async function toggleRecord() {
   render();
 }
 
+// ---------------------------------------------------------------- phone call
+// The call runs at ElevenLabs; this page only polls its transcript. The poll is
+// slow on purpose: a turn takes several seconds to say anyway.
+const CALL_POLL_MS = 3000;
+const CALL_STATUS = { "initiated": "Ringing…", "in-progress": "On the call. What is said appears below.",
+                      "processing": "The call has ended. Sorting the answers…" };
+
+function showTurns(turns) {
+  const list = $("call-turns");
+  list.replaceChildren(...turns.map(turn => {
+    const item = document.createElement("li");
+    item.className = turn.role === "agent" ? "agent" : "user";
+    const who = document.createElement("span");
+    who.className = "who";
+    who.textContent = turn.role === "agent" ? "AI interviewer" : "Jobseeker";
+    item.append(who, turn.text);
+    return item;
+  }));
+  list.scrollTop = list.scrollHeight;
+}
+
+function callFinished(answers) {
+  state.answers = answers;
+  $("call-status").textContent = "The call has ended. Check the transcript, then review the answers.";
+  $("call-review").hidden = false;
+}
+
+function mockCall() {
+  const turns = [];
+  FIXTURE_QUESTIONS.questions.forEach((question, n) => {
+    turns.push({ role: "agent", text: question.zh }, { role: "user", text: MOCK_ANSWERS[n].answer_zh });
+  });
+  let shown = 0;
+  $("call-status").textContent = CALL_STATUS["in-progress"];
+  state.mockTimer = setInterval(() => {
+    shown += 1;
+    showTurns(turns.slice(0, shown));
+    if (shown < turns.length) return;
+    clearInterval(state.mockTimer);
+    callFinished(FIXTURE_QUESTIONS.questions.map((question, n) => ({
+      id: question.id, section: question.section, question_en: question.en, question_zh: question.zh,
+      answer_zh: MOCK_ANSWERS[n].answer_zh, answer_en: MOCK_ANSWERS[n].answer_en,
+    })));
+  }, 800);
+}
+
+async function pollCall(conversationId) {
+  let body;
+  try {
+    const response = await fetch("/api/call/result?id=" + encodeURIComponent(conversationId));
+    if (!response.ok) throw new Error("the call answered HTTP " + response.status);
+    body = await response.json();
+  } catch (err) {
+    // One missed poll is venue wifi, not a failed call: try again.
+    $("call-status").textContent = "Could not reach the call (" + err.message + "). Trying again…";
+    return setTimeout(() => pollCall(conversationId), CALL_POLL_MS);
+  }
+  if (body.turns) showTurns(body.turns);
+  if (body.status === "failed") return showError("The call failed. Check the number and try again.");
+  if (!body.done) {
+    $("call-status").textContent = CALL_STATUS[body.status] || unanswered(body) || "Waiting for the call…";
+    return setTimeout(() => pollCall(conversationId), CALL_POLL_MS);
+  }
+  if (body.offline) addOffline(body.reason);
+  if (body.unplaced && body.unplaced.length) {
+    addOffline(body.unplaced.length + " answer(s) did not fit a question and are only in the transcript above.");
+  }
+  callFinished(body.answers);
+}
+
+async function startCall() {
+  const to = $("phone-number").value.trim();
+  if (!state.consent || !to) return;
+  showError("");
+  clearOffline();
+  $("start").hidden = true;
+  $("call-panel").hidden = false;
+  $("call-status").textContent = "Calling " + to + "…";
+  if (MOCK) return mockCall();
+  try {
+    const body = await (await postJson("/api/call/start", { to })).json();
+    if (body.offline) throw new Error(body.reason);
+    pollCall(body.conversation_id);
+  } catch (err) {
+    showError("The call was not placed: " + err.message);
+    $("call-panel").hidden = true;
+    $("start").hidden = false;
+  }
+}
+
 // ---------------------------------------------------------------- moving on
 function showQuestion() {
   const question = current();
@@ -496,6 +614,10 @@ function next() {
     state.index += 1;
     return showQuestion();
   }
+  handOver();
+}
+
+function handOver() {
   try {
     const handed = { language: LANGUAGE, answers: state.answers };
     const person = readPerson();
@@ -526,6 +648,7 @@ function render() {
   const question = current();
   $("progress").textContent = $("interview").hidden || !total ? "" : "Question " + (state.index + 1) + " of " + total;
   $("begin").disabled = !state.consent;
+  $("call").disabled = !state.consent;
 
   const voice = $("voice");
   voice.classList.toggle("speaking", state.speaking && !recording);
@@ -558,6 +681,8 @@ $("begin").addEventListener("click", () => {
 $("play").addEventListener("click", speak);
 $("record").addEventListener("click", toggleRecord);
 $("next").addEventListener("click", next);
+$("call").addEventListener("click", startCall);
+$("call-review").addEventListener("click", handOver);
 
 loadQuestions().then(questions => {
   state.questions = questions;
