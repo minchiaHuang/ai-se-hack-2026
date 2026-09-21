@@ -908,6 +908,70 @@ PBO／WorkFoundations 里程碑 ＋ EPRI ＋ 各州社會採購申報。**每一
 4. **一個立刻可用的產品約束**：DSS 的 AWP／AWPR 範本每欄建議 **300 字以內**
 5. **唯一不可被複製的差異**：倫理紅線寫進程式。其餘兩條（澳洲格式、小組織價位）都只是時間問題
 
+---
+
+### 第四輪研究（2026-09-21 深夜）—— 「用 AI 幫填資料」這條線，有人做了
+
+**觸發**：團隊把目標講成「用 AI 幫填資料」。第三輪盤的是「影響力衡量平台」，
+**那是另一條產品線**，會漏掉整個 AI 表單自動填寫市場。本輪補上。
+
+**⚠️ 結論先講**：如果我們把自己定位成「AI 幫填補助表單」，
+**這一格是滿的，而且澳洲已經有一個、就長在澳洲撥款方在用的那個平台家族裡。**
+
+#### A. 直接對打的產品
+
+| 產品 | 做什麼 | 對我們的意義 |
+|---|---|---|
+| ⛔ **Drafter**（The Funding Centre，SmartyGrants 的姊妹單位，同屬 Our Community） https://www.smartygrants.com.au/articles/artificial-intelligence-powers-grant-writing-tool-for-nfps | **2025-10 上線，澳洲**。輸入組織／專案／目標補助的資料，**生成符合資助方指引與字數上限的草擬回答**，且**組織與專案資訊可在未來的申請中重複使用**。內嵌在 Funding Centre 平台（訂閱制） | **最危險的一個**。澳洲、在地、already shipped，而且和澳紐使用率最高的撥款系統 SmartyGrants 同一家。**他們握有通路** |
+| **Grantyd** https://www.prnewswire.com/news-releases/grantyd-launches-as-first-ever-autofill-platform-for-grant-applications-302443629.html | **contextual autofill engine（專利申請中）**：瀏覽器外掛把線上入口的申請題目抓進平台 → AI 草擬 → **一鍵填回原本的申請表**。免費層／AI 層 **US$20 月**／協作層 **US$45 月** | 「AI 幫填表單」這件事**已經被做成產品並訂價了**，而且很便宜 |
+| **Grantable** | 把 RFP 變成檢查清單，**從你的內容庫與過去得標的申請書**逐段草擬 | 同型 |
+| **Loopio／Responsive（原 RFPIO）** | 企業級對照組：內容庫＋AI **自動回答最多約 80%** 的題目，同一套也做 DDQ 與資安問卷 | 證明這個模式在企業市場已經成熟十年 |
+| **Instafill.ai／Happycapy** | 通用 AI 表單填寫。Instafill 有**澳洲商業表單與 ATO 表單**分類；Happycapy 用真實瀏覽器登入政府入口網站**填答並送出** | 連「登入政府網站幫你填」都有人做了 |
+
+**可引用的工時數字（⚠️ 廠商來源，不是研究）**：
+「average mid-sized grant takes **25–30 hours** to complete」，Grantyd 宣稱可減少最多 **60%**。
+**這是我們目前唯一的申報工時數字**，但它出自廠商新聞稿，**引用時必須講明出處性質**。
+（第三輪已確認：找不到任何澳洲研究量化過這件事。）
+
+#### B. ⭐ 唯一還站得住的區分：**文字題 vs 數字題**
+
+上述**每一個**產品填的都是**文字**：從內容庫、過去的申請書、組織文件裡，
+把散文式的回答重複利用（"describe your project"、"what outcomes will you achieve"）。
+
+**沒有任何一個宣稱：從營運紀錄算出一個數字，並附上算式與來源。**
+
+> 「留任率 = 第 6 個月仍在職 14 人 ÷ 安置 22 人 = 64%，來源：出勤彙總，信心 0.9」
+>
+> 這一句，內容庫做不出來。去年的散文裡沒有今年的分母。
+
+**這就是方向 6 剩下的那一格**，而且它剛好對上 WISE 的實際處境：
+資助方要的是**安置數、留任率、工時**——全是數字，不是文字。
+
+⚠️ **誠實的三個限制**：
+1. **Sopact** 是唯一逼近的：自述會「clean IDs、code qualitative text、standardize reporting」
+   並對映到資助方範本——那是資料側，比其他家更靠近數字。**但仍未查到它宣稱做推導與算式**
+2. 我們**用「AI 從專案資料算出成效指標供申報」搜尋，沒找到任何產品**。
+   ⚠️ **搜尋沒找到 ≠ 不存在**，不得宣稱「沒有人做」
+3. 這一格很窄，**任何一家補上「算數字」都會蓋掉我們**。
+   我們不靠這個站著（本場沒有新穎性評分），只用它來說明我們在哪一格
+
+#### C. 對定位的直接影響（會改 pitch 的措辭）
+
+**不要說**（這樣說等於自願跳進 Drafter 與 Grantyd 的格子）：
+> "We use AI to help fill in grant applications."
+
+**要說**：
+> "We do not fill in the words. Tools already do that — Drafter in Australia,
+> Grantyd in the US. We compute the numbers. Placements, retention, hours —
+> derived from the records the enterprise already keeps, with the formula and the
+> source shown beside every figure, and a refusal when the group is too small."
+
+**被問到 Drafter 時的答法**：
+> Drafter is good and it is Australian and it ships. It reuses organisational and
+> project information across applications. That is the narrative half of the form.
+> The other half is the table of numbers, and that half cannot be reused —
+> the denominator changes every year.
+
 **維持不變的硬性限制**
 - **倫理紅線（原第 4 點）不因本判定而放寬**：只能做彙總，不得做個別受支持員工的評分、監控或能力推論
 - **無公開員工層級資料**（本應如此）：demo 只能用合成或彙總資料，且必須明說是合成的

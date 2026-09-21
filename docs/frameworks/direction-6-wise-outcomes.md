@@ -246,6 +246,62 @@ that does take more.」）——**這是目前最硬的一句「申報工作本�
 ⚠️ 商業 SaaS 那一列多數描述來自各家自家或競品比較行銷內容（尤其 sopact.com 的「比較」頁面
 是 Sopact 自己寫的），**屬廠商宣稱，未經獨立驗證**。被追問時要講明這一點。
 
+## ⛔ 「AI 幫填資料」這句話不能講 —— 那一格是滿的
+
+2026-09-21 深夜補查。如果把目標講成「用 AI 幫填補助表單」，我們就跳進了一個已經有人的格子：
+
+| 產品 | 關鍵事實 |
+|---|---|
+| ⛔ **Drafter**（The Funding Centre／Our Community，**SmartyGrants 的姊妹單位**） | **2025-10 上線，澳洲**。生成符合資助方指引與**字數上限**的草擬回答，組織與專案資訊**可在未來申請中重複使用**。**他們握有澳紐撥款系統的通路** |
+| **Grantyd** | 瀏覽器外掛抓題目 → AI 草擬 → **一鍵填回原申請表**（專利申請中）。**US$20／月** |
+| **Grantable** | 從內容庫與過去得標申請書逐段草擬 |
+| **Loopio／Responsive** | 企業級：內容庫 AI **自動回答最多約 80%** 的題目 |
+| **Instafill.ai／Happycapy** | 通用 AI 填表，含**澳洲商業與 ATO 表單**；Happycapy 用真實瀏覽器登入政府網站填答送出 |
+
+⚠️ 唯一的工時數字：「average mid-sized grant takes **25–30 hours**」（Grantyd 新聞稿，
+**廠商來源不是研究**，引用要講明）。
+
+### ⭐ 唯一還站得住的區分：文字題 vs 數字題
+
+上面每一個填的都是**文字**——從內容庫與過去的申請書重複利用散文。
+**沒有一個宣稱從營運紀錄算出數字並附上算式與來源。**
+
+> 「留任率 = 第 6 個月仍在職 14 人 ÷ 安置 22 人 = 64%，來源：出勤彙總，信心 0.9」
+>
+> **內容庫做不出這一句。去年的散文裡沒有今年的分母。**
+
+而資助方向 WISE 要的**安置數、留任率、工時全是數字**。
+
+### 照著講的兩段
+
+**不要說**：
+> "We use AI to help fill in grant applications."
+
+**要說**：
+> "We do not fill in the words. Tools already do that — Drafter in Australia,
+> Grantyd in the US. We compute the numbers. Placements, retention, hours —
+> derived from the records the enterprise already keeps, with the formula and the
+> source shown beside every figure, and a refusal when the group is too small."
+
+中文：我們不填文字。已經有工具在做那件事——澳洲的 Drafter、美國的 Grantyd。
+**我們算數字。** 安置數、留任率、工時——從這家社企本來就在記的紀錄推導出來，
+**每一個數字旁邊都附上算式與來源**，而當群體太小的時候就拒絕輸出。
+
+**被問到 Drafter 時**：
+> Drafter is good and it is Australian and it ships. It reuses organisational and
+> project information across applications. That is the narrative half of the form.
+> The other half is the table of numbers, and that half cannot be reused —
+> the denominator changes every year.
+
+中文：Drafter 很好，是澳洲的，而且已經上線了。它讓組織與專案資訊跨申請重複使用，
+那是表單裡**敘述的那一半**。另一半是**數字的那張表**，而那一半無法重複使用
+——**分母每年都在變。**
+
+⚠️ 三個誠實限制：(a) **Sopact** 是唯一逼近的（自述做資料清洗與對映到資助方範本），
+但未查到它宣稱做推導與算式；(b) 我們搜尋「AI 從專案資料算出成效指標供申報」沒找到產品，
+但**搜尋沒找到 ≠ 不存在**，不得宣稱「沒有人做」；
+(c) 這一格很窄，任何一家補上「算數字」都會蓋掉我們——**我們不靠這個站著**。
+
 ## 申報格式清單 —— demo 要對映的目標就從這裡挑
 
 ⭐ **首選：Social Traders 認證／重新認證**（強制、週期性、格式穩定）
