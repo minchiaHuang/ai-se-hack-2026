@@ -51,6 +51,8 @@ HOME_PAGE = WEB / "home.html"
 START_PAGE = WEB / "start.html"
 PATH_PAGE = WEB / "path.html"
 LOGO = WEB / "logo.svg"
+# The homepage photos (Unsplash License), served by name from this folder only.
+PHOTOS = {f.name: f for f in (WEB / "img").glob("*.jpg")}
 # The Figma resume template, drawn the same way on /review and /jobs.
 RESUME_CSS = WEB / "resume-template.css"
 RESUME_JS = WEB / "resume-template.js"
@@ -403,6 +405,8 @@ class Handler(BaseHTTPRequestHandler):
             return self._send(200, "text/html; charset=utf-8", PATH_PAGE.read_bytes())
         if parsed.path == "/logo.svg":
             return self._send(200, "image/svg+xml", LOGO.read_bytes())
+        if parsed.path.startswith("/img/") and parsed.path[5:] in PHOTOS:
+            return self._send(200, "image/jpeg", PHOTOS[parsed.path[5:]].read_bytes())
         if parsed.path == "/resume-template.css":
             return self._send(200, "text/css; charset=utf-8", RESUME_CSS.read_bytes())
         if parsed.path == "/resume-template.js":

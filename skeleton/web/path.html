@@ -27,24 +27,27 @@ body {
 [hidden] { display: none !important; }
 
 .brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; }
-.brand img { width: 83px; height: 76px; }
-.wordmark { font-size: 40px; line-height: 1; letter-spacing: -.01em; white-space: nowrap; }
+.brand img { width: 55px; height: 50px; }
+.wordmark { font-size: 28px; line-height: 1; letter-spacing: -.01em; white-space: nowrap; }
 .wordmark b { color: #000; font-weight: 700; }
 .wordmark span {
   font-weight: 300; margin-left: 4px; color: #1f7f9c;
   background: linear-gradient(#2bcdff, #1b4b5a); -webkit-background-clip: text; background-clip: text;
   -webkit-text-fill-color: transparent;
 }
-header.top { height: 122px; padding: 0 43px; display: flex; align-items: center; background: var(--card); }
+header.top {
+  height: 80px; padding: 0 40px; display: flex; align-items: center;
+  background: var(--card); border-bottom: 1px solid var(--line);
+}
 
-.banner { margin: 0; padding: .5rem 43px; background: var(--card); border: 2px dashed var(--line); }
 
 main { padding: 90px 24px 72px; text-align: center; }
 h1 { color: var(--primary); font-size: 30px; font-weight: 700; margin: 0 0 8px; }
 .sub { color: var(--muted); font-weight: 600; margin: 0 0 44px; }
 .cards { display: grid; grid-template-columns: repeat(2, minmax(0, 479px)); gap: 51px; justify-content: center; text-align: left; }
 .card { background: var(--card); border-radius: 20px; padding: 36px 40px; min-height: 376px; display: flex; flex-direction: column; }
-.icon { width: 63px; height: 54px; border-radius: 5px; background: var(--bg); display: grid; place-items: center; font-size: 30px; }
+.icon { width: 56px; height: 56px; border-radius: 14px; background: var(--bg); display: grid; place-items: center; color: var(--primary); }
+.icon svg { width: 28px; height: 28px; }
 .card h2 { font-size: 20px; color: #000; margin: 28px 0 16px; }
 .card p { color: var(--muted); font-weight: 500; margin: 0; }
 .card p.best { margin: auto 0 16px; padding-top: 24px; }
@@ -56,10 +59,9 @@ h1 { color: var(--primary); font-size: 30px; font-weight: 700; margin: 0 0 8px; 
 .back:hover, .back:focus-visible { text-decoration: underline; }
 
 @media (max-width: 760px) {
-  header.top { height: 76px; padding: 0 16px; }
-  .brand img { width: 55px; height: 50px; }
-  .wordmark { font-size: 28px; }
-  .banner { padding: .5rem 16px; }
+  header.top { height: 68px; padding: 0 16px; }
+  .brand img { width: 44px; height: 40px; }
+  .wordmark { font-size: 24px; }
   main { padding: 40px 16px 56px; }
   h1 { font-size: 26px; }
   .sub { margin-bottom: 28px; }
@@ -72,21 +74,28 @@ h1 { color: var(--primary); font-size: 30px; font-weight: 700; margin: 0 0 8px; 
 <header class="top">
   <a class="brand" href="/" data-route><img src="/logo.svg" alt=""><span class="wordmark"><b>Bridge</b><span>Work</span></span></a>
 </header>
-<p id="mock-banner" class="banner" hidden>Mock mode: fixture data for a fictional cook, no backend. Nothing is recorded or sent.</p>
 
 <main>
   <h1>How would you like to build this Resume?</h1>
   <p class="sub">Pick based on what the client already has. You can switch later if needed.</p>
   <div class="cards">
     <section class="card">
-      <div class="icon" aria-hidden="true">🎙️</div>
+      <div class="icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="9" y="2.5" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0"/><path d="M12 17.5V21"/><path d="M8.5 21h7"/>
+        </svg>
+      </div>
       <h2>Voice Interview</h2>
       <p>Client has no resume and may not read or write in English. They speak in their own language — AI listens and fills the resume template live while you watch.</p>
       <p class="best">Best for: no formal work history, low literacy</p>
       <a class="button" href="/interview" data-route>Select This →</a>
     </section>
     <section class="card">
-      <div class="icon" aria-hidden="true">📄</div>
+      <div class="icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2.75H7a1.5 1.5 0 0 0-1.5 1.5v15.5a1.5 1.5 0 0 0 1.5 1.5h10a1.5 1.5 0 0 0 1.5-1.5V7.25z"/><path d="M14 2.75v4.5h4.5"/><path d="M9 12.5h6"/><path d="M9 16h6"/>
+        </svg>
+      </div>
       <h2>Upload Existing Resume</h2>
       <p>Client already has a resume, in any language or format. Translate it, polish the wording, and clean up the layout automatically.</p>
       <p class="best">Best for: has a resume, even rough or non-English</p>
@@ -101,10 +110,8 @@ const params = new URLSearchParams(location.search);
 const MOCK = params.get("mock") === "1";
 const carried = new URLSearchParams();
 if (MOCK) carried.set("mock", "1");
-if (MOCK && params.get("quiet") === "1") carried.set("quiet", "1");
 const suffix = carried.toString() ? "?" + carried : "";
 document.querySelectorAll("a[data-route]").forEach(a => { a.href = a.getAttribute("href") + suffix; });
-document.getElementById("mock-banner").hidden = !MOCK || params.get("quiet") === "1";
 </script>
 </body>
 </html>

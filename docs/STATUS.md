@@ -23,11 +23,12 @@ with no network at all.
 
 ## Last verification
 
-2026-09-22: `bash bin/verify.sh` → GREEN, 327 tests.
+2026-09-22: `bash bin/verify.sh` → GREEN, 330 tests.
 
 ## What is built
 
-- `/` → `/start` → `/start/path`: the caseworker's entry, then two ways in.
+- `/` → `/start` → `/start/path`: a photo-led homepage, the caseworker's entry, then two ways
+  in. The photos are Unsplash stock: the people are models, not refugees.
 - `/interview`: the fixed questions read aloud in Mandarin, answers recorded and
   transcribed, or an ElevenLabs AI interviewer the jobseeker talks to on their
   own phone; the transcript is sorted into the questions, Mandarin verbatim.

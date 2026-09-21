@@ -21,7 +21,10 @@ bash bin/verify.sh            # the full check: VERIFY: GREEN or RED
 ```
 
 Python 3 standard library only: nothing to install, no build step, no database. Add
-`?mock=1` to any page to run the whole flow against fixtures with no network at all.
+`?mock=1` to any page to run the whole flow against fixtures with no network at all. No page
+says so on screen, and the homepage's **Live demo** button opens the flow this way, so it reads
+as the product: nothing is recorded or sent, the client is fictional, and an application is
+never actually submitted — say this when demoing.
 
 Optional keys, each one adding a live step: `ANTHROPIC_API_KEY` (mapping, translation, resume
 drafting), `ELEVENLABS_API_KEY` (speech to text, the spoken questions, the phone interviewer).
@@ -65,6 +68,9 @@ confirms it. Applying is simulated, and the page says so.
 - **Mandarin is the validated demo language.** Arabic is configured but has not been checked with a
   native speaker, so we do not claim it. We claim no accuracy figure for Chinese speech to text.
 - **The demo transcripts are fictional**, written with AI help.
+- **The homepage photos are stock images** (Unsplash License, copied into
+  `skeleton/web/img/`). The people in them are models, not refugees, and the skills labelled
+  on them are illustrative.
 - **The job ads are real; the mapping is a model's reading of a short teaser**, checked only in that
   the quote must appear verbatim in the ad. No employer has confirmed any of it.
 

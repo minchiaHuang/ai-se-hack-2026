@@ -49,11 +49,11 @@ class Links(unittest.TestCase):
     def test_upload_goes_back_to_choosing_a_path(self):
         self.assertIn("/start/path", ROUTE.findall(page("upload")))
 
-    def test_every_hand_over_carries_the_quiet_flag(self):
-        # A recorded demo opened with ?quiet=1 must not show a mock banner later on.
+    def test_every_hand_over_carries_the_mock_flag(self):
+        # A demo opened with ?mock=1 must stay in mock mode on the next page.
         for name in FLAGGED:
             with self.subTest(page=name):
-                self.assertRegex(page(name), r'"quiet=1"|\.set\("quiet"')
+                self.assertRegex(page(name), r'"mock=1"|\.set\("mock"')
 
 
 if __name__ == "__main__":

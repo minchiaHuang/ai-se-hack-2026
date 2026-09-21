@@ -141,7 +141,6 @@ input[type=radio], input[type=checkbox] { width: 26px; height: 26px; accent-colo
   <header>
     <h1>Bridge Work intake</h1>
     <p class="muted">A consultant and a jobseeker, one screen. Work experience nobody can verify, whether spoken or written down, mapped to Australian occupations and units; every item points back to the line it came from.</p>
-    <p id="mock-banner" class="banner mock" hidden>Mock mode: fixture data, no backend. Nothing is recorded or sent.</p>
   </header>
 
   <section id="refusal" class="refusal" role="alert" hidden>
@@ -976,7 +975,6 @@ function render() {
 }
 
 // ---------------------------------------------------------------- wiring
-$("mock-banner").hidden = !MOCK;
 $("occupation-label").textContent = OCCUPATION_LABEL;
 $("langs").addEventListener("change", event => chooseLanguage(event.target.value));
 $("rlang").addEventListener("change", event => chooseLanguage(event.target.value));
