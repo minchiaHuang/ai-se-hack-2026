@@ -30,6 +30,9 @@
   --gate-bg: #efe9fb;
   --hit: #fff1a8;
   --focus: #ffbf00;
+  /* Save and apply only. Ink text on both: white on either fails contrast. */
+  --apply: #E8874A;
+  --applied: #4C9A6B;
 }
 * { box-sizing: border-box; }
 html { font-size: 17px; }
@@ -167,6 +170,27 @@ svg.i { flex: none; width: 1.05em; height: 1.05em; }
 .resume-doc li.req { border-left: 4px solid var(--accent); }
 .resume-doc .to-add { margin-top: .9rem; font-style: italic; }
 .status { min-height: 1.3rem; font-weight: 600; }
+
+/* Save and apply. Recorded in this tab only; see APPLY_KEY in the script. */
+.marks { display: flex; flex-wrap: wrap; gap: .5rem; margin-left: auto; }
+.marks button, .job-actions button, .apply-buttons button { min-height: 40px; padding: .3rem .9rem; border-radius: 999px;
+                                                            font-weight: 700; cursor: pointer; }
+.marks button { border: 2px solid var(--line); background: var(--card); }
+.marks button[aria-pressed=true] { border-color: var(--ink); background: var(--pill); }
+.job-actions { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .6rem; }
+button.save { border: 2px solid var(--line); background: var(--card); }
+button.save[aria-pressed=true] { border-color: var(--apply); }
+button.save .star { color: var(--apply); }
+button.apply { border: 2px solid var(--apply); background: var(--apply); color: var(--ink); }
+button.applied { border: 2px solid var(--applied); background: var(--applied); color: var(--ink); cursor: default; }
+.apply-panel { margin-bottom: 1rem; padding: .8rem 1rem; border: 3px solid var(--apply); border-radius: 12px;
+               background: var(--card); scroll-margin: 80px; }
+.apply-panel h3 { margin: 0 0 .1rem; font-size: 1.15rem; }
+.apply-panel h4 { font-size: .95rem; margin: .8rem 0 .25rem; }
+.apply-draft { max-height: 16rem; overflow: auto; margin: 0; padding: .6rem .7rem; border-radius: 8px; background: var(--pill);
+               white-space: pre-wrap; overflow-wrap: anywhere; font: .82rem/1.4 ui-monospace, Menlo, Consolas, monospace; }
+.apply-who { margin: .7rem 0 .5rem; font-weight: 700; }
+.apply-buttons { display: flex; flex-wrap: wrap; gap: .5rem; }
 .empty { color: var(--muted); font-style: italic; }
 
 /* ------------------------------------------------------------ evidence and source views */
@@ -275,11 +299,17 @@ html:not([data-view=evidence]) #view-evidence, html:not([data-view=source]) #vie
             <label><span class="visually-hidden" id="facet-0-label"></span><select id="facet-0" aria-labelledby="facet-0-label"></select></label>
             <label><span class="visually-hidden" id="facet-1-label"></span><select id="facet-1" aria-labelledby="facet-1-label"></select></label>
             <label><span class="visually-hidden" id="facet-2-label"></span><select id="facet-2" aria-labelledby="facet-2-label"></select></label>
+            <div class="marks" role="group" aria-label="Saved and applied jobs">
+              <button type="button" id="only-saved" data-mark="saved" aria-pressed="false"></button>
+              <button type="button" id="only-applied" data-mark="applied" aria-pressed="false"></button>
+            </div>
           </div>
+          <p class="status small" id="mark-status" role="status" aria-live="polite"></p>
           <p class="small muted shown" id="jobs-shown" aria-live="polite"></p>
           <div class="jobs" id="jobs"></div>
         </section>
         <aside class="profile" aria-label="Selected job">
+          <section class="apply-panel" id="apply-panel" aria-labelledby="h-apply" hidden></section>
           <section class="job-detail" id="job-detail" aria-labelledby="h-detail"></section>
           <section class="resume-panel" id="resume-panel" aria-labelledby="h-resume"></section>
         </aside>
@@ -338,8 +368,11 @@ const state = {
   selectedJob: null, // null means the first job listed
   // facets maps a job field to the one value kept; "" or absent means any.
   // onlyOurs is the top bar's tab: the occupation's jobs, or all of them.
-  filters: { q: "", facets: {}, onlyOurs: false },
+  // mark keeps only saved or only applied jobs; "" means all of them.
+  filters: { q: "", facets: {}, onlyOurs: false, mark: "" },
   view: "jobs",      // "jobs", "evidence" or "source"
+  marks: null,       // { saved: {id: true}, applied: {id: ISO time} }, see readMarks()
+  applying: null,    // the job whose confirmation panel is open
 };
 
 const $ = id => document.getElementById(id);
@@ -545,7 +578,8 @@ function visibleJobs(match) {
   return boardJobs(match).filter(job =>
     (!q || (job.title + " " + employerLine(job)).toLowerCase().includes(q)) &&
     Object.entries(f.facets).every(([key, value]) => !value || job[key] === value) &&
-    (!f.onlyOurs || job.for_occupation));
+    (!f.onlyOurs || job.for_occupation) &&
+    (!f.mark || (f.mark === "saved" ? isSaved(job.id) : Boolean(appliedAt(job.id)))));
 }
 
 // A job hidden by the search or filters cannot stay selected, or the panel
@@ -678,7 +712,8 @@ function renderJobCard(job, selected, meta) {
         // about pay rather than showing a guess.
         fact("pay", job.salary, "Salary stated by the employer"),
         fact("shift", job.shift, "Hours"), fact("level", job.level, "Level")),
-      adzunaLink(job, meta)),
+      adzunaLink(job, meta),
+      jobActions(job, "card")),
     renderFit(job, "card"));
 }
 
@@ -744,6 +779,7 @@ function renderJobDetail(match, job, meta) {
     renderCompany(job),
     el("p", { class: "muted small" },
       [job.location, job.employment_type, job.salary, job.shift, job.level].filter(Boolean).join(" · ")),
+    jobActions(job, "detail"),
     renderFit(job, "panel"),
     // The two empty cases are different facts and are never merged: one ad was
     // read and asked for nothing checkable, the other was never read at all.
@@ -840,6 +876,140 @@ function renderResume(match, job) {
       el("p", { class: "to-add" }, doc.to_add)));
 }
 
+// ---------------------------------------------------------------- save and apply
+// Nothing here is sent anywhere, in any mode: no network request, no email, no
+// Adzuna call. Confirming an application only records the caseworker's
+// confirmation in sessionStorage, this tab alone, so it survives a reload and
+// is gone when the tab closes. A real application to an employer is out of
+// scope (decided); the Adzuna link on each card is how the ad is opened.
+const APPLY_KEY = "d7-apply";
+
+// The marks belong to the pack they were made on: a new intake in this tab
+// starts a clean board, so one jobseeker's saves never show on another's.
+function packStamp() {
+  const raw = sessionStorage.getItem(SESSION_KEY) || "";
+  let hash = 5381;
+  for (let i = 0; i < raw.length; i++) hash = (hash * 33 + raw.charCodeAt(i)) | 0;
+  return raw.length + ":" + hash;
+}
+
+function readMarks() {
+  try {
+    const pack = packStamp();
+    const stored = JSON.parse(sessionStorage.getItem(APPLY_KEY));
+    if (stored && stored.pack === pack && stored.saved && stored.applied) return stored;
+    return { pack, saved: {}, applied: {} };
+  } catch (err) {
+    // Blocked storage or a damaged value: start clean rather than crash the board.
+    return { pack: "", saved: {}, applied: {} };
+  }
+}
+
+function writeMarks() {
+  try {
+    sessionStorage.setItem(APPLY_KEY, JSON.stringify(state.marks));
+  } catch (err) {
+    // Storage full or blocked: the marks still hold until the tab reloads.
+  }
+}
+
+function isSaved(id) { return Boolean(state.marks.saved[id]); }
+function appliedAt(id) { return state.marks.applied[id] || null; }
+
+function timeOf(iso) {
+  return new Date(iso).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+}
+
+// Every re-render replaces the buttons, so focus is put back on the successor.
+function refocus(mark, id) {
+  const button = document.querySelector('[data-mark="' + mark + '"][data-job="' + CSS.escape(id) + '"]');
+  if (button) button.focus({ preventScroll: true });
+}
+
+// The card is itself clickable (it selects the job); a click on these buttons
+// must not also select it underneath.
+function jobActions(job, where) {
+  const saved = isSaved(job.id), at = appliedAt(job.id);
+  const only = fn => event => { event.stopPropagation(); fn(); };
+  return el("div", { class: "job-actions" },
+    el("button", { type: "button", class: "save", "aria-pressed": String(saved), "aria-label": "Save " + job.title,
+                   "data-mark": "save-" + where, "data-job": job.id,
+                   onclick: only(() => toggleSave(job.id, where)) },
+       el("span", { class: "star", "aria-hidden": "true" }, saved ? "\u2605" : "\u2606"), saved ? " Saved" : " Save"),
+    at ? el("button", { type: "button", class: "applied", disabled: true }, "Applied \u2713 " + timeOf(at))
+       : el("button", { type: "button", class: "apply", "aria-label": "Apply to " + job.title,
+                        "data-mark": "apply-" + where, "data-job": job.id,
+                        onclick: only(() => openApply(job.id, where)) }, "Apply"));
+}
+
+function toggleSave(id, where) {
+  if (isSaved(id)) delete state.marks.saved[id];
+  else state.marks.saved[id] = true;
+  writeMarks();
+  renderMatches();
+  refocus("save-" + where, id);
+}
+
+function openApply(id, where) {
+  state.applying = { id, where };
+  state.selectedJob = id;
+  renderMatches();
+  $("apply-panel").scrollIntoView({ behavior: "smooth", block: "start" });
+  $("h-apply").focus({ preventScroll: true });
+}
+
+function closeApply() {
+  const { id, where } = state.applying;
+  state.applying = null;
+  renderMatches();
+  refocus("apply-" + where, id);
+}
+
+function confirmApply(job) {
+  state.marks.applied[job.id] = new Date().toISOString();
+  writeMarks();
+  state.applying = null;
+  renderMatches();
+  $("mark-status").textContent = "Application to " + job.title + " recorded at " + timeOf(appliedAt(job.id)) +
+    ". Nothing was sent.";
+  const title = document.querySelector('.job-card[data-id="' + CSS.escape(job.id) + '"] h3 button');
+  if (title) title.focus({ preventScroll: true });
+}
+
+// The confirmation is a panel in the page, not a browser dialog: the job, the
+// draft already built for it, who sends it, and what this demo does not do.
+function renderApply(match) {
+  const panel = $("apply-panel");
+  const job = state.applying && boardJobs(match).find(j => j.id === state.applying.id);
+  if (!job) { panel.hidden = true; panel.replaceChildren(); return; }
+  const resume = match.resumes ? match.resumes[job.id] : null;
+  panel.hidden = false;
+  panel.replaceChildren(
+    el("h3", { id: "h-apply", tabindex: "-1" }, "Apply: " + job.title),
+    renderCompany(job),
+    el("p", { class: "muted small" }, [job.location, job.employment_type].filter(Boolean).join(" · ")),
+    el("h4", {}, "Tailored resume draft"),
+    // NEEDS DECISION: a job with no draft can still be confirmed, with no
+    // resume attached; the panel says so rather than hiding Apply.
+    resume ? el("pre", { class: "apply-draft", lang: "en" }, resume.text)
+           : el("p", { class: "empty" }, "No draft for this job: none of the units it asks for is evidenced. " +
+                                         "The application would go without a tailored resume."),
+    el("p", { class: "apply-who" }, "The caseworker sends this with the jobseeker's agreement."),
+    el("div", { class: "apply-buttons" },
+      el("button", { type: "button", class: "apply", onclick: () => confirmApply(job) }, "Confirm application"),
+      el("button", { type: "button", class: "secondary", onclick: closeApply }, "Cancel")),
+    el("p", { class: "small muted" }, "Demo: recorded in this browser tab only. Nothing is sent to an employer, by email or to Adzuna."));
+}
+
+function renderMarkFilters(board) {
+  const count = has => board.filter(job => has(job.id)).length;
+  for (const [id, mark, word, has] of [["only-saved", "saved", "Saved", isSaved],
+                                      ["only-applied", "applied", "Applied", appliedAt]]) {
+    $(id).textContent = word + " (" + count(has) + ")";
+    $(id).setAttribute("aria-pressed", String(state.filters.mark === mark));
+  }
+}
+
 function fillFilter(select, label, values, current) {
   select.replaceChildren(el("option", { value: "" }, "Any " + label),
     ...values.map(value => el("option", { value, selected: value === current }, value)));
@@ -881,6 +1051,8 @@ function renderMatches() {
                                                : [el("p", { class: "empty" }, "No job matches this search and these filters.")]));
   renderJobDetail(match, selected, meta);
   renderResume(match, selected);
+  renderMarkFilters(board);
+  renderApply(match);
 }
 
 // ---------------------------------------------------------------- wiring
@@ -916,6 +1088,14 @@ if (!session) {
     });
   });
   $("job-search").addEventListener("input", event => { state.filters.q = event.target.value; renderMatches(); });
+  for (const button of document.querySelectorAll(".marks button")) {
+    button.addEventListener("click", () => {
+      state.filters.mark = state.filters.mark === button.dataset.mark ? "" : button.dataset.mark;
+      renderMatches();
+    });
+  }
+  document.addEventListener("keydown", event => { if (event.key === "Escape" && state.applying) closeApply(); });
+  state.marks = readMarks();
   setView("jobs");
   renderPack();
   renderTranscript();
