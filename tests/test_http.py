@@ -23,6 +23,20 @@ COOK_TRANSCRIPT = [
      "en": "Raw meat and cooked food had to be kept apart."},
 ]
 
+# The Mandarin lines "Use demo transcript" sends, copied from intake.html.
+DEMO_TRANSCRIPT = [
+    {"t": "00:12", "text": "我在營區的廚房做了三年，每天煮兩百個人的飯。",
+     "en": "I worked in the camp kitchen for three years, cooking for two hundred people every day."},
+    {"t": "00:47", "text": "早上四點就開始準備，主要做米飯、燉菜和湯。",
+     "en": "We started preparing at four in the morning, mostly rice, stews and soup."},
+    {"t": "01:30", "text": "我負責排班，也教新來的人怎麼切菜。",
+     "en": "I did the roster and taught new people how to cut vegetables."},
+    {"t": "02:41", "text": "生肉和煮好的食物要分開放，冰箱的溫度我每天都記在本子上。",
+     "en": "Raw meat and cooked food had to be kept apart, and I wrote the fridge temperature in a notebook every day."},
+    {"t": "03:20", "text": "我沒有證書，那裡沒有人發這種東西。",
+     "en": "I have no certificate; nobody there issued one."},
+]
+
 
 def cook(**over):
     body = {"occupation": "cookery", "language": "zh", "consent": True,
@@ -161,6 +175,20 @@ class IntakeApi(Server):
                                                      "transcript": COOK_TRANSCRIPT})
         self.assertEqual(status, 200)
         self.assertIn("Raw meat and cooked food", body["resume"]["text"])
+
+    def test_the_demo_transcript_gives_the_resume_experience_lines(self):
+        """What the page does: extract, then match with the same transcript and
+        the units the pack evidences. The experience lines are what a viewer reads."""
+        status, pack = self.post_json("/api/extract", cook(transcript=DEMO_TRANSCRIPT))
+        self.assertEqual(status, 200)
+        units = [{"code": code, "sources": item["sources"]}
+                 for item in pack["suggestions"] if item["field"] == "units_evidenced"
+                 for code in item["value"].split("; ")]
+        status, body = self.post_json("/api/match", {"occupation": "cookery",
+                                                     "evidenced_units": units,
+                                                     "transcript": DEMO_TRANSCRIPT})
+        self.assertEqual(status, 200)
+        self.assertRegex(body["resume"]["text"], r"(?m)^- .+ \[transcript \d\d:\d\d\]$")
 
     def test_an_unknown_occupation_is_a_400_without_a_traceback(self):
         for path, data in (("/api/extract", cook(occupation="astronaut")),
