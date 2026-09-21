@@ -39,7 +39,7 @@
 
 - **語言覆蓋是跛的，要自己先講**：ElevenLabs Scribe 能聽約 90 種、Agents 能說約 31 種，
   但 **Dari／Tigrinya／Rohingya／Hazaragi 不在清單上**，普什圖語 WER 25–50%。
-  demo 只上阿拉伯語／波斯語／史瓦希里語三種，其餘走明確拒絕畫面。
+  demo 用中文錄影、阿拉伯語保留為設定語言，其餘走明確拒絕畫面（見下方 Tommy 的決定）。
 
 - ⭐ **實作計畫已完成並經審查**：`docs/superpowers/plans/2026-09-21-direction-7-implementation.md`
   九個 task、全程 TDD，**切線在 Task 6 之後**。計畫內的程式碼已原封貼進拋棄式副本實跑，
@@ -54,7 +54,10 @@
 - **技術堆疊定案**：Python 標準函式庫 ＋ 一頁 vanilla JS，**零外部套件、零建置步驟**。
   真實 API 用 `urllib.request` 直打，**因此不需要安裝核准**。
 - **2026-09-21 傍晚，Tommy 的決定（以此為準）**：
-  - **示範語言只用阿拉伯語**，`SUPPORTED_LANGUAGES = ("ar",)`，其餘語言一律拒絕畫面。
+  - **Demo 語言（最終）：中文測試與錄影，阿拉伯語保留為設定語言**，`SUPPORTED_LANGUAGES = ("zh", "ar")`，
+    其餘語言一律拒絕畫面。台詞：*"We recorded this in Mandarin because it is the language we could verify
+    word for word. Arabic is configured, but we have not validated it with a native speaker, so we do not claim it."*
+    ElevenLabs 對中文的準確率**未查證，不得引用數字**。（先前的「只用阿拉伯語」已被此決定取代。）
   - **今晚範圍 = 原計畫 ＋ 課程推薦**（課程推薦從 `missing` 單元推出，框為 RPL 的 gap training）。
   - **訪談只問工作與學習，不問逃亡經歷**；就算求職者自己講了也不抽取。
   - **四個 worker 平行開發**（orca-flow，疊在本分支上）：`d7-core`、`d7-live`、`d7-match`、`d7-intake-ui`；
@@ -95,16 +98,30 @@ White Box Enterprises 與 Seedkit 的答案、SEDI 付費論證、Social Traders
 - GitHub 會 redirect 舊 URL，但隊友若已 clone 應改用新 URL。
 - `.claude/orca-flow.json` 的 `"project"` 仍是賽事全名，那是顯示字串不是路徑，刻意不動。
 
-## 下一步
+## 下一步 —— 新 session 從這裡接手（2026-09-21 晚）
 
-1. **照計畫執行 Task 1–6**（`docs/superpowers/plans/2026-09-21-direction-7-implementation.md`）。
-   每個 task 以 `bash bin/verify.sh` GREEN ＋ commit 結束。
-2. ⭐ **錄製 demo 備援影片**（Task 9 Step 1）——**照罐頭情境講**。
-3. 主線與影片完成後才碰 Task 7–8（LLM 抽取、B 線媒合）。
-4. **母語逐字稿**交給隊友或母語者填寫（阿拉伯語／波斯語／史瓦希里語）。
-5. **上台前逐條複驗要念的 5–6 個數字**，打開原始 URL 確認。
-6. **查清楚 ElevenLabs 的音檔保留設定**；查清楚前不得宣稱零保留。
-7. 前端是否改由設計師用 React 寫尚未決定；若改，計畫 Task 5 需重寫。
+**目標：今晚做完全部 web code，明早錄影。** 前一個 session 是 manager，因 context 滿了交接。
+
+1. **Tommy 手動推送本分支**（hook 擋所有 Claude 的推送）。確認計畫已在遠端：
+   `git cat-file -e origin/docs/direction-7-refugee-employment:docs/superpowers/plans/2026-09-21-direction-7-implementation.md`
+2. **新 session 切成 bypassPermissions**，以 orca-flow manager 角色同時開第一波 4 個 worker。
+   brief 已寫好，存在共用狀態目錄（所有 worktree 都看得到）：
+   ```
+   D=/Users/tommyhuang/Desktop/Projects/Hackathon/ai-se-hack-2026/.git/orca-flow/pending-briefs/2026-09-21-d7
+   S=~/.claude/skills/orca-flow/scripts/spawn_worker.py
+   for w in d7-core d7-live d7-match d7-intake-ui; do
+     python3 $S --name $w --brief $D/$w.md --base origin/docs/direction-7-refugee-employment --bypass
+   done
+   ```
+   Bash timeout 600000。`--dry-run` 已驗證通過。
+   ⚠️ 帳號用量上限曾觸發（HTTP 429，19:10 重置）；若 worker 一啟動就 429，等重置再開。
+3. **Worker 完成時卡片顯示 `READY:<branch> — push by hand`**，終端會印出確切的推送與
+   `gh pr create --base docs/direction-7-refugee-employment` 指令。Tommy 照貼，manager 審 PR。
+4. **第一波合併後開第二波 `d7-wire`**：把 `/intake`、`/api/extract`、`/api/transcribe`、`/api/match`
+   接進 `skeleton/app.py`，改 `ThreadingHTTPServer`，有金鑰時 `model_for()` 回傳 `live.LiveModel`。
+   brief 依第一波實際合進來的程式碼再寫；介面契約見任一份 pending brief 的 "API contract"。
+5. **錄影前**：`python3 skeleton/app.py` → `http://127.0.0.1:8000/intake`；斷網再跑一次確認離線可用；
+   逐條複驗要念的數字；查 ElevenLabs 音檔保留設定（查清楚前不得宣稱零保留）。
 
 **現場優先**：現場出現的真實問題，一律優先於上述任何方向（判準見交接文件第 7 節）。
 現場那張要拿在手上的是 **`docs/frameworks/onsite-matching-sheet.md`**。
