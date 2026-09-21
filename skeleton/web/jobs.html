@@ -74,7 +74,7 @@ main { max-width: 1240px; margin: 0 auto; padding: 22px 24px 48px; }
 
 /* ------------------------------------------------------------ job cards (Figma "Job Card") */
 .jobs { display: flex; flex-direction: column; gap: 16px; }
-.job-card { display: grid; grid-template-columns: 56px minmax(0, 1fr) auto; gap: 1.1rem; align-items: center;
+.job-card { display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 1.1rem; align-items: start;
             padding: 20px 22px; border: 2px solid transparent; border-radius: 12px; background: var(--card);
             box-shadow: 0 0 0 1px var(--line); cursor: pointer; }
 .job-card:hover { box-shadow: 0 0 0 1px var(--line), 0 4px 14px rgba(17, 24, 39, .08); }
@@ -83,7 +83,11 @@ main { max-width: 1240px; margin: 0 auto; padding: 22px 24px 48px; }
             color: var(--primary); font-weight: 700; font-size: 1.15rem; }
 .job-card h3 { margin: 0; font-size: 1.2rem; font-weight: 600; line-height: 1.25; }
 .job-card h3 button { padding: 0; border: 0; background: none; font: inherit; text-align: left; cursor: pointer; }
-.meta { margin: .2rem 0 .45rem; color: var(--muted); font-size: .88rem; }
+.company { margin: .15rem 0 0; font-size: .95rem; }
+.meta { margin: .1rem 0 0; color: var(--muted); font-size: .88rem; }
+/* SEEK's search summary: two lines of the ad, the rest is in the panel. */
+.snippet { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+           margin: .5rem 0 .6rem; color: var(--muted); font-size: .88rem; }
 .pills { display: flex; flex-wrap: wrap; gap: .45rem; }
 .pill { padding: .1rem .55rem; border-radius: 4px; font-size: .84rem; font-weight: 500; }
 .pill.ok { background: var(--ok-bg); color: var(--ok); }
@@ -91,21 +95,7 @@ main { max-width: 1240px; margin: 0 auto; padding: 22px 24px 48px; }
 .pill.plain { background: var(--pill); color: var(--muted); }
 .pill.done { background: var(--success); color: var(--on-fill); font-weight: 700; }
 
-/* The fit: unit coverage of this job, drawn as a ring. The caption carries no
-   label that grades the match or the person. */
-.fit { display: flex; flex-direction: column; align-items: center; gap: .3rem; min-width: 96px; text-align: center; }
-.ring { position: relative; width: 64px; height: 64px; }
-.ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
-.ring .pct { position: absolute; inset: 0; display: grid; place-items: center; font-size: .95rem; font-weight: 700;
-             color: var(--primary); font-variant-numeric: tabular-nums; }
-/* An ad that names no unit has nothing to divide, so the ring shows a dash
-   rather than a 0% that would read as a judgement of the person. */
-.ring .pct.none { font-size: 1.3rem; color: var(--muted); }
-.fit .caption { max-width: 7.5rem; color: var(--muted); font-size: .8rem; }
-
 .list-foot { margin: 14px 0 0; }
-.source-line { margin: .5rem 0 0; font-size: .82rem; color: var(--muted); }
-.source-line a { color: var(--primary); }
 .empty { color: var(--muted); font-style: italic; }
 
 /* ------------------------------------------------------------ the right panel */
@@ -115,6 +105,15 @@ main { max-width: 1240px; margin: 0 auto; padding: 22px 24px 48px; }
 .panel .sub { margin: .2rem 0 .8rem; color: var(--muted); font-size: .9rem; }
 .panel > h3 { margin: 1rem 0 .45rem; font-size: .92rem; color: var(--primary); }
 .back { margin-bottom: .6rem; }
+.skills { margin: 0; padding: 0; list-style: none; display: grid; gap: .3rem; }
+.skills li { position: relative; padding-left: 1.5rem; }
+.skills li::before { position: absolute; left: 0; font-weight: 700; }
+.skills.ok li::before { content: "\2713"; color: var(--ok); }
+.skills.miss li::before { content: "+"; color: var(--miss); }
+.about { margin: 0; color: var(--muted); font-size: .92rem; }
+.details { margin-top: 1.2rem; padding-top: .8rem; border-top: 1px solid var(--line); }
+.details summary { cursor: pointer; color: var(--primary); font-weight: 700; font-size: .92rem; }
+.details h4 { margin: 1rem 0 .4rem; font-size: .88rem; color: var(--primary); }
 .units { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
 .unit { padding: .5rem .8rem; border-radius: 4px; font-size: .88rem; }
 .unit.ok { background: var(--ok-bg); }
@@ -125,7 +124,7 @@ main { max-width: 1240px; margin: 0 auto; padding: 22px 24px 48px; }
 .unit.miss p { margin: .1rem 0 0; color: var(--ink); }
 .unit .basis { display: block; margin-top: .2rem; font-size: .78rem; color: var(--muted); overflow-wrap: anywhere; }
 .note { padding: .5rem .7rem; border-radius: 6px; background: var(--pill); font-size: .88rem; }
-.apply { display: block; width: 100%; min-height: 46px; margin-top: 1.2rem; border: 0; border-radius: 6px;
+.apply { display: block; width: 100%; min-height: 46px; margin-top: .9rem; border: 0; border-radius: 6px;
          background: var(--accent); color: var(--on-fill); font-weight: 700; cursor: pointer; }
 .apply:disabled { background: var(--success); cursor: default; }
 button.secondary { min-height: 44px; padding: .3rem 1rem; border: 2px solid var(--primary); border-radius: 6px;
@@ -136,7 +135,9 @@ button.secondary { min-height: 44px; padding: .3rem 1rem; border: 2px solid var(
    116x23 px. Do not shrink these two values or drop the link. */
 .adzuna { display: inline-flex; align-items: center; min-width: 116px; min-height: 23px;
           color: var(--muted); font-size: .85rem; }
-.status { min-height: 1.3rem; margin-top: .6rem; font-weight: 600; }
+.status { margin-top: .6rem; font-weight: 600; }
+.status:empty { display: none; }
+a.link { color: var(--primary); font-weight: 700; }
 
 /* Apply: the confirmed resume the application goes with. */
 .resume-box { margin-top: .6rem; padding: 22px 24px; border: 1px solid var(--line); border-radius: 8px; }
@@ -170,7 +171,6 @@ button.secondary { min-height: 44px; padding: .3rem 1rem; border: 2px solid var(
 @media (max-width: 560px) {
   .job-card { grid-template-columns: 44px minmax(0, 1fr); padding: 16px; }
   .initials { width: 44px; height: 44px; }
-  .fit { grid-column: 1 / -1; flex-direction: row; justify-content: flex-start; }
   .search { width: 100%; }
 }
 
@@ -212,7 +212,6 @@ button.secondary { min-height: 44px; padding: .3rem 1rem; border: 2px solid var(
         <h2 id="h-jobs" class="visually-hidden">Jobs</h2>
         <div class="jobs" id="jobs"></div>
         <p class="list-foot"><button type="button" class="link" id="show-all"></button></p>
-        <p class="source-line" id="jobs-source"></p>
       </section>
       <aside class="panel" id="panel" aria-label="Selected job"></aside>
     </div>
@@ -273,7 +272,7 @@ const state = {
   selectedJob: null, // null means the first job listed
   q: "",
   showAll: false,    // false lists only the jobs with at least one unit evidenced
-  panel: "why",      // "why", "pack" or "apply"
+  panel: "why",      // "why" or "apply"
   applied: null,     // { id: ISO time }, see readApplied()
   via: session ? session.via || null : null, // "interview" or "upload", from /review only
 };
@@ -372,12 +371,7 @@ function renderPack() {
   const gaps = (extract.gaps || []).length ? el("div", { class: "card withheld" },
       el("h4", {}, "Not answered yet: ask about these"),
       el("ul", {}, extract.gaps.map(field => el("li", {}, FIELD_LABELS[field] || field)))) : null;
-  return [
-    el("p", { class: "back" }, el("button", { type: "button", class: "link", onclick: () => openPanel("why") }, "← Back to why this matched")),
-    el("h2", { id: "h-panel", tabindex: "-1" }, "Evidence pack"),
-    el("p", { class: "sub" }, "Everything mapped from this " + sourceWord() + " to Australian occupations and units. " +
-                              "Coverage is shown to the jobseeker and caseworker only, never to an employer."),
-    items, withheld, gaps, renderGate(extract.gate, extract),
+  return [items, withheld, gaps, renderGate(extract.gate, extract),
     el("p", { class: "small muted" }, extract.metric_name + ": " + extract.metric_value)];
 }
 
@@ -400,8 +394,10 @@ function initials(job) {
   return (words.length > 1 ? words[0][0] + words[1][0] : (words[0] || "?").slice(0, 2)).toUpperCase();
 }
 
+// Where, what kind of work and, only when the employer stated it, the pay: a
+// predicted salary is dropped when the snapshot is built.
 function jobMeta(job) {
-  return [employerLine(job), job.location, job.contract_time || job.employment_type].filter(Boolean).join("  ·  ");
+  return [job.location, job.contract_time || job.employment_type, job.salary].filter(Boolean).join("  ·  ");
 }
 
 // The jobs listed: by default those with at least one unit evidenced, in the
@@ -440,7 +436,7 @@ function openPanel(which) {
 // never disagree. It describes the job, not the person.
 //
 // An ad that names no unit has no denominator. percent is null, never 0: a 0%
-// ring would read as a verdict on the person when the ad asked for nothing we
+// would read as a verdict on the person when the ad asked for nothing we
 // could count.
 function coverage(job) {
   const required = job.matched.length + job.missing.length;
@@ -457,40 +453,10 @@ function noCoverageReason(job) {
   return NO_COVERAGE[job.units_status] || "No units to count";
 }
 
-const SVG = "http://www.w3.org/2000/svg";
-
-function renderFit(job) {
-  const { evidenced, required, percent } = coverage(job);
-  const none = percent === null;
-  const radius = 28, circumference = 2 * Math.PI * radius;
-  const svg = document.createElementNS(SVG, "svg");
-  svg.setAttribute("viewBox", "0 0 64 64");
-  svg.setAttribute("aria-hidden", "true");
-  for (const [stroke, dash] of [["var(--line)", null], ["var(--success)", circumference * (1 - (percent || 0) / 100)]]) {
-    const circle = document.createElementNS(SVG, "circle");
-    for (const [key, value] of Object.entries({ cx: 32, cy: 32, r: radius, fill: "none", stroke, "stroke-width": 5 })) {
-      circle.setAttribute(key, value);
-    }
-    if (dash !== null) {
-      circle.setAttribute("stroke-linecap", "round");
-      circle.setAttribute("stroke-dasharray", String(circumference));
-      circle.setAttribute("stroke-dashoffset", String(dash));
-      // A round cap on an empty arc would still draw a dot and read as some coverage.
-      if (none || !evidenced) circle.setAttribute("stroke", "none");
-    }
-    svg.append(circle);
-  }
-  const caption = none ? noCoverageReason(job) : "units matched";
-  const label = none ? caption : percent + " percent of units matched, " + evidenced + " of " + required;
-  return el("div", { class: "fit", role: "img", "aria-label": label },
-    el("div", { class: "ring" }, svg, none ? el("span", { class: "pct none" }, "—") : el("span", { class: "pct" }, percent + "%")),
-    el("span", { class: "caption" }, caption));
-}
-
 // A required unit is either quoted from the ad itself or rests on the job
-// title. Each says which in plain English, because a reader has to be able to
-// see which units the employer actually wrote down. The older sample board
-// carries no basis, so it says nothing.
+// title. The details say which in plain English, because a reader has to be
+// able to see which units the employer actually wrote down. The older sample
+// board carries no basis, so it says nothing.
 const BASIS = {
   stated: "The ad says it needs this",
   title: "Jobs with this title normally need this",
@@ -499,32 +465,31 @@ const BASIS = {
 function basisLine(unit) {
   const said = BASIS[unit.basis];
   if (!said) return null;
-  return el("span", { class: "basis" }, said, unit.basis === "stated" && unit.quote ? ": \u201c" + unit.quote + "\u201d" : "");
+  return el("span", { class: "basis" }, said, unit.basis === "stated" && unit.quote ? ": “" + unit.quote + "”" : "");
 }
 
-const plural = (n, word) => n + " " + word + (n === 1 ? "" : "s");
-
-function jobPills(job) {
-  const at = state.applied[job.id];
-  if (job.units_status && job.units_status !== "mapped") {
-    return [el("span", { class: "pill plain" }, noCoverageReason(job)), at ? el("span", { class: "pill done" }, "Applied") : null];
-  }
-  return [
-    job.matched.length ? el("span", { class: "pill ok" }, plural(job.matched.length, "unit") + " evidenced") : null,
-    job.missing.length ? el("span", { class: "pill miss" }, plural(job.missing.length, "unit") + " missing") : null,
-    job.for_occupation ? null : el("span", { class: "pill plain" }, "Another occupation"),
-    at ? el("span", { class: "pill done" }, "Applied") : null];
+// The one line a card and the panel give the fit: "75% skills match", the share
+// of the units this job requires that the evidence covers. An ad with nothing
+// to count says why instead of showing a 0% that would read as a verdict.
+function matchPill(job) {
+  const { percent } = coverage(job);
+  if (percent === null) return el("span", { class: "pill plain" }, noCoverageReason(job));
+  return el("span", { class: "pill " + (percent ? "ok" : "plain") }, percent + "% skills match");
 }
 
 function renderJobCard(job, selected) {
+  const at = state.applied[job.id];
   return el("article", { class: "job-card" + (selected ? " selected" : ""), "data-id": job.id,
                          onclick: () => selectJob(job.id) },
     el("div", { class: "initials", "aria-hidden": "true" }, initials(job)),
     el("div", {},
       el("h3", {}, el("button", { type: "button", "aria-pressed": String(selected) }, job.title)),
+      el("p", { class: "company" }, employerLine(job)),
       el("p", { class: "meta" }, jobMeta(job)),
-      el("div", { class: "pills" }, jobPills(job))),
-    renderFit(job));
+      job.snippet ? el("p", { class: "snippet" }, job.snippet) : null,
+      el("div", { class: "pills" }, matchPill(job),
+         job.for_occupation ? null : el("span", { class: "pill plain" }, "Another occupation"),
+         at ? el("span", { class: "pill done" }, "Applied") : null)));
 }
 
 // Adzuna's licence: every ad carries the mark, linking to that ad, drawn at no
@@ -535,48 +500,63 @@ function adzunaLink(job) {
   return job.redirect_url ? el("a", { class: "adzuna", href: job.redirect_url, target: "_blank", rel: "noopener" }, text) : null;
 }
 
+// Everything the caseworker may need to check, folded away so the job reads
+// like a job ad: each unit's code, the line that evidences it and where the
+// requirement comes from, then the full evidence pack.
+function renderDetails(job) {
+  const courses = Object.fromEntries((state.match.all_courses || state.match.courses || []).map(c => [c.code, c]));
+  const unit = (u, evidenced) => {
+    const quote = evidenced ? (u.sources || []).map(citedText).find(Boolean) : "";
+    const course = courses[u.code];
+    return el("li", { class: "unit " + (evidenced ? "ok" : "miss") },
+      el("span", { class: "code" }, u.code, " ", el("span", { class: "title" }, u.title)),
+      quote ? el("q", {}, quote) : null,
+      !evidenced ? el("p", {}, "Nothing in this " + sourceWord() + " covers this one yet." +
+                              (course ? " Gap training: " + course.qualification + "." : "")) : null,
+      basisLine(u));
+  };
+  return el("details", { class: "details" },
+    el("summary", {}, "Show evidence details"),
+    job.matched.length ? [el("h4", {}, evidencedHeading()),
+      el("ul", { class: "units" }, job.matched.map(u => unit(u, true)))] : null,
+    job.missing.length ? [el("h4", {}, "Not evidenced yet"),
+      el("ul", { class: "units" }, job.missing.map(u => unit(u, false))),
+      el("p", { class: "small muted" }, "The caseworker decides whether to apply anyway.")] : null,
+    el("h4", {}, "Evidence pack"),
+    el("p", { class: "small muted" }, "Everything mapped from this " + sourceWord() + " to Australian occupations and units. " +
+                                      "Shown to the jobseeker and caseworker only, never to an employer."),
+    renderPack());
+}
+
 function renderWhy(job) {
   if (!job) {
     return [el("h2", { id: "h-panel", tabindex: "-1" }, "No job selected"),
             el("p", { class: "empty" }, "No role matches this search.")];
   }
-  const courses = Object.fromEntries((state.match.all_courses || state.match.courses || []).map(c => [c.code, c]));
   const at = state.applied[job.id];
+  const noUnits = job.units_status && job.units_status !== "mapped";
   return [
     el("h2", { id: "h-panel", tabindex: "-1" }, job.title),
-    el("p", { class: "sub" }, [employerLine(job), job.location].filter(Boolean).join("  ·  ")),
+    el("p", { class: "company" }, employerLine(job)),
+    el("p", { class: "sub" }, jobMeta(job)),
+    el("button", { type: "button", class: "apply", disabled: Boolean(at), onclick: () => openPanel("apply") },
+       at ? "Applied ✓ " + timeOf(at) : "Apply with this resume"),
+    el("p", { class: "status small", id: "apply-status", role: "status", "aria-live": "polite" }),
     // The two empty cases are different facts and are never merged: one ad was
     // read and asked for nothing checkable, the other was never read at all.
     job.units_status === "none_named" ? el("p", { class: "note" },
-      "This ad was read and is too short to name a unit of competency, so there is nothing to count. Open it on Adzuna to read the full listing.") : null,
+      "This ad is too short to name the skills it needs, so there is nothing to match against.") : null,
     job.units_status === "not_mapped" ? el("p", { class: "note" },
-      "This ad was not mapped to units, so nothing about it has been counted. Open it on Adzuna to read the full listing.") : null,
-    job.for_occupation ? null : el("p", { class: "note" },
-      "This job is for a " + job.occupation_label + ". It asks for units from another qualification; it is listed so no job is hidden, not as a match."),
-    job.matched.length ? [el("h3", {}, evidencedHeading()),
-      el("ul", { class: "units" }, job.matched.map(unit => {
-        const quote = (unit.sources || []).map(citedText).find(Boolean);
-        return el("li", { class: "unit ok" },
-          el("span", { class: "code" }, unit.code, " ", el("span", { class: "title" }, unit.title)),
-          quote ? el("q", {}, quote) : null,
-          basisLine(unit));
-      }))] : null,
-    job.missing.length ? [el("h3", {}, "Not evidenced yet"),
-      el("ul", { class: "units" }, job.missing.map(unit => {
-        const course = courses[unit.code];
-        return el("li", { class: "unit miss" },
-          el("span", { class: "code" }, unit.code, " ", el("span", { class: "title" }, unit.title)),
-          el("p", {}, "Nothing in this " + sourceWord() + " covers this one yet." +
-                      (course ? " Gap training: " + course.qualification + "." : "")),
-          basisLine(unit));
-      })),
-      el("p", { class: "small muted" }, "The caseworker decides whether to apply anyway.")] : null,
-    el("button", { type: "button", class: "apply", disabled: Boolean(at), onclick: () => openPanel("apply") },
-       at ? "Applied ✓ " + timeOf(at) : "Apply with this resume →"),
-    el("p", { class: "status small", id: "apply-status", role: "status", "aria-live": "polite" }),
+      "This ad has not been matched against skills yet.") : null,
+    job.matched.length ? [el("h3", {}, "Why " + (firstName() || "the jobseeker") + " is a match"),
+      el("ul", { class: "skills ok" }, job.matched.map(u => el("li", {}, u.title)))] : null,
+    job.missing.length ? [el("h3", {}, "Skills to build"),
+      el("ul", { class: "skills miss" }, job.missing.map(u => el("li", {}, u.title)))] : null,
+    job.snippet ? [el("h3", {}, "About the job"), el("p", { class: "about" }, job.snippet)] : null,
     el("div", { class: "panel-foot" },
-      adzunaLink(job),
-      el("button", { type: "button", class: "link", onclick: () => openPanel("pack") }, "See full evidence pack →"))];
+      job.redirect_url ? el("a", { class: "link", href: job.redirect_url, target: "_blank", rel: "noopener" }, "View full ad ↗") : null,
+      adzunaLink(job)),
+    noUnits ? null : renderDetails(job)];
 }
 
 // ---------------------------------------------------------------- apply
@@ -648,16 +628,6 @@ function renderApply(job) {
 }
 
 // ---------------------------------------------------------------- render
-// The snapshot is committed so the demo runs offline, which means the board is
-// as old as the fetch. Saying when it was taken is part of showing real ads.
-function renderSource() {
-  const meta = state.match.jobs_source;
-  if (!meta || !meta.fetched_at) { $("jobs-source").textContent = ""; return; }
-  $("jobs-source").replaceChildren((meta.source || "Adzuna") + " snapshot taken " + String(meta.fetched_at).slice(0, 10) +
-    ", committed so the demo runs offline. Every role links to its ad on ",
-    el("a", { href: "https://www.adzuna.com.au/", target: "_blank", rel: "noopener" }, "Adzuna"), ".");
-}
-
 function render() {
   const board = boardJobs(state.match);
   const matched = board.filter(job => job.matched.length > 0).length;
@@ -665,14 +635,11 @@ function render() {
   const selectedId = selectedJobId(listed);
   const selected = listed.find(job => job.id === selectedId) || null;
   $("title").textContent = state.name ? "Matched jobs for " + state.name : "Matched jobs";
-  $("summary").textContent = matched + " of " + board.length + " open roles in Sydney match the confirmed " + sourceWord() +
-    ". Ranked by units evidenced.";
+  $("summary").textContent = matched + " matching roles in Sydney";
   $("jobs").replaceChildren(...(listed.length ? listed.map(job => renderJobCard(job, job.id === selectedId))
     : [el("p", { class: "empty" }, state.q ? "No role matches this search." : "No role has a unit evidenced yet.")]));
-  $("show-all").textContent = state.showAll ? "Show matched roles only" : "Show all " + board.length + " open roles →";
-  const panel = state.panel === "pack" ? renderPack()
-              : state.panel === "apply" && selected ? renderApply(selected)
-              : renderWhy(selected);
+  $("show-all").textContent = state.showAll ? "Show matching roles only" : "Show all " + board.length + " roles";
+  const panel = state.panel === "apply" && selected ? renderApply(selected) : renderWhy(selected);
   $("panel").replaceChildren(...el("div", {}, panel).childNodes);
 }
 
@@ -690,7 +657,6 @@ if (!session) {
   $("job-search").addEventListener("input", event => { state.q = event.target.value; render(); });
   $("show-all").addEventListener("click", () => { state.showAll = !state.showAll; render(); });
   document.addEventListener("keydown", event => { if (event.key === "Escape" && state.panel !== "why") openPanel("why"); });
-  renderSource();
   render();
 }
 </script>
