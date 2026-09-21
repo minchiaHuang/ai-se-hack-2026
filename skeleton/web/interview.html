@@ -245,7 +245,9 @@ const PERSON_KEY = "d7.person";
 // this tab would otherwise show the uploaded resume instead of this interview.
 const SECTIONS_KEY = "d7.sections";
 const LANGUAGE = "zh";
-const REVIEW_URL = (location.protocol === "file:" ? "review.html" : "/review") + (MOCK ? "?mock=1" : "");
+// Both flags ride along, so a demo opened quiet stays quiet on /review.
+const FLAGS = [MOCK && "mock=1", QUIET && "quiet=1"].filter(Boolean).join("&");
+const REVIEW_URL = (location.protocol === "file:" ? "review.html" : "/review") + (FLAGS ? "?" + FLAGS : "");
 
 // ---------------------------------------------------------------- fixtures
 // The team's questions exactly as GET /api/interview/questions serves them.
