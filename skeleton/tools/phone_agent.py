@@ -3,12 +3,14 @@
     ELEVENLABS_API_KEY=... TWILIO_ACCOUNT_SID=... TWILIO_AUTH_TOKEN=... \\
         TWILIO_PHONE_NUMBER=+61... python3 -m skeleton.tools.phone_agent
     python3 -m skeleton.tools.phone_agent --call +61400000000
+    python3 -m skeleton.tools.phone_agent --update-agent
 
 The first form creates the agent and imports the number, then prints the two
 IDs to put in the environment. An ID already set is kept, so running it again
 creates nothing twice; unset ELEVENLABS_AGENT_ID to make a new agent after the
 prompt changes. --call rings a phone with those IDs, to test the whole chain
-before the page uses it. Standard library only, keys from the environment only.
+before the page uses it. --update-agent pushes a changed prompt to the agent
+in ELEVENLABS_AGENT_ID, keeping its id and link. Standard library only, keys from the environment only.
 """
 import os
 import sys
@@ -27,6 +29,20 @@ def main(argv=(), post=None):
             print(body.get("reason", "The call was not placed."), file=sys.stderr)
             return 1
         print(f"Calling {number}. conversation_id={body['conversation_id']}")
+        return 0
+    if "--update-agent" in argv:
+        key = os.environ.get("ELEVENLABS_API_KEY", "")
+        agent_id = os.environ.get("ELEVENLABS_AGENT_ID", "")
+        if not (key and agent_id):
+            print("Set ELEVENLABS_API_KEY and ELEVENLABS_AGENT_ID first.", file=sys.stderr)
+            return 2
+        try:
+            phone.update_agent(key, agent_id)
+        except Exception as error:
+            print(f"{phone._failure(error, 'Update')['reason']} ({type(error).__name__})",
+                  file=sys.stderr)
+            return 1
+        print(f"Updated {agent_id} with the current prompt.")
         return 0
     env = {name: os.environ.get(name, "") for name in NEEDED}
     missing = [name for name, value in env.items() if not value]

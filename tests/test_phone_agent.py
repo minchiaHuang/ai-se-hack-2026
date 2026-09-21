@@ -59,6 +59,23 @@ class Setup(unittest.TestCase):
         self.assertIn("OSError", err)
 
 
+class UpdateAgent(unittest.TestCase):
+    def test_update_agent_patches_the_agent_in_the_environment(self):
+        env = {"ELEVENLABS_API_KEY": "key", "ELEVENLABS_AGENT_ID": "agent_1"}
+        with mock.patch.object(phone_agent.phone, "update_agent") as update:
+            code, out, _ = run(argv=["--update-agent"], env=env)
+        self.assertEqual(code, 0)
+        update.assert_called_once_with("key", "agent_1")
+        self.assertIn("agent_1", out)
+
+    def test_update_agent_without_an_agent_is_exit_2(self):
+        with mock.patch.object(phone_agent.phone, "update_agent") as update:
+            code, _, err = run(argv=["--update-agent"], env={"ELEVENLABS_API_KEY": "key"})
+        self.assertEqual(code, 2)
+        self.assertIn("ELEVENLABS_AGENT_ID", err)
+        update.assert_not_called()
+
+
 class TestCall(unittest.TestCase):
     def test_call_prints_the_conversation_id(self):
         with mock.patch.object(phone_agent.phone, "start_call",

@@ -69,6 +69,29 @@ class AgentConfig(unittest.TestCase):
         for topic in ("逃难", "签证"):
             self.assertIn(topic, prompt)
 
+    def test_the_first_message_asks_the_whole_first_question(self):
+        first = interview.questions()["questions"][0]["zh"]
+        self.assertIn(first, phone.agent_config()["conversation_config"]["agent"]["first_message"])
+
+    def test_the_prompt_keeps_order_asks_every_part_and_adds_nothing(self):
+        prompt = phone.agent_prompt()
+        for rule in ("严格按顺序", "每个小问题", "不要加上对方没说过的内容"):
+            self.assertIn(rule, prompt)
+
+    def test_the_split_keeps_alternatives_as_alternatives(self):
+        self.assertIn("alternatives", phone.SPLIT_INSTRUCTIONS)
+
+    def test_update_agent_patches_the_same_agent_with_the_current_config(self):
+        sent = []
+
+        def patch(url, headers, payload):
+            sent.append((url, payload))
+            return {"agent_id": "agent_1"}
+        phone.update_agent("key", "agent_1", patch=patch)
+        url, payload = sent[0]
+        self.assertEqual(url, phone.AGENT_URL.format(id="agent_1"))
+        self.assertEqual(payload, phone.agent_config())
+
     def test_the_agent_speaks_mandarin_with_a_multilingual_voice_and_can_hang_up(self):
         config = phone.agent_config()["conversation_config"]
         self.assertEqual(config["agent"]["language"], "zh")

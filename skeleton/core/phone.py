@@ -28,6 +28,7 @@ from skeleton.core import interview, live
 
 API = "https://api.elevenlabs.io/v1/convai"
 CREATE_AGENT_URL = API + "/agents/create"
+AGENT_URL = API + "/agents/{id}"
 PHONE_NUMBERS_URL = API + "/phone-numbers"
 OUTBOUND_URL = API + "/twilio/outbound-call"
 CONVERSATION_URL = API + "/conversations/{id}"
@@ -39,11 +40,11 @@ TTS_MODEL = "eleven_flash_v2_5"
 SETUP = "Run python3 -m skeleton.tools.phone_agent once and set the IDs it prints."
 
 FIRST_MESSAGE = ("你好，我是帮你整理工作经历的AI助手。接下来大概十分钟，我会问你一些关于学习和工作的问题，"
-                 "你用中文回答就可以。我们开始吧，可以先简单介绍一下你自己吗？")
+                 "你用中文回答就可以。我们开始吧：{first}")
 
 PROMPT = """你是一位友善、耐心的就业访谈员，用简体中文和一位刚到澳大利亚的求职者通电话。你的唯一任务是了解他的学习和工作经历，以便就业顾问之后帮他整理简历和资历认证材料。
 
-按以下顺序提问，一次只问一个问题，等对方说完再问下一个。开场白已经问了第一个问题。对方回答太简短时，可以追问一次细节（例如具体做什么、用什么工具、做了多久），然后继续：
+严格按顺序提问，不要跳题，也不要调换顺序。开场白已经问了第一题。每一题里的每个小问题都要问到：对方只回答了一部分时，接着问没回答的部分，一次问一两个就好。对方回答太简短时，可以追问一次细节（例如具体做什么、用什么工具、做了多久），然后问下一题：
 {questions}
 
 规则：
@@ -51,6 +52,7 @@ PROMPT = """你是一位友善、耐心的就业访谈员，用简体中文和�
 - 如果对方主动讲到逃难或创伤经历，简短、温和地回应（例如“谢谢你告诉我”），不要追问，然后回到工作相关的问题。
 - 不要评价、打分或判断对方，不要给就业或法律建议，不要承诺任何工作机会。
 - 句子要简短口语化，这是电话。
+- 复述或确认对方的话时，只用对方说过的内容，不要加上对方没说过的内容（例如对方只说了“AWS”，就不要说成“AWS认证”）。不确定时直接问对方。
 - 对方想停下或不想回答某题时，尊重并跳过。
 - 所有问题都问完后，感谢对方，告诉他就业顾问会根据这次谈话帮他整理材料，然后结束通话。"""
 
@@ -64,6 +66,8 @@ Output only a JSON array: [{"turn": <number>, "id": "<question id>", "en": "<Eng
 - Use only the listed question ids. A turn that answers none of them is left out.
 - Translate what was said. Do not add, explain, summarise, correct or improve it.
 - Keep names, places, dates, numbers, phone numbers and email addresses exactly.
+- Keep alternatives and ranges as the speaker gave them: "2026、2027 毕业" is
+  "graduating in 2026 or 2027", not two separate facts.
 - Never add a score, rating or judgement about the person."""
 
 
@@ -78,7 +82,8 @@ def agent_config():
         "conversation_config": {
             "agent": {
                 "language": "zh",
-                "first_message": FIRST_MESSAGE,
+                "first_message": FIRST_MESSAGE.format(
+                    first=interview.questions()["questions"][0]["zh"]),
                 "prompt": {
                     "prompt": agent_prompt(),
                     "built_in_tools": {"end_call": {
@@ -129,6 +134,22 @@ def _env(value, name):
 def create_agent(key, post=None):
     """The new agent's id. Raises on failure: only the setup tool calls this."""
     return (post or live._post_json)(CREATE_AGENT_URL, _headers(key), agent_config())["agent_id"]
+
+
+def _patch_json(url, headers, payload):
+    request = urllib.request.Request(
+        url, data=json.dumps(payload).encode("utf-8"), method="PATCH")
+    for name, value in headers.items():
+        request.add_header(name, value)
+    with urllib.request.urlopen(request, timeout=30) as response:
+        return json.loads(response.read().decode("utf-8"))
+
+
+def update_agent(key, agent_id, patch=None):
+    """Push the current prompt and settings to the existing agent, so its id
+    (and every link to it) stays the same. Raises on failure, like create_agent."""
+    url = AGENT_URL.format(id=urllib.parse.quote(agent_id, safe=""))
+    return (patch or _patch_json)(url, _headers(key), agent_config())
 
 
 def import_number(key, number, sid, token, post=None):
