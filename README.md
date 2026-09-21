@@ -7,6 +7,11 @@ Sydney job ads and drafts a resume for each one. Every item cites the line it ca
 
 Built at the AI for Social Enterprise Hackathon 2026.
 
+**Live site: https://bridgework.onrender.com** — the free instance sleeps when idle, so the
+first request after a quiet spell can take about 50 seconds. No API keys are set there: every
+page still runs and says on screen what it could not do, and **Live demo** on the homepage
+opens the whole flow against fixtures.
+
 **Why this problem.** A peer-reviewed UNSW study (Guo & Tani, *British Journal of Industrial
 Relations*, 2026, n=3,757) found refugees' probability of employment on arrival in Australia is
 about 88 percentage points lower, and still more than 51 points lower after five years, and

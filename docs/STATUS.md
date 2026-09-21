@@ -11,6 +11,9 @@ decides, and the limits the team states openly.
 
 ## Run it
 
+Live at **https://bridgework.onrender.com**. The free instance sleeps when idle, so the
+first request after a quiet spell can take about 50 seconds.
+
 ```
 python3 skeleton/app.py        # http://127.0.0.1:8000
 bash bin/verify.sh             # the whole check
@@ -23,7 +26,7 @@ with no network at all.
 
 ## Last verification
 
-2026-09-22: `bash bin/verify.sh` → GREEN, 330 tests.
+2026-09-22: `bash bin/verify.sh` → GREEN, 333 tests.
 
 ## What is built
 
