@@ -26,7 +26,15 @@ Keep confirmed facts, research inferences, and unknowns separate. Re-check time-
 - Day 1 (re-verified 2026-09-21; times moved 15 minutes earlier than the 2026-09-17 record): 8:30 AM arrival and check-in; 9:00 AM introduction; 9:30 AM intro to AI for social enterprise; 9:45 AM intro to problem validation; 10:00 AM idea and problem-statement pitching; 10:30 AM team formation and start work; 1:00–3:00 PM non-technical mentorship; 3:00–5:00 PM technical mentorship; the Spark Festival Opening Celebration from 5:00–8:30 PM is optional
 - Day 2: build a working prototype and pitch; the Top 5 teams pitch to the full room. The official page gives no itemised Day 2 timetable, only 9:00 AM–5:00 PM.
 - Recommended team size: 3–5
-- Official judging language: quality, impact reasoning, viability
+- Official judging criteria and weights, read from the official event page on 2026-09-21. This supersedes the earlier record "Official judging language: quality, impact reasoning, viability", which was a paraphrase and not the scored list. There is still no novelty criterion:
+  - Problem-Solution Fit — 20%
+  - Usability — 15%
+  - Working Prototype — 15%
+  - Effective Use of AI — 15%, described on the page as assessing how appropriately AI creates value
+  - Social Impact Reasoning — 15%, described as evaluating potential for meaningful positive change
+  - Problem Validation — 10%
+  - Pathway to Sustainability — 10%
+- Official event page: https://hackhq.io/events/o6v6DgCLc4 — the source of record for the facts in this section, and where projects are submitted
 - Attendance on both days: required by the FAQ
 - IP: retained by the team; partners and social enterprises do not automatically receive rights
 - Lunch: not provided; the organiser says nearby restaurant discounts are available
@@ -136,7 +144,7 @@ Do not claim Sourabh, John, Social Impact Hub, SECNA, UTS Startups, Spark repres
 
 UTS Startups, Social Impact Hub, SECNA, ElevenLabs, Goods 4 Good, Lovable, Base44, Red Bull, HackHQ, Spark Festival.
 
-ElevenLabs, Lovable and Base44 were not in the 2026-09-17 record. EVIDENCE: they are named as partners and two of them back prizes (ElevenCreative Pro, Base44 credits), and one judge is an ElevenLabs engineer. INFERENCE, not official: sponsor tooling is likely to be available and voice or rapid-prototyping approaches are likely to be legible to at least one judge. This does not change the official criteria of quality, impact reasoning and viability, and must not be used to claim a scoring preference.
+ElevenLabs, Lovable and Base44 were not in the 2026-09-17 record. EVIDENCE: they are named as partners and two of them back prizes (ElevenCreative Pro, Base44 credits), and one judge is an ElevenLabs engineer. INFERENCE, not official: sponsor tooling is likely to be available and voice or rapid-prototyping approaches are likely to be legible to at least one judge. This does not change the official judging criteria listed above, and must not be used to claim a scoring preference.
 
 ### Social Impact Hub
 
