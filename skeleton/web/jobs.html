@@ -5,33 +5,41 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Jobs - Bridge Work</title>
 <style>
-/* Untitled UI community kit (Figma KYWUHL795TJwqHRANibwch), read from nodes
-   701:62721, 701:59219 and 701:59223. Names are unchanged so the rules below
-   are untouched; only the values moved. CARRIED marks a value the free kit
-   has no source for. Full token set and contrast notes: design/tokens.css. */
+/* The job platform the intake hands over to. Layout and colour follow a common
+   job-board pattern (sidebar, tabbed top bar, filter pills, wide cards on grey,
+   a dark panel with a ring on each card, a profile column on the right); no
+   other product's name, marks or wording. Everything is inline so the page
+   renders offline from the stdlib server. */
 :root {
-  --primary: #7f56d9;  /* Brand/600 */
-  --accent: #7f56d9;  /* Untitled UI has one brand; the accent role collapses into it */
-  --success: #2f6b47;  /* CARRIED: no green in the free kit */
-  --bg: #e5e5e5;  /* Neutral/200 */
-  --ink: #171717;  /* Neutral/900 */
-  --card: #ffffff;  /* Base/White */
-  --muted: #525252;  /* Neutral/600, 7.82:1 on white */
-  --line: #d4d4d4;  /* Neutral/300 */
-  --pill: #e5e5e5;  /* Neutral/200 */
+  /* BridgeWork theme from the Figma "Design Theme" frame, the same tokens as
+     review.html. --ink is Figma's --text. */
+  --primary: #1B4B5A;
+  --accent: #E8874A;
+  --success: #4C9A6B;
+  --bg: #F7F5F1;
+  --ink: #2B2B2B;
+  --card: #fff;
+  --muted: #5b6168;
+  --line: #d9d4cb;
+  --pill: #efebe4;
+  /* The ring sits on a light panel: #4C9A6B on --primary is only 2.8:1, below
+     the 3:1 a graphic needs, and on --bg it is 3.1:1. */
   --ring: var(--success);
-  --ring-track: #e5e5e5;  /* Neutral/200 */
-  --ok: #2f6b47;  /* CARRIED, as --success */
-  --ok-bg: #e4f0e8;  /* CARRIED, as --success */
-  --warn: #7a4a00;  /* CARRIED: the kit has no warning text colour */
-  --warn-bg: #fef0c7;  /* Warning/100 */
-  --gate: #171717;  /* Neutral/900, moved off purple now that the brand is purple */
-  --gate-bg: #e5e5e5;  /* Neutral/200 */
-  --hit: #fef0c7;  /* Warning/100 */
-  --focus: #ffbf00;  /* CARRIED: the kit draws no focus ring */
+  --ring-track: var(--line);
+  /* Text on a success tint: --success itself is too light for text (3.1:1). */
+  --ok: #2f6b47;
+  --ok-bg: #e4f0e8;
+  --warn: #7a4a00;
+  --warn-bg: #fff3d6;
+  --gate: #3b1f7a;
+  --gate-bg: #efe9fb;
+  --hit: #fff1a8;
+  --focus: #ffbf00;
+  /* Save and apply only. Dark text on both: white on either fails contrast,
+     and so does --ink on --success (4.1:1). */
   --apply: var(--accent);
   --applied: var(--success);
-  --on-fill: #ffffff;  /* white clears both fills: 4.96:1 on brand, 6.33:1 on green */
+  --on-fill: #1f1a15;
 }
 * { box-sizing: border-box; }
 html { font-size: 17px; }
