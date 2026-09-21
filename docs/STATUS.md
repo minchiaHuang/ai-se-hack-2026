@@ -8,7 +8,7 @@
 
 最後驗證：2026-09-22（`bash bin/verify.sh` → GREEN，含 263 個骨架測試，於 `feat/d7-figma-jobs-template` 最新 commit，PR #31）
 
-**2026-09-22 清晨，`feat/d7-figma-jobs-template`（待合入）**：`/jobs` 改成 Figma「Matched Jobs」版面（左邊配對職缺卡、右邊 Why this matched，每個單元附上佐證它的那一行原文，並標明是廣告寫的還是職稱推定的；Apply 顯示審閱頁確認過的履歷），拿掉側欄、分頁、篩選、收藏，佐證包收進右欄「See full evidence pack →」；履歷改成 Figma「Template 50」版型（`skeleton/web/resume-template.{css,js}`，`/review` 與 `/jobs` 共用）。`/review` 交給 `/jobs` 的 session 多帶 `name`、`sections`、`via`。未做：`/intake` 路徑進 `/jobs` 的 Apply 只顯示純文字草稿（沒有 sections），沒有實際點過。之後依 Tommy 意見再簡化成 SEEK 式：卡片只剩職稱、公司、地點、工作類型、薪資、兩行摘要、一個「NN% skills match」；右欄是 Apply、白話技能清單、About the job；單元代碼、原句、佐證包收進「Show evidence details」折疊區。再依 Tommy 給的 SEEK grad 截圖改成單欄卡片：每張卡片自帶 Apply／Why a match／View ad，在卡片內展開；右側小欄是「Li's skills」摘要，完整佐證包折疊在內。
+**2026-09-22 清晨，`feat/d7-figma-jobs-template`（待合入）**：`/jobs` 改成 Figma「Matched Jobs」版面（左邊配對職缺卡、右邊 Why this matched，每個單元附上佐證它的那一行原文，並標明是廣告寫的還是職稱推定的；Apply 顯示審閱頁確認過的履歷），拿掉側欄、分頁、篩選、收藏，佐證包收進右欄「See full evidence pack →」；履歷改成 Figma「Template 50」版型（`skeleton/web/resume-template.{css,js}`，`/review` 與 `/jobs` 共用）。`/review` 交給 `/jobs` 的 session 多帶 `name`、`sections`、`via`。未做：`/intake` 路徑進 `/jobs` 的 Apply 只顯示純文字草稿（沒有 sections），沒有實際點過。之後依 Tommy 意見再簡化成 SEEK 式：卡片只剩職稱、公司、地點、工作類型、薪資、兩行摘要、一個「NN% skills match」；右欄是 Apply、白話技能清單、About the job；單元代碼、原句、佐證包收進「Show evidence details」折疊區。再依 Tommy 給的 SEEK grad 截圖改成單欄卡片：每張卡片自帶 Apply／Why a match／View ad，在卡片內展開；之後再改：列表右側留白，每個職缺有自己的頁面 `/jobs?job=<id>`（Match summary、About the job、折疊的佐證細節與完整佐證包、右側 Apply 與職缺資訊）。
 
 ## 進行中
 
