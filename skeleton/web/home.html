@@ -5,148 +5,266 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>BridgeWork</title>
 <style>
-/* Figma "BridgeWork" frame "Homepage" (10:610), drawn at 1280 wide. Inline and
-   without a web-font download: the demo runs offline from the stdlib server. */
+/* Figma "BridgeWork" frame "V3 / 01b — Homepage (photo-led)" (127:2), drawn at
+   1440 wide. Inline and without a web-font download: the demo runs offline from
+   the stdlib server. Photos are local copies from Unsplash (Unsplash License). */
 :root {
   --primary: #1B4B5A;
+  --primary-dark: #10313B;
   --accent: #E8874A;
   --success: #4C9A6B;
   --bg: #F7F5F1;
   --text: #2B2B2B;
+  --body: #555;
   --muted: #868686;
   --card: #fff;
-  --line: #d9d4cb;
+  --line: #e6e1d8;
   --focus: #ffbf00;
 }
 * { box-sizing: border-box; }
 body {
   margin: 0; background: var(--card); color: var(--text);
-  font: 15px/1.35 Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font: 16px/1.5 Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 a { color: inherit; }
+img { display: block; max-width: 100%; }
 :focus-visible { outline: 4px solid var(--focus); outline-offset: 2px; }
 [hidden] { display: none !important; }
 
 /* Logo icon, then "Bridge" bold and "Work" light with Figma's top-down gradient. */
 .brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; }
-.brand img { width: 83px; height: 76px; }
-.wordmark { font-size: 40px; line-height: 1; letter-spacing: -.01em; white-space: nowrap; }
+.brand img { width: 55px; height: 50px; }
+.wordmark { font-size: 28px; line-height: 1; letter-spacing: -.01em; white-space: nowrap; }
 .wordmark b { color: #000; font-weight: 700; }
 .wordmark span {
   font-weight: 300; margin-left: 4px; color: #1f7f9c;
   background: linear-gradient(#2bcdff, #1b4b5a); -webkit-background-clip: text; background-clip: text;
   -webkit-text-fill-color: transparent;
 }
-header.top { height: 100px; padding: 0 30px; display: flex; align-items: center; background: var(--card); }
+header.top {
+  height: 80px; padding: 0 40px; display: flex; align-items: center; gap: 28px;
+  background: var(--card); border-bottom: 1px solid var(--line);
+}
+header.top nav { margin-left: auto; display: flex; gap: 28px; font-size: 14px; font-weight: 500; }
+header.top nav a { text-decoration: none; }
+header.top nav a:hover { text-decoration: underline; }
 
-.banner { margin: 0; padding: .5rem 30px; background: var(--card); border: 2px dashed var(--line); }
 
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; padding: 14px 24px; border-radius: 8px;
+  font: 600 16px Inter, system-ui, sans-serif; text-decoration: none; border: 1.5px solid transparent;
+}
+.btn.primary { background: var(--accent); color: #fff; }
+.btn.ghost-light { border-color: rgba(255,255,255,.75); color: #fff; }
+.btn.ghost-dark { border-color: var(--primary); color: var(--primary); }
+.btn.small { padding: 10px 18px; font-size: 14px; }
+.btn.small.primary { background: var(--primary); }
+
+/* Hero: the photo, a scrim that is dark on the left so the white copy reads, then the copy. */
 .hero {
-  min-height: 732px; padding: 0 72px 40px; display: flex; flex-direction: column; justify-content: center;
-  background: linear-gradient(145.7deg, #1B4B5A 34.5%, #31849E 98%); color: #fff;
+  position: relative; min-height: 680px; display: flex; align-items: center; padding: 80px;
+  color: #fff; background: var(--primary) url(/img/hero-caseworker.jpg) center / cover no-repeat;
 }
-.eyebrow { color: var(--accent); font-size: 20px; font-weight: 700; margin: 0 0 22px; }
-.hero h1 { font-size: 50px; line-height: 1.2; font-weight: 700; max-width: 717px; margin: 0 0 30px; }
-.hero p.lede { font-size: 15px; max-width: 703px; margin: 0; }
+.hero::before {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(90deg, rgba(12,40,48,.95) 0%, rgba(18,57,74,.8) 45%, rgba(27,75,90,.15) 75%, rgba(27,75,90,0) 100%);
+}
+.hero-copy { position: relative; max-width: 640px; display: grid; gap: 24px; justify-items: start; }
+.pill {
+  margin: 0; padding: 6px 12px; border-radius: 999px; background: var(--accent);
+  font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+}
+.hero h1 { margin: 0; font-size: 60px; line-height: 1.12; font-weight: 700; }
+.hero .lede { margin: 0; max-width: 560px; font-size: 20px; line-height: 1.5; opacity: .9; }
+.actions { display: flex; flex-wrap: wrap; gap: 12px; }
 
-main { background: var(--bg); padding: 86px 24px 120px; }
-h2 { color: var(--primary); font-size: 40px; font-weight: 700; text-align: center; margin: 0 0 50px; }
+/* Three facts the product itself guarantees; no impact figures, since none are sourced. */
+.proof { background: var(--bg); padding: 40px 80px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 40px; }
+.proof div::before { content: ""; display: block; width: 32px; height: 4px; border-radius: 2px; background: var(--accent); margin-bottom: 8px; }
+.proof h3 { margin: 0 0 8px; color: var(--primary); font-size: 22px; }
+.proof p { margin: 0; color: var(--body); }
 
-/* The three steps sit on one grey rule drawn from the first circle to the last. */
-.steps { list-style: none; margin: 0 auto; padding: 0; max-width: 1060px; position: relative;
-         display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
-.steps::before { content: ""; position: absolute; top: 35px; left: 16.7%; right: 16.7%; height: 2px; background: #c9c9c9; }
-.steps li { position: relative; display: flex; flex-direction: column; align-items: center; text-align: center; }
-.num { width: 70px; height: 70px; border-radius: 50%; background: var(--primary); color: #fff;
-       display: grid; place-items: center; font-size: 40px; font-weight: 700; }
-.steps h3 { color: var(--primary); font-size: 20px; margin: 18px 0 12px; }
-.steps p { color: var(--muted); font-weight: 700; max-width: 240px; margin: 0; }
+.eyebrow { margin: 0 0 12px; color: var(--accent); font-size: 13px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
+h2 { margin: 0; color: var(--primary); font-size: 40px; line-height: 1.18; font-weight: 700; }
 
-.cards { display: grid; grid-template-columns: repeat(2, minmax(0, 479px)); gap: 64px; justify-content: center; margin-top: 160px; }
-.card { background: var(--card); border-radius: 20px; padding: 36px 40px; min-height: 376px; display: flex; flex-direction: column; }
-.icon { width: 63px; height: 54px; border-radius: 5px; background: var(--bg); display: grid; place-items: center; font-size: 30px; }
-.card h3 { font-size: 20px; color: #000; margin: 28px 0 16px; }
-.card p { color: var(--muted); font-weight: 500; margin: 0 0 32px; }
+.how { padding: 96px 80px; }
+.steps { list-style: none; margin: 48px 0 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; }
+.steps li { border: 1px solid var(--line); border-radius: 16px; overflow: hidden; background: var(--card); }
+.steps img { width: 100%; aspect-ratio: 5 / 3; object-fit: cover; }
+.steps .body { padding: 24px 24px 28px; }
+.num { display: inline-block; padding: 4px 10px; border-radius: 999px; background: #FCE9DC; color: #C9621F; font-size: 12px; font-weight: 600; }
+.steps h3 { margin: 10px 0; font-size: 22px; }
+.steps p { margin: 0; color: var(--body); }
+
+.skills { background: var(--primary); color: #fff; padding: 96px 80px; display: grid; grid-template-columns: 440px 1fr; gap: 64px; align-items: center; }
+.skills .eyebrow { color: #F3A26F; }
+.skills h2 { color: #fff; }
+.skills p.copy { margin: 20px 0 0; font-size: 18px; line-height: 1.55; opacity: .85; }
+.tiles { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.tiles li { position: relative; aspect-ratio: 372 / 300; border-radius: 16px; overflow: hidden; }
+.tiles img { width: 100%; height: 100%; object-fit: cover; }
+.tiles li::after { content: ""; position: absolute; inset: 0; background: linear-gradient(transparent 55%, rgba(0,0,0,.75)); }
+.tiles .cap { position: absolute; left: 20px; right: 20px; bottom: 20px; z-index: 1; }
+.tiles b { display: block; font-size: 18px; }
+.tiles span { font-size: 14px; opacity: .9; }
+
+.who { background: var(--bg); padding: 96px 80px; display: grid; grid-template-columns: 600px 1fr; gap: 64px; align-items: center; }
+.who > img { width: 100%; aspect-ratio: 600 / 440; object-fit: cover; border-radius: 20px; }
+.who h2 { font-size: 36px; margin-bottom: 28px; }
+.who ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 28px; }
+.who li { position: relative; padding-left: 28px; }
+.who li::before { content: ""; position: absolute; left: 0; top: 7px; width: 12px; height: 12px; border-radius: 50%; background: var(--accent); }
+.who h3 { margin: 0 0 6px; font-size: 20px; }
+.who li p { margin: 0 0 16px; color: var(--body); }
 .button {
-  margin-top: auto; display: flex; align-items: center; justify-content: center; height: 50px; border-radius: 12px;
-  background: var(--primary); color: #fff; font: 500 20px Inter, system-ui, sans-serif; text-decoration: none; border: 0; width: 100%;
+  display: inline-flex; align-items: center; justify-content: center; padding: 10px 18px; border-radius: 8px;
+  font: 600 14px Inter, system-ui, sans-serif; text-decoration: none; border: 1.5px solid var(--primary);
+  background: var(--primary); color: #fff;
 }
-.button:disabled { background: #d1d5db; color: #4b5563; cursor: not-allowed; }
+.button:disabled { background: #d1d5db; border-color: #d1d5db; color: #4b5563; cursor: not-allowed; }
 
-footer { padding: 52px 30px 30px; display: flex; justify-content: flex-end; background: var(--card); }
+.cta { padding: 96px 24px; text-align: center; color: #fff; background: linear-gradient(145deg, #1B4B5A 20%, #31849E 100%); }
+.cta h2 { color: #fff; font-size: 44px; }
+.cta p { margin: 24px 0; font-size: 20px; opacity: .85; }
+.cta .actions { justify-content: center; }
 
+footer { padding: 48px 80px 32px; background: var(--primary-dark); color: rgba(255,255,255,.8); font-size: 14px; text-align: center; }
+footer nav { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px 28px; font-weight: 600; color: #fff; }
+footer nav a { text-decoration: none; }
+footer nav a:hover { text-decoration: underline; }
+footer .country { max-width: 720px; margin: 28px auto; line-height: 1.6; }
+footer small { display: block; padding-top: 20px; border-top: 1px solid rgba(255,255,255,.15); color: rgba(255,255,255,.55); font-size: 13px; }
+
+@media (max-width: 1100px) {
+  .skills, .who { grid-template-columns: minmax(0, 1fr); }
+}
 @media (max-width: 760px) {
-  header.top { height: 76px; padding: 0 16px; }
-  .brand img { width: 55px; height: 50px; }
-  .wordmark { font-size: 28px; }
-  .banner { padding: .5rem 16px; }
+  header.top { height: 68px; padding: 0 16px; gap: 12px; }
+  header.top nav { display: none; }
+  .brand img { width: 44px; height: 40px; }
+  .wordmark { font-size: 24px; }
+  header.top .btn { margin-left: auto; }
   .hero { min-height: 0; padding: 72px 16px; }
-  .hero h1 { font-size: 34px; }
-  main { padding: 56px 16px 72px; }
-  h2 { font-size: 30px; margin-bottom: 32px; }
-  .steps { grid-template-columns: 1fr; gap: 32px; }
-  .steps::before { display: none; }
-  .cards { grid-template-columns: minmax(0, 1fr); gap: 24px; margin-top: 64px; }
-  .card { min-height: 0; padding: 28px 24px; }
-  footer { padding: 32px 16px; }
+  .hero::before { background: rgba(12,40,48,.82); }
+  .hero h1 { font-size: 36px; }
+  .hero .lede { font-size: 17px; }
+  .proof { grid-template-columns: minmax(0, 1fr); padding: 32px 16px; gap: 24px; }
+  h2 { font-size: 30px; }
+  .how, .skills, .who { padding: 56px 16px; }
+  .steps { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  .tiles { grid-template-columns: minmax(0, 1fr); }
+  .who h2 { font-size: 28px; }
+  .cta { padding: 64px 16px; }
+  .cta h2 { font-size: 32px; }
+  footer { padding: 40px 16px 24px; }
 }
 </style>
 </head>
 <body>
 <header class="top">
   <a class="brand" href="/" data-route><img src="/logo.svg" alt=""><span class="wordmark"><b>Bridge</b><span>Work</span></span></a>
+  <nav aria-label="Main">
+    <a href="#how">How it works</a>
+    <a href="#who">Who it’s for</a>
+  </nav>
+  <a class="btn small primary" href="/start" data-route>Start a resume</a>
 </header>
-<p id="mock-banner" class="banner" hidden>Mock mode: fixture data for a fictional cook, no backend. Nothing is recorded or sent.</p>
 
 <section class="hero">
-  <p class="eyebrow">Built For Refugee Employment</p>
-  <h1>Breaking the language barrier, one resume at a time.</h1>
-  <p class="lede">Bridgework helps NGO caseworkers turn a refugee client's spoken story — in their own language — into a job-ready English resume. No typing, no formal English required on the client's side.</p>
+  <div class="hero-copy">
+    <p class="pill">Built for refugee employment</p>
+    <h1>Work experience should not be lost in translation.</h1>
+    <p class="lede">BridgeWork helps caseworkers turn a client’s spoken story — in any language — into a clear, job-ready English resume, then shows which Sydney jobs it fits and why.</p>
+    <div class="actions">
+      <a class="btn primary" href="/start" data-route>Start a resume</a>
+      <!-- No data-route: the demo sets ?mock=1 itself, whatever the page was opened with. -->
+      <a class="btn ghost-light" href="/start?mock=1">Live demo</a>
+    </div>
+  </div>
 </section>
 
-<main>
-  <h2>How it works</h2>
-  <ol class="steps">
-    <li><span class="num">1</span><h3>Conversation</h3><p>A refugee client speaks in their own language, in a real interview with a caseworker.</p></li>
-    <li><span class="num">2</span><h3>Resume</h3><p>AI drafts a resume in Australian English — the caseworker reviews and confirms.</p></li>
-    <li><span class="num">3</span><h3>Match &amp; Apply</h3><p>Matched to real, open roles, with a resume ready to send.</p></li>
-  </ol>
+<section class="proof" aria-label="What BridgeWork guarantees">
+  <div><h3>Any language</h3><p>Clients speak in the language that feels natural; the resume comes out in English.</p></div>
+  <div><h3>Every skill cites a source</h3><p>Each suggested skill links to the moment in the interview or the resume line it came from.</p></div>
+  <div><h3>Caseworker approves</h3><p>Nothing goes on the resume until the caseworker has reviewed every line.</p></div>
+</section>
 
-  <div class="cards">
-    <section class="card">
-      <div class="icon" aria-hidden="true">🤝</div>
-      <h3>I’m an NGO caseworker</h3>
-      <p>Bring a refugee client's story — spoken in their own language — to a job-ready resume in one session. No typing required on their side.</p>
-      <a class="button" href="/start" data-route>Get Started →</a>
-    </section>
-    <section class="card">
-      <div class="icon" aria-hidden="true">🏢</div>
-      <h3>I’m hiring refugee talent</h3>
-      <p>Reach candidates ready to work, with wage-subsidy evidence — hours, tenure, wage records — generated automatically as they work with you.</p>
-      <!-- There is no employer side yet, so this card cannot lead anywhere. -->
-      <button class="button" type="button" disabled>Coming soon</button>
-    </section>
+<section class="how" id="how">
+  <p class="eyebrow">How it works</p>
+  <h2>From a conversation to an opportunity.</h2>
+  <ol class="steps">
+    <li><img src="/img/step-listen.jpg" alt="" loading="lazy"><div class="body"><span class="num">01</span><h3>Listen together</h3><p>The client tells their work story in their own language while the caseworker listens.</p></div></li>
+    <li><img src="/img/step-review.jpg" alt="" loading="lazy"><div class="body"><span class="num">02</span><h3>Review the draft</h3><p>AI turns the story into clear resume content. The caseworker edits and approves.</p></div></li>
+    <li><img src="/img/step-match.jpg" alt="" loading="lazy"><div class="body"><span class="num">03</span><h3>Match with evidence</h3><p>See which real Sydney jobs fit, which skills the ad asks for, and what still needs checking.</p></div></li>
+  </ol>
+</section>
+
+<section class="skills">
+  <div>
+    <p class="eyebrow">The skills are already there</p>
+    <h2>A kitchen, a warehouse, a family shop — it all counts.</h2>
+    <p class="copy">Years of work often disappear on an Australian resume because they were never written down in English. BridgeWork names those skills in the words employers use, and shows where each one came from.</p>
+  </div>
+  <!-- The skill lines are illustrations of the kind of work, not claims about these people. -->
+  <ul class="tiles">
+    <li><img src="/img/work-kitchen.jpg" alt="A cook plating food in a restaurant kitchen" loading="lazy"><div class="cap"><b>Kitchen hand → Commis chef</b><span>Food safety · prep · stock rotation</span></div></li>
+    <li><img src="/img/work-warehouse.jpg" alt="Warehouse aisles stacked with boxes" loading="lazy"><div class="cap"><b>Warehouse</b><span>Picking &amp; packing · forklift readiness</span></div></li>
+    <li><img src="/img/work-construction.jpg" alt="Road workers on a city construction site" loading="lazy"><div class="cap"><b>Construction labourer</b><span>Site safety · traffic control</span></div></li>
+    <li><img src="/img/work-retail.jpg" alt="A smiling woman in a hijab" loading="lazy"><div class="cap"><b>Retail &amp; customer service</b><span>Cash handling · languages spoken</span></div></li>
+  </ul>
+</section>
+
+<section class="who" id="who">
+  <img src="/img/team.jpg" alt="" loading="lazy">
+  <div>
+    <p class="eyebrow">Who it’s for</p>
+    <h2>Built for the people who help others into work.</h2>
+    <ul>
+      <li>
+        <h3>Caseworkers &amp; settlement services</h3>
+        <p>Spend the appointment listening, not typing. Leave with a resume draft you have checked.</p>
+        <a class="button" href="/start" data-route>Get Started →</a>
+      </li>
+      <li>
+        <h3>Employers</h3>
+        <p>See what a candidate has actually done, with the evidence behind each skill.</p>
+        <!-- There is no employer side yet, so this card cannot lead anywhere. -->
+        <button class="button" type="button" disabled>Coming soon</button>
+      </li>
+    </ul>
   </div>
   <!-- Figma's testimonial section is left out on purpose: it quotes a
        caseworker, no such interview has happened, and AI_CONTEXT.md forbids
        presenting unvalidated testimony. -->
-</main>
+</section>
+
+<section class="cta">
+  <h2>Start with a conversation.</h2>
+  <p>One appointment. Any language. A resume the caseworker trusts.</p>
+  <div class="actions">
+    <a class="btn primary" href="/start" data-route>Start a resume</a>
+  </div>
+</section>
 
 <footer>
-  <a class="brand" href="/" data-route><img src="/logo.svg" alt=""><span class="wordmark"><b>Bridge</b><span>Work</span></span></a>
+  <nav aria-label="Footer">
+    <a href="#how">How it works</a>
+    <a href="#who">Who it’s for</a>
+    <a href="/start" data-route>Start a resume</a>
+  </nav>
+  <p class="country">BridgeWork acknowledges the Gadigal people of the Eora Nation, the Traditional Custodians of the land where this was built, and pays respect to Elders past and present.</p>
+  <small>© 2026 BridgeWork · Built at AI for Social Enterprise Hackathon 2026</small>
 </footer>
 
 <script>
-// ?mock=1 (and &quiet=1, which only hides the banner for the video) rides along
-// on every link, so the whole flow stays in mock mode from the first click.
+// ?mock=1 rides along on every link, so the whole flow stays in mock mode
+// from the first click.
 const params = new URLSearchParams(location.search);
 const MOCK = params.get("mock") === "1";
 const carried = new URLSearchParams();
 if (MOCK) carried.set("mock", "1");
-if (MOCK && params.get("quiet") === "1") carried.set("quiet", "1");
 const suffix = carried.toString() ? "?" + carried : "";
 document.querySelectorAll("a[data-route]").forEach(a => { a.href = a.getAttribute("href") + suffix; });
-document.getElementById("mock-banner").hidden = !MOCK || params.get("quiet") === "1";
 </script>
 </body>
 </html>

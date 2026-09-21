@@ -5,6 +5,7 @@ class, so transcription and the model run on their offline paths.
 """
 import base64
 import json
+import re
 import os
 import threading
 import unittest
@@ -124,8 +125,31 @@ class HttpRoundTrip(Server):
         self.assertEqual(status, 200)
         self.assertEqual(headers["Content-Type"], "text/html; charset=utf-8")
         _, body = self.get("/")
-        self.assertIn("Breaking the language barrier", body)
+        self.assertIn("Work experience should not be lost in translation.", body)
         self.assertIn('href="/start"', body)
+
+    def test_the_homepage_offers_the_demo_in_mock_mode(self):
+        # The demo button carries ?mock=1 itself, so it must not be rewritten
+        # by the data-route script, which would drop mock mode on a live page.
+        _, body = self.get("/")
+        self.assertIn('<a class="btn ghost-light" href="/start?mock=1">Live demo</a>', body)
+
+    def test_every_homepage_photo_serves_as_jpeg(self):
+        _, body = self.get("/")
+        photos = sorted(set(re.findall(r"/img/([\w-]+\.jpg)", body)))
+        self.assertEqual(len(photos), 9)
+        for name in photos:
+            with self.subTest(photo=name):
+                status, headers = self.raw_get("/img/" + name)
+                self.assertEqual(status, 200)
+                self.assertEqual(headers["Content-Type"], "image/jpeg")
+
+    def test_the_photo_route_serves_only_the_photo_folder(self):
+        # Anything not in the folder falls through to the developer index page.
+        _, headers = self.raw_get("/img/../app.py")
+        self.assertEqual(headers["Content-Type"], "text/html; charset=utf-8")
+        _, body = self.get("/img/../app.py")
+        self.assertNotIn("class Handler", body)
 
     def test_the_homepage_keeps_mock_mode_on_its_own(self):
         # No redirect any more: the page carries ?mock=1 onto its links itself.
@@ -180,13 +204,15 @@ class HttpRoundTrip(Server):
             with self.subTest(href=href):
                 self.assertIn(href, body)
 
-    def test_quiet_hides_only_the_mock_banner_on_the_entry_pages(self):
-        # &quiet=1 is for the demo video: the banner goes, mock mode stays.
-        for path in ("/", "/start", "/start/path"):
+    def test_no_page_carries_a_mock_banner(self):
+        """The demo is shown as the product, so the fixture data is stated in
+        the README and said out loud, not stamped across every page."""
+        for path in ("/", "/start", "/start/path", "/interview", "/review",
+                     "/upload", "/jobs", "/intake"):
             with self.subTest(path=path):
-                _, body = self.get(path)
-                self.assertIn('id="mock-banner"', body)
-                self.assertIn('.hidden = !MOCK || params.get("quiet") === "1"', body)
+                _, body = self.get(path + "?mock=1")
+                self.assertNotIn("mock-banner", body)
+                self.assertNotIn("Mock mode:", body)
 
     def test_the_logo_serves_as_svg(self):
         status, headers = self.raw_get("/logo.svg")

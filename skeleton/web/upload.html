@@ -30,10 +30,11 @@ body {
   font: 1rem/1.5 Inter, system-ui, sans-serif;
 }
 /* Figma header: white bar, logo icon, "Bridge" bold and "Work" regular. */
-header.top { display: flex; align-items: center; gap: 1.25rem; padding: 14px 24px;
+header.top { height: 80px; padding: 0 40px; display: flex; align-items: center; gap: 1.25rem;
              border-bottom: 1px solid var(--line); background: var(--card); }
-.wordmark { display: flex; align-items: center; font-size: 1.6rem; margin: 0; letter-spacing: -.01em; }
-.wordmark img { height: 1.6em; width: auto; margin-right: .45rem; }
+@media (max-width: 760px) { header.top { height: 68px; padding: 0 16px; } .wordmark { font-size: 24px; } .wordmark img { height: 40px; } }
+.wordmark { display: flex; align-items: center; font-size: 28px; margin: 0; letter-spacing: -.01em; }
+.wordmark img { height: 50px; width: auto; margin-right: .45rem; }
 .wordmark b { color: var(--text); }
 .wordmark span { color: var(--primary); font-weight: 400; margin-left: .15em; }
 .step { color: var(--muted); font-weight: 600; }
@@ -131,7 +132,6 @@ pre.original { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font: 
   <span class="step">Upload a resume</span>
 </header>
 <main>
-  <p id="mock-banner" class="banner mock" hidden>Mock mode: a fictional cook's Mandarin resume stands in for any file, no backend. Nothing is recorded or sent.</p>
   <p id="offline" class="banner offline" role="status" hidden></p>
   <p id="error" class="banner error" role="alert" hidden></p>
 
@@ -195,14 +195,12 @@ pre.original { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font: 
 // request at all: the demo is recorded in it.
 const params = new URLSearchParams(location.search);
 const MOCK = params.get("mock") === "1";
-// ?quiet=1 hides only the mock banner, for the recorded demo; nothing else changes.
-const QUIET = params.get("quiet") === "1";
 
 // Read by /review. sessionStorage keeps the resume to this tab.
 const SECTIONS_KEY = "d7.sections";
 const INTERVIEW_KEY = "d7.interview";
-// Both flags ride along on every link, so a demo opened quiet stays quiet.
-const FLAGS = [MOCK && "mock=1", QUIET && "quiet=1"].filter(Boolean).join("&");
+// The mock flag rides along on every link, so a demo stays in mock mode.
+const FLAGS = [MOCK && "mock=1"].filter(Boolean).join("&");
 const asRoute = (route, file) => (location.protocol === "file:" ? file : route) + (FLAGS ? "?" + FLAGS : "");
 const REVIEW_URL = asRoute("/review", "review.html");
 
@@ -490,7 +488,6 @@ function toggleEdit(key) {
 }
 
 // ---------------------------------------------------------------- wiring
-$("mock-banner").hidden = !MOCK || QUIET;
 $("consent").addEventListener("change", event => { state.consent = event.target.checked; $("why").textContent = ""; });
 $("lang").addEventListener("change", event => { state.language = event.target.value; });
 $("drop").addEventListener("click", chooseFile);
