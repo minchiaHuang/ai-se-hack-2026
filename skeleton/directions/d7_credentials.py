@@ -66,11 +66,15 @@ def prepare(payload):
     """What the model sees: the transcript and the occupational frame, nothing else."""
     occupation_key = payload["occupation"]
     anzsco, osca = registry.classifications(occupation_key)
+    qualification = registry.occupation(occupation_key)["qualification"]
     return {
         "transcript": payload["transcript"],
         "candidate_units": registry.all_units(occupation_key),
         "anzsco": anzsco,
         "osca": osca,
+        # Code and title only: without it the live model has no qualification
+        # to cite, and live._allowed_codes() drops every qualification it names.
+        "qualification": {"code": qualification["code"], "title": qualification["title"]},
     }
 
 

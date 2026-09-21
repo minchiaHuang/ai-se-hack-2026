@@ -596,7 +596,7 @@ async function buildPack() {
     setStatus("Matching against sample jobs…");
     render();
     const match = await call("/api/match", { json: {
-      occupation: OCCUPATION, evidenced_units: evidencedUnits(extract) } });
+      occupation: OCCUPATION, evidenced_units: evidencedUnits(extract), transcript } });
     if (refusedBy(match)) return;
     state.match = match;
     setStatus("");

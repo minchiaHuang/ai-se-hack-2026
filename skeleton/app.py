@@ -6,8 +6,10 @@ confirms every row before anything counts.
 """
 import html
 import json
+import os
 import sys
-from http.server import BaseHTTPRequestHandler, HTTPServer
+import traceback
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
@@ -16,11 +18,11 @@ from urllib.parse import parse_qs, urlparse
 if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from skeleton.core import registry
+from skeleton.core import live, registry
 from skeleton.core.model import CANNED, StubModel
 from skeleton.core.pipeline import run
 from skeleton.core.schema import AggregationError
-from skeleton.directions import d2_triage, d3_evidence, d6_outcomes, d7_credentials
+from skeleton.directions import d2_triage, d3_evidence, d6_outcomes, d7_credentials, d7_match
 from skeleton.directions.d7_credentials import RedLineError, UnsupportedLanguageError
 
 DIRECTIONS = {"d2": d2_triage, "d3": d3_evidence,
@@ -30,6 +32,16 @@ REFUSALS = (AggregationError, RedLineError, UnsupportedLanguageError)
 SCENARIOS = json.loads(
     (Path(__file__).resolve().parent / "demo_data" / "payloads.json").read_text(encoding="utf-8")
 )
+INTAKE_PAGE = Path(__file__).resolve().parent / "web" / "intake.html"
+
+# A request past these is refused before it is read: a few minutes of webm
+# speech is well under 25 MB, and no JSON the page sends comes near 1 MB.
+MAX_AUDIO_BYTES = 25 * 1024 * 1024
+MAX_JSON_BYTES = 1024 * 1024
+
+
+class BadRequest(Exception):
+    """Answered as HTTP 400 with this message and nothing else."""
 
 
 def direction_for(scenario_key):
@@ -135,13 +147,48 @@ def model_for_occupation(occupation_key):
     """Pick the stub's canned answer by occupation, so a welder is not handed
     the cook's evidence pack. An occupation with no canned file gets nothing,
     which the pipeline reports as gaps rather than borrowing another trade's
-    evidence. The live model replaces this."""
+    evidence. With ANTHROPIC_API_KEY set the live model answers, and this
+    stub is what it falls back to when the call fails."""
     if occupation_key == "cookery":
-        return model_for("d7")
-    scenario_key = f"d7_{occupation_key}"
-    if (CANNED / f"{scenario_key}.json").exists():
-        return model_for(scenario_key)
-    return StubModel({d7_credentials.KEY: []})
+        stub = model_for("d7")
+    elif (CANNED / f"d7_{occupation_key}.json").exists():
+        stub = model_for(f"d7_{occupation_key}")
+    else:
+        stub = StubModel({d7_credentials.KEY: []})
+    if os.environ.get("ANTHROPIC_API_KEY"):
+        return live.LiveModel(fallback=stub)
+    return stub
+
+
+def transcribe(audio, language):
+    """Refused before ElevenLabs is called: audio in a language we cannot
+    verify is never sent anywhere, and never transcribed as English."""
+    if language not in d7_credentials.SUPPORTED_LANGUAGES:
+        return {"refused": f"{language}: not supported. This demo runs in "
+                           f"{', '.join(d7_credentials.SUPPORTED_LANGUAGES)}. "
+                           "We will not fake a language we cannot verify."}
+    return live.transcribe(audio, language)
+
+
+def match(payload):
+    """Jobs, gap courses and a draft resume for the best-fit job.
+
+    The page sends no transcript to this route, so the resume's experience
+    lines are empty unless a caller passes one; units and qualifications are
+    still listed. Lines without an English gloss are left out because the
+    resume is written in English.
+    """
+    evidenced = payload.get("evidenced_units", [])
+    if not isinstance(evidenced, list) or not all(isinstance(u, dict) for u in evidenced):
+        raise BadRequest("evidenced_units must be a list of objects")
+    transcript = [line for line in payload.get("transcript") or []
+                  if isinstance(line, dict) and "t" in line and "en" in line]
+    jobs = d7_match.match_jobs(payload.get("occupation"), evidenced)
+    resume = None
+    if jobs:
+        resume = {"job_id": jobs[0]["id"],
+                  "text": d7_match.resume_for(jobs[0], evidenced, transcript)}
+    return {"jobs": jobs, "courses": d7_match.courses_for(jobs), "resume": resume}
 
 
 PAGE = """<!doctype html><meta charset=utf-8><title>Direction skeleton</title>
@@ -160,14 +207,66 @@ table{{border-collapse:collapse;width:100%}} td{{border-top:1px solid #ddd;paddi
 class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         parsed = urlparse(self.path)
+        if parsed.path == "/intake":
+            return self._send(200, "text/html; charset=utf-8", INTAKE_PAGE.read_bytes())
         scenario = parse_qs(parsed.query).get("s", [None])[0]
         if parsed.path == "/run" and scenario in SCENARIOS:
             body = render_result(scenario)
         else:
             body = render_index()
-        encoded = PAGE.format(body=body).encode("utf-8")
-        self.send_response(200)
-        self.send_header("Content-Type", "text/html; charset=utf-8")
+        self._send(200, "text/html; charset=utf-8", PAGE.format(body=body).encode("utf-8"))
+
+    def do_POST(self):
+        parsed = urlparse(self.path)
+        # Every refusal is a 200 {"refused": ...}: the page shows its refusal
+        # panel only on a 200, and a non-200 reads as a generic error.
+        try:
+            if parsed.path == "/api/transcribe":
+                language = parse_qs(parsed.query).get("language", [""])[0]
+                body = transcribe(self._read(MAX_AUDIO_BYTES), language)
+            elif parsed.path == "/api/extract":
+                body = extract(self._read_json())
+            elif parsed.path == "/api/match":
+                body = match(self._read_json())
+            else:
+                return self._json(404, {"error": f"{parsed.path}: no such endpoint"})
+        except BadRequest as bad:
+            return self._json(400, {"error": str(bad)})
+        except KeyError as unknown:
+            # An unknown occupation, or a missing field the pipeline needs.
+            return self._json(400, {"error": f"unknown or missing: {unknown.args[0]}"})
+        except Exception:
+            # The traceback stays in the server's terminal, never in the response.
+            traceback.print_exc()
+            return self._json(500, {"error": "internal error"})
+        self._json(200, body)
+
+    def _read(self, limit):
+        try:
+            length = int(self.headers.get("Content-Length") or 0)
+        except ValueError:
+            length = -1
+        if not 0 <= length <= limit:
+            # The body is left unread, so this connection cannot be reused.
+            self.close_connection = True
+            raise BadRequest(f"body must be between 0 and {limit} bytes")
+        return self.rfile.read(length)
+
+    def _read_json(self):
+        try:
+            payload = json.loads(self._read(MAX_JSON_BYTES))
+        except (UnicodeDecodeError, json.JSONDecodeError):
+            raise BadRequest("body is not valid JSON") from None
+        if not isinstance(payload, dict):
+            raise BadRequest("body must be a JSON object")
+        return payload
+
+    def _json(self, status, body):
+        self._send(status, "application/json", json.dumps(body).encode("utf-8"))
+
+    def _send(self, status, content_type, encoded):
+        self.send_response(status)
+        self.send_header("Content-Type", content_type)
         self.send_header("Content-Length", str(len(encoded)))
         self.end_headers()
         self.wfile.write(encoded)
@@ -186,5 +285,5 @@ if __name__ == "__main__":
     if "--check" in sys.argv:
         check()
     else:
-        print("http://127.0.0.1:8000")
-        HTTPServer(("127.0.0.1", 8000), Handler).serve_forever()
+        print("http://127.0.0.1:8000  (intake page: http://127.0.0.1:8000/intake)")
+        ThreadingHTTPServer(("127.0.0.1", 8000), Handler).serve_forever()
