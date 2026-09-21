@@ -53,5 +53,123 @@
     "target_fields": [
       "retention_6m"
     ]
+  },
+  "d7": {
+    "label": "Camp kitchen, three years, no papers",
+    "occupation": "cookery",
+    "language": "zh",
+    "consent": true,
+    "transcript": [
+      {
+        "t": "00:03",
+        "text": "我一直是做饭的，在厨房干了好多年了。",
+        "en": "I've always been a cook. I've worked in kitchens for years."
+      },
+      {
+        "t": "00:12",
+        "text": "在营地的厨房我干了三年，每天差不多要做两百个人的饭。",
+        "en": "In the camp kitchen I worked for three years, cooking for about two hundred people every day."
+      },
+      {
+        "t": "00:47",
+        "text": "早上五点就开始了，先蒸米饭，然后炖肉、熬汤，一大锅一大锅的。",
+        "en": "We started at five in the morning. Rice first, then stewing the meat and making soup, one huge pot after another."
+      },
+      {
+        "t": "01:26",
+        "text": "后来我带几个人，四五个吧，谁切菜谁洗锅，都是我来安排。",
+        "en": "Later I had a few people with me, four or five. I decided who chopped vegetables and who washed the pots."
+      },
+      {
+        "t": "02:03",
+        "text": "肉是每天早上送来的，我先看新不新鲜，不新鲜的就不能用。",
+        "en": "The meat was delivered every morning. I checked first whether it was fresh, and if it wasn't, we couldn't use it."
+      },
+      {
+        "t": "02:41",
+        "text": "生的和熟的一定要分开放，砧板和刀也分开用。冰箱的温度我每天记两次，写在本子上。",
+        "en": "Raw and cooked food always had to be kept apart, with separate chopping boards and knives too. I wrote down the fridge temperature twice a day in a notebook."
+      },
+      {
+        "t": "03:18",
+        "text": "证书我没有，一张都没有。可是这些活儿我都会做。",
+        "en": "I don't have a certificate, not a single one. But I can do all of this work."
+      },
+      {
+        "t": "03:52",
+        "text": "在这边我想先找个厨房的工作，然后再慢慢学。",
+        "en": "Here I'd like to find a kitchen job first, and then keep learning bit by bit."
+      }
+    ]
+  },
+  "d7_welding": {
+    "label": "Structural steel welder, seven years, no certificate",
+    "occupation": "welding",
+    "language": "zh",
+    "consent": true,
+    "transcript": [
+      {
+        "t": "00:05",
+        "text": "我是焊工，干了七年多了。",
+        "en": "I'm a welder. I've done it for more than seven years."
+      },
+      {
+        "t": "00:21",
+        "text": "主要是焊钢结构，厂房的钢梁啊、楼梯啊、栏杆这些。",
+        "en": "Mostly structural steel: beams for factory buildings, stairs, railings, that kind of thing."
+      },
+      {
+        "t": "00:58",
+        "text": "电焊条的我会，气保焊也会，就是用焊丝的那种。氩弧焊做得少一点。",
+        "en": "I can weld with stick electrodes, and gas-shielded too, the kind with the wire. I did less TIG."
+      },
+      {
+        "t": "01:30",
+        "text": "切割也是我自己来，用氧气乙炔割钢板。",
+        "en": "I did the cutting myself as well, cutting steel plate with oxy-acetylene."
+      },
+      {
+        "t": "02:05",
+        "text": "图纸我看得懂。师傅把图给我，我自己量、自己下料。",
+        "en": "I can read drawings. The foreman gave me the drawing, and I measured and cut the material myself."
+      },
+      {
+        "t": "02:47",
+        "text": "干活的时候面罩、手套一定要戴，旁边不能放油和纸，怕着火。",
+        "en": "When working, the mask and gloves always went on, and no oil or paper was kept nearby, because of fire."
+      },
+      {
+        "t": "03:30",
+        "text": "证书我没有，但是你给我一块钢板，我焊给你看。",
+        "en": "I don't have a certificate, but give me a steel plate and I'll weld it to show you."
+      }
+    ]
+  },
+  "d7_lowconfidence": {
+    "label": "Unclear whether the work was paid",
+    "occupation": "cookery",
+    "language": "zh",
+    "consent": true,
+    "transcript": [
+      {
+        "t": "04:08",
+        "text": "我在我叔叔的厨房帮过忙。",
+        "en": "I helped out in my uncle's kitchen."
+      }
+    ]
+  },
+  "d7_unsupported_language": {
+    "label": "Tigrinya - we refuse rather than fake it",
+    "occupation": "cookery",
+    "language": "ti",
+    "consent": true,
+    "transcript": []
+  },
+  "d7_no_consent": {
+    "label": "Consent not given - nothing is processed",
+    "occupation": "cookery",
+    "language": "zh",
+    "consent": false,
+    "transcript": []
   }
 }

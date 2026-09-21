@@ -19,9 +19,13 @@ if __package__ in (None, ""):
 from skeleton.core.model import CANNED, StubModel
 from skeleton.core.pipeline import run
 from skeleton.core.schema import AggregationError
-from skeleton.directions import d2_triage, d3_evidence, d6_outcomes
+from skeleton.directions import d2_triage, d3_evidence, d6_outcomes, d7_credentials
+from skeleton.directions.d7_credentials import RedLineError, UnsupportedLanguageError
 
-DIRECTIONS = {"d2": d2_triage, "d3": d3_evidence, "d6": d6_outcomes}
+DIRECTIONS = {"d2": d2_triage, "d3": d3_evidence,
+              "d6": d6_outcomes, "d7": d7_credentials}
+
+REFUSALS = (AggregationError, RedLineError, UnsupportedLanguageError)
 SCENARIOS = json.loads(
     (Path(__file__).resolve().parent / "demo_data" / "payloads.json").read_text(encoding="utf-8")
 )
@@ -61,7 +65,7 @@ def render_result(scenario_key):
 
     try:
         result = run(direction, payload, model_for(scenario_key))
-    except AggregationError as refused:
+    except REFUSALS as refused:
         return (head + '<div class="refused"><strong>Refused</strong><p>'
                 + html.escape(str(refused)) + "</p></div>" + back)
 

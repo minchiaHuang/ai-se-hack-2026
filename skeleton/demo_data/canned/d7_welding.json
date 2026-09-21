@@ -1,0 +1,66 @@
+[
+  {
+    "field": "anzsco_code",
+    "value": "322313 Welder (First Class)",
+    "reason": "Over seven years welding structural steel: beams, stairs and railings.",
+    "confidence": 0.83,
+    "sources": [
+      [
+        "transcript",
+        "t=00:05"
+      ],
+      [
+        "transcript",
+        "t=00:21"
+      ]
+    ]
+  },
+  {
+    "field": "osca_code",
+    "value": "331133 Welder (First Class)",
+    "reason": "Same testimony; OSCA 2024 code for the same occupation. Note the code differs from ANZSCO.",
+    "confidence": 0.81,
+    "sources": [
+      [
+        "transcript",
+        "t=00:05"
+      ]
+    ]
+  },
+  {
+    "field": "units_evidenced",
+    "value": "MEM05012; MEM05050; MEM05007; MEM09002; MEM05052",
+    "reason": "Describes stick and wire-fed gas-shielded welding, oxy-acetylene cutting, working from drawings, and fire and PPE precautions.",
+    "confidence": 0.74,
+    "sources": [
+      [
+        "transcript",
+        "t=00:58"
+      ],
+      [
+        "transcript",
+        "t=01:30"
+      ],
+      [
+        "transcript",
+        "t=02:05"
+      ],
+      [
+        "transcript",
+        "t=02:47"
+      ]
+    ]
+  },
+  {
+    "field": "qualification",
+    "value": "MEM31925 Certificate III in Engineering - Fabrication Trade",
+    "reason": "The units described belong to one current fabrication qualification. Whether they add up to recognition of prior learning is an RTO assessor's decision.",
+    "confidence": 0.47,
+    "sources": [
+      [
+        "transcript",
+        "t=00:58"
+      ]
+    ]
+  }
+]
