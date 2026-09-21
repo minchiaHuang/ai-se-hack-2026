@@ -1,4 +1,9 @@
-"""Job matching counts evidence; it never scores the person."""
+"""Job matching counts evidence; it never scores the person.
+
+The board is a committed snapshot of real Adzuna ads, refetched by hand, so
+nothing here pins a job id or a count from today's file. Every expectation is
+derived from whatever the snapshot currently holds.
+"""
 import json
 import re
 import tempfile
@@ -50,22 +55,50 @@ def _job(jobs, job_id):
     return next(j for j in jobs if j["id"] == job_id)
 
 
+def _required(job):
+    """The codes an ad asks for, whatever shape the snapshot is in."""
+    return [u["code"] for u in (job.get("required_units") or ())]
+
+
+def _mapped(jobs):
+    """The ads that name at least one unit: the only ones with a count to make."""
+    return [j for j in jobs if j["units_status"] == d7_match.MAPPED]
+
+
+def _fake(job_id, occupation, required, **rest):
+    """One ad in snapshot shape. The two empty cases have to be testable even
+    when the committed snapshot happens to hold neither."""
+    job = {"id": job_id, "occupation": occupation, "title": "Cook", "company": "A Kitchen",
+           "location": "Sydney, Sydney Region", "contract_type": "permanent",
+           "contract_time": "full_time", "created": "2026-09-17T14:18:08Z",
+           "redirect_url": "https://www.adzuna.com.au/land/ad/" + job_id,
+           "snippet": "A short ad.", "required_units": required, "mapped_by": None}
+    job.update(rest)
+    return job
+
+
 class Matching(unittest.TestCase):
     def test_matched_is_required_and_evidenced_missing_is_the_rest(self):
-        job = _job(d7_match.match_jobs("cookery", EVIDENCED), "cookery-1")
+        evidenced = {u["code"] for u in EVIDENCED}
+        ads = {j["id"]: j for j in d7_match.load_jobs()}
+        counted = _mapped(d7_match.match_jobs("cookery", EVIDENCED))
 
-        self.assertEqual([u["code"] for u in job["matched"]],
-                         ["SITHCCC027", "SITXFSA005", "SITXFSA006"])
-        self.assertEqual([u["code"] for u in job["missing"]], ["SITHCCC043"])
-        self.assertEqual(job["fit"], "3 of 4 required units evidenced")
-        self.assertEqual(job["note"], "Representative sample, not a real listing")
+        self.assertTrue(counted, "the snapshot holds no mapped cookery ad")
+        for job in counted:
+            required = _required(ads[job["id"]])
+            with self.subTest(job=job["id"]):
+                self.assertEqual([u["code"] for u in job["matched"]],
+                                 [c for c in required if c in evidenced])
+                self.assertEqual([u["code"] for u in job["missing"]],
+                                 [c for c in required if c not in evidenced])
+                self.assertEqual(job["fit"], f"{len(job['matched'])} of {len(required)} "
+                                             "required units evidenced")
 
     def test_only_jobs_for_the_occupation_come_back_best_fit_first(self):
         jobs = d7_match.match_jobs("cookery", EVIDENCED)
 
-        self.assertEqual([j["id"] for j in jobs],
-                         ["cookery-5", "cookery-1", "cookery-3", "cookery-6", "cookery-7",
-                          "cookery-8", "cookery-2", "cookery-4", "cookery-9"])
+        self.assertEqual({j["id"] for j in jobs},
+                         {j["id"] for j in d7_match.load_jobs() if j["occupation"] == "cookery"})
         counts = [len(j["matched"]) for j in jobs]
         self.assertEqual(counts, sorted(counts, reverse=True))
 
@@ -75,21 +108,38 @@ class Matching(unittest.TestCase):
         for job in d7_match.match_jobs("cookery", claimed):
             with self.subTest(job=job["id"]):
                 self.assertEqual(job["matched"], [])
-                self.assertTrue(job["fit"].startswith("0 of "))
+                if job["units_status"] == d7_match.MAPPED:
+                    self.assertTrue(job["fit"].startswith("0 of "))
 
-    def test_every_matched_unit_carries_its_sources(self):
+    def test_every_matched_unit_carries_its_sources_and_the_words_it_came_from(self):
         for job in d7_match.match_jobs("cookery", EVIDENCED):
             for unit in job["matched"]:
                 with self.subTest(job=job["id"], unit=unit["code"]):
                     self.assertTrue(unit["sources"])
                     self.assertTrue(unit["title"])
+                    # The ad's own words travel with the unit, and say which of
+                    # the ad and the job title they were read from.
+                    self.assertTrue(unit["quote"])
+                    self.assertIn(unit["basis"], {"stated", "title"})
+
+    def test_a_missing_unit_carries_its_quote_and_basis_too(self):
+        """A unit is no less quoted for not being evidenced yet."""
+        for job in d7_match.match_jobs("cookery", EVIDENCED):
+            for unit in job["missing"]:
+                with self.subTest(job=job["id"], unit=unit["code"]):
+                    self.assertTrue(unit["quote"])
+                    self.assertIn(unit["basis"], {"stated", "title"})
+                    self.assertNotIn("sources", unit)
 
     def test_the_fit_is_a_count_never_a_percentage_or_score(self):
         for occupation in ("cookery", "welding", "aged_care"):
             for job in d7_match.match_jobs(occupation, EVIDENCED):
                 with self.subTest(job=job["id"]):
                     self.assertNotIn("%", job["fit"])
-                    self.assertRegex(job["fit"], r"^\d+ of \d+ required units evidenced$")
+                    if job["units_status"] == d7_match.MAPPED:
+                        self.assertRegex(job["fit"], r"^\d+ of \d+ required units evidenced$")
+                    else:
+                        self.assertIn(job["fit"], {d7_match.NONE_NAMED_FIT, d7_match.NOT_MAPPED_FIT})
                     self.assertFalse({"score", "rank", "percent", "rating"} & set(job))
 
     def test_an_unknown_occupation_is_refused(self):
@@ -106,7 +156,6 @@ class AllJobs(unittest.TestCase):
 
         self.assertEqual(sorted(j["id"] for j in board),
                          sorted(j["id"] for j in d7_match.load_jobs()))
-        self.assertEqual(len(board), 17)
         self.assertEqual([j["id"] for j in board[:len(ours)]], [j["id"] for j in ours])
         self.assertTrue(all(j["for_occupation"] for j in board[:len(ours)]))
         self.assertFalse(any(j["for_occupation"] for j in board[len(ours):]))
@@ -121,27 +170,120 @@ class AllJobs(unittest.TestCase):
                     self.assertEqual(same, ours[job["id"]])
 
     def test_other_occupations_show_zero_of_their_required_units(self):
-        required = {j["id"]: len(j["required_units"]) for j in d7_match.load_jobs()}
+        required = {j["id"]: len(_required(j)) for j in d7_match.load_jobs()}
         others = [j for j in d7_match.all_jobs("cookery", EVIDENCED) if not j["for_occupation"]]
 
-        self.assertEqual(len(others), 8)
+        self.assertEqual({j["id"] for j in others},
+                         {j["id"] for j in d7_match.load_jobs() if j["occupation"] != "cookery"})
         for job in others:
             with self.subTest(job=job["id"]):
                 self.assertEqual(job["matched"], [])
                 self.assertEqual(len(job["missing"]), required[job["id"]])
-                self.assertEqual(job["fit"], f"0 of {required[job['id']]} required units evidenced")
+                if job["units_status"] == d7_match.MAPPED:
+                    self.assertEqual(job["fit"],
+                                     f"0 of {required[job['id']]} required units evidenced")
                 self.assertTrue(job["occupation_label"])
 
     def test_the_board_never_carries_a_percentage_or_score(self):
+        """Only what this module writes is checked. A "%" inside an ad's own
+        words is the employer's shift loading, not a score we invented, and
+        passing it through verbatim is the point of quoting the ad."""
+        written = ("id", "employment_type", "salary", "fit", "units_status",
+                   "occupation_label")
         for job in d7_match.all_jobs("welding", EVIDENCED):
             with self.subTest(job=job["id"]):
-                self.assertNotIn("%", json.dumps(job))
-                self.assertRegex(job["fit"], r"^\d+ of \d+ required units evidenced$")
+                self.assertNotIn("%", json.dumps({k: job[k] for k in written}))
+                if job["units_status"] == d7_match.MAPPED:
+                    self.assertRegex(job["fit"], r"^\d+ of \d+ required units evidenced$")
                 self.assertFalse({"score", "rank", "percent", "rating"} & set(job))
+
+    def test_the_board_never_carries_the_posting_date(self):
+        """Adzuna sends "created" and the snapshot keeps it; showing how long an
+        ad has been up is one of the things this board does not do."""
+        for job in d7_match.all_jobs("cookery", EVIDENCED):
+            with self.subTest(job=job["id"]):
+                self.assertNotIn("created", job)
+                self.assertNotIn("applicants", job)
 
     def test_an_unknown_occupation_is_refused(self):
         with self.assertRaises(KeyError):
             d7_match.all_jobs("plumbing", EVIDENCED)
+
+
+class AdWithNoUnits(unittest.TestCase):
+    """[] and None are different facts about an ad and are reported apart.
+
+    Both are built here rather than read from the snapshot: a refetch may leave
+    the file with neither, and the rule holds regardless of what it holds today.
+    """
+
+    def board(self, jobs):
+        with mock.patch.object(d7_match, "load_jobs", return_value=jobs):
+            return d7_match.all_jobs("cookery", EVIDENCED)
+
+    def test_an_ad_that_names_no_unit_is_not_a_zero_of_zero(self):
+        job, = self.board([_fake("empty", "cookery", [])])
+
+        self.assertEqual(job["units_status"], d7_match.NONE_NAMED)
+        self.assertEqual(job["fit"], d7_match.NONE_NAMED_FIT)
+        self.assertEqual((job["matched"], job["missing"]), ([], []))
+        self.assertNotIn("0 of 0", job["fit"])
+
+    def test_an_unmapped_ad_says_so_in_its_own_words(self):
+        job, = self.board([_fake("unmapped", "cookery", None)])
+
+        self.assertEqual(job["units_status"], d7_match.NOT_MAPPED)
+        self.assertEqual(job["fit"], d7_match.NOT_MAPPED_FIT)
+        self.assertNotEqual(job["fit"], d7_match.NONE_NAMED_FIT)
+
+    def test_neither_is_dropped_from_the_board_or_from_the_occupation(self):
+        jobs = [_fake("empty", "cookery", []), _fake("unmapped", "cookery", None),
+                _fake("welder", "welding", [])]
+        self.assertEqual({j["id"] for j in self.board(jobs)},
+                         {"empty", "unmapped", "welder"})
+        with mock.patch.object(d7_match, "load_jobs", return_value=jobs):
+            self.assertEqual({j["id"] for j in d7_match.match_jobs("cookery", EVIDENCED)},
+                             {"empty", "unmapped"})
+
+    def test_neither_carries_a_percentage_and_courses_ask_nothing_of_them(self):
+        board = self.board([_fake("empty", "cookery", []), _fake("unmapped", "cookery", None)])
+
+        self.assertNotIn("%", json.dumps(board))
+        self.assertEqual(d7_match.courses_for(board), [])
+
+
+class AdzunaFields(unittest.TestCase):
+    """What a card shows comes from the ad, or is left out."""
+
+    def board(self, job):
+        with mock.patch.object(d7_match, "load_jobs", return_value=[job]):
+            return d7_match.all_jobs("cookery", EVIDENCED)[0]
+
+    def test_employment_type_joins_whichever_halves_the_ad_stated(self):
+        cases = {("full_time", "permanent"): "Full-time · Permanent",
+                 ("part_time", None): "Part-time",
+                 (None, "contract"): "Contract",
+                 (None, None): ""}
+        for (time, kind), expected in cases.items():
+            with self.subTest(contract_time=time, contract_type=kind):
+                job = self.board(_fake("x", "cookery", [], contract_time=time, contract_type=kind))
+                self.assertEqual(job["employment_type"], expected)
+
+    def test_a_salary_shows_only_when_the_employer_stated_one(self):
+        self.assertEqual(self.board(_fake("x", "cookery", []))["salary"], "")
+        self.assertEqual(
+            self.board(_fake("x", "cookery", [], salary_min=80000, salary_max=90000))["salary"],
+            "$80,000 - $90,000")
+        # One figure, not a range invented from it.
+        self.assertEqual(
+            self.board(_fake("x", "cookery", [], salary_min=124800, salary_max=124800))["salary"],
+            "$124,800")
+
+    def test_the_employer_and_the_link_travel_to_the_page(self):
+        job = self.board(_fake("5887149079", "cookery", []))
+        self.assertEqual(job["company"], "A Kitchen")
+        self.assertIn("adzuna.com.au", job["redirect_url"])
+        self.assertTrue(job["snippet"])
 
 
 class Courses(unittest.TestCase):
@@ -157,14 +299,16 @@ class Courses(unittest.TestCase):
         jobs = d7_match.match_jobs("cookery", EVIDENCED)
         courses = {c["code"]: c for c in d7_match.courses_for(jobs)}
 
-        self.assertEqual(courses["SITHCCC043"]["for_jobs"],
-                         ["cookery-1", "cookery-7", "cookery-2", "cookery-9"])
-        self.assertEqual(courses["SITHCCC036"]["for_jobs"],
-                         ["cookery-7", "cookery-8", "cookery-2", "cookery-9"])
-        self.assertEqual(courses["SITHCCC036"]["qualification"],
-                         "SIT30821 Certificate III in Commercial Cookery")
-        self.assertEqual(courses["SITHCCC036"]["note"],
-                         "Gap training through a Registered Training Organisation")
+        self.assertTrue(courses, "no cookery ad in the snapshot has a gap unit")
+        for code, course in courses.items():
+            with self.subTest(code=code):
+                # The jobs a unit would open, in the order the board lists them.
+                self.assertEqual(course["for_jobs"],
+                                 [j["id"] for j in jobs
+                                  if code in {u["code"] for u in j["missing"]}])
+                self.assertRegex(course["qualification"], r"^[A-Z]{3}\d{5} ")
+                self.assertEqual(course["note"],
+                                 "Gap training through a Registered Training Organisation")
 
     def test_courses_opening_more_jobs_come_first(self):
         courses = d7_match.courses_for(d7_match.match_jobs("cookery", EVIDENCED))
@@ -224,19 +368,24 @@ class TailoredResume(unittest.TestCase):
                       for job in self.jobs}
 
     def test_each_job_lists_its_required_and_evidenced_units_first(self):
-        self.assertEqual(_skill_codes(self.texts["cookery-1"]),
-                         ["SITXFSA005", "SITXFSA006", "SITHCCC027", "SITHCCC029"])
-        self.assertEqual(_skill_codes(self.texts["cookery-2"]),
-                         ["SITHCCC027", "SITHCCC029", "SITXFSA005", "SITXFSA006"])
+        """The units this job asks for move up; the rest keep the pack's order."""
+        pack = [u["code"] for u in EVIDENCED]
         for job in self.jobs:
-            matched = [u["code"] for u in job["matched"]]
+            matched = {u["code"] for u in job["matched"]}
             with self.subTest(job=job["id"]):
-                codes = _skill_codes(self.texts[job["id"]])
-                self.assertEqual(set(codes[:len(matched)]), set(matched))
+                self.assertEqual(_skill_codes(self.texts[job["id"]]),
+                                 [c for c in pack if c in matched]
+                                 + [c for c in pack if c not in matched])
 
     def test_the_lines_that_evidence_the_job_come_first(self):
-        self.assertEqual(_experience_stamps(self.texts["cookery-1"]), ["00:12", "02:41", "01:05"])
-        self.assertEqual(_experience_stamps(self.texts["cookery-2"]), ["00:12", "01:05", "02:41"])
+        """Then by timestamp within each group, so a draft still reads in order."""
+        cited = {u["code"]: [s[1][2:] for s in u["sources"]] for u in EVIDENCED}
+        for job in self.jobs:
+            for_job = {t for u in job["matched"] for t in cited[u["code"]]}
+            rest = {t for stamps in cited.values() for t in stamps} - for_job
+            with self.subTest(job=job["id"]):
+                self.assertEqual(_experience_stamps(self.texts[job["id"]]),
+                                 sorted(for_job) + sorted(rest))
 
     def test_tailoring_only_reorders_the_same_claims(self):
         def claims(text):
@@ -303,16 +452,21 @@ class ResumeSource(unittest.TestCase):
                 self.assertNotIn("transcript", text)
 
     def test_skills_name_the_resume_lines_they_come_from(self):
-        skills = self.sections["cookery-1"]["skills"]
-        self.assertEqual({s["code"]: s["described_at"] for s in skills},
-                         {"SITXFSA005": ["9"], "SITHCCC027": ["10"], "SITHCCC029": ["2"]})
-        self.assertIn("SITXFSA005 Use hygienic practices for food safety (resume line 9)",
-                      self.texts["cookery-1"])
+        for job_id, sections in self.sections.items():
+            with self.subTest(job=job_id):
+                self.assertEqual({s["code"]: s["described_at"] for s in sections["skills"]},
+                                 {"SITXFSA005": ["9"], "SITHCCC027": ["10"], "SITHCCC029": ["2"]})
+                self.assertIn("SITXFSA005 Use hygienic practices for food safety (resume line 9)",
+                              self.texts[job_id])
 
     def test_lines_sort_by_number_not_as_text(self):
-        """Line 10 comes after line 9, not before line 2."""
-        lines = [e["line"] for e in self.sections["cookery-2"]["experience"]]
-        self.assertEqual(lines, ["2", "10", "9"])
+        """Line 10 comes after line 9, not before line 2, in every draft."""
+        for job_id, sections in self.sections.items():
+            for_job = {t for s in sections["skills"] if s["for_this_job"] for t in s["described_at"]}
+            rest = {"2", "9", "10"} - for_job
+            with self.subTest(job=job_id):
+                self.assertEqual([e["line"] for e in sections["experience"]],
+                                 sorted(for_job, key=int) + sorted(rest, key=int))
 
     def test_a_journey_line_no_unit_cites_never_reaches_a_draft(self):
         for job_id, text in self.texts.items():
@@ -328,39 +482,60 @@ class ResumeSource(unittest.TestCase):
 
 
 class JobData(unittest.TestCase):
-    def test_nine_cookery_four_welding_four_aged_care_all_marked_as_samples(self):
-        jobs = d7_match.load_jobs()
-        self.assertEqual(len(jobs), 17)
-        for occupation, count in (("cookery", 9), ("welding", 4), ("aged_care", 4)):
-            self.assertEqual(sum(j["occupation"] == occupation for j in jobs), count)
-        for job in jobs:
-            with self.subTest(job=job["id"]):
-                self.assertEqual(job["note"], "Representative sample, not a real listing")
+    """The committed snapshot of real Adzuna ads, as the page will read it."""
 
-    def test_every_job_has_a_board_row_and_nothing_a_sample_cannot_honestly_carry(self):
-        """Salaries, posted dates and applicant counts would read as a real
-        listing, so a sample never carries them."""
+    def test_the_snapshot_says_where_it_came_from_and_when(self):
+        meta = d7_match.snapshot_meta()
+        self.assertEqual(meta["source"], "Adzuna")
+        self.assertEqual(meta["attribution"], "Jobs by Adzuna")
+        # Licensing and honesty both rest on the date: the board is a snapshot.
+        self.assertRegex(meta["fetched_at"], r"^\d{4}-\d{2}-\d{2}T")
+
+    def test_every_ad_carries_what_a_card_needs_and_a_link_back_to_adzuna(self):
         jobs = d7_match.load_jobs()
+        self.assertTrue(jobs)
         self.assertEqual(len({j["id"] for j in jobs}), len(jobs))
         for job in jobs:
             with self.subTest(job=job["id"]):
-                self.assertIn(job["employment_type"], {"Full-time", "Part-time", "Casual"})
-                self.assertRegex(job["location"], r" NSW$")
-                self.assertTrue(job["level"] and job["shift"] and job["setting"])
-                self.assertFalse({"salary", "pay", "posted", "applicants", "employer", "company"} & set(job))
-                self.assertNotRegex(json.dumps(job), r"\$|\d+ ?(days?|hours?) ago|applicant")
+                self.assertTrue(job["title"])
+                self.assertIn(job["occupation"], d7_match._occupations())
+                self.assertRegex(job["redirect_url"], r"^https://www\.adzuna\.com\.au/")
+                self.assertIn(job.get("contract_time"), {None, "full_time", "part_time"})
+                self.assertIn(job.get("contract_type"), {None, "permanent", "contract"})
 
-    def test_every_required_unit_is_a_seeded_unit_of_its_occupation(self):
+    def test_no_ad_carries_a_predicted_salary_or_an_applicant_count(self):
+        """Adzuna's terms require a predicted salary to be labelled as such, so
+        fetch_jobs.py keeps only employer-stated ones and the page shows those."""
+        for job in d7_match.load_jobs():
+            with self.subTest(job=job["id"]):
+                self.assertNotIn("salary_is_predicted", job)
+                self.assertNotIn("applicants", job)
+
+    def test_every_required_unit_is_a_seeded_unit_of_its_occupation_and_is_quoted(self):
         occupations = d7_match._occupations()
         for job in d7_match.load_jobs():
             codes = {u["code"] for u in occupations[job["occupation"]]["units"]}
-            for code in job["required_units"]:
-                with self.subTest(job=job["id"], code=code):
-                    self.assertIn(code, codes)
+            for unit in (job["required_units"] or ()):
+                with self.subTest(job=job["id"], code=unit["code"]):
+                    self.assertIn(unit["code"], codes)
+                    self.assertIn(unit["basis"], {"stated", "title"})
+                    # A single word cannot stand as the citation for a unit.
+                    self.assertGreaterEqual(len(unit["quote"].strip()), 12)
 
-    def test_one_cookery_job_needs_the_nsw_food_safety_supervisor_pair(self):
-        self.assertTrue(any({"SITXFSA005", "SITXFSA006"} <= set(j["required_units"])
-                            for j in d7_match.load_jobs() if j["occupation"] == "cookery"))
+    def test_an_unmapped_ad_is_null_and_an_ad_that_named_nothing_is_empty(self):
+        """The two are never collapsed into one another in the file either."""
+        for job in d7_match.load_jobs():
+            required = job["required_units"]
+            with self.subTest(job=job["id"]):
+                self.assertTrue(required is None or isinstance(required, list))
+                if required is None:
+                    self.assertIsNone(job["mapped_by"])
+
+    def test_the_invented_sample_board_is_still_on_disk_and_is_no_longer_read(self):
+        """Deciding jobs.json's fate is not this module's job, but the product
+        reads real ads now, so nothing here may fall back to it."""
+        self.assertTrue(d7_match.SAMPLE_JOBS.exists())
+        self.assertEqual(d7_match.JOBS.name, "jobs_adzuna.json")
 
 
 if __name__ == "__main__":

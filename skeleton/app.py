@@ -206,7 +206,7 @@ def transcribe(audio, language):
 
 
 def match(payload):
-    """Jobs, gap courses and a draft resume tailored to each job.
+    """Real job ads, gap courses and a draft resume tailored to each job.
 
     Without a transcript the resume's experience lines are empty; units and
     qualifications are still listed. Lines without an English gloss are left
@@ -217,6 +217,7 @@ def match(payload):
     ("resume": [{line, text, en}]) and the drafts cite resume lines.
 
     "all_jobs" lists every job, the occupation's first, for the page's board.
+    "jobs_source" names the Adzuna snapshot the board was read from.
     """
     evidenced = payload.get("evidenced_units", [])
     if not isinstance(evidenced, list) or not all(isinstance(u, dict) for u in evidenced):
@@ -240,9 +241,12 @@ def match(payload):
     # occupation's jobs: a draft for another occupation's job would cite none
     # of the units that job asks for.
     board = d7_match.all_jobs(payload.get("occupation"), evidenced)
+    # Where the ads came from and when. Adzuna's licence asks for the mark, and
+    # a snapshot has to say how old it is, so the page is given both.
     return {"jobs": jobs, "courses": d7_match.courses_for(jobs),
             "resume": resume, "resumes": resumes,
-            "all_jobs": board, "all_courses": d7_match.courses_for(board)}
+            "all_jobs": board, "all_courses": d7_match.courses_for(board),
+            "jobs_source": d7_match.snapshot_meta()}
 
 
 PAGE = """<!doctype html><meta charset=utf-8><title>Direction skeleton</title>
