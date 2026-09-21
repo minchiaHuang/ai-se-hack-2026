@@ -4,6 +4,7 @@ One page per scenario: run the pipeline, show what it suggests, what it
 withholds, what it cannot answer, and what it refuses outright. A human
 confirms every row before anything counts.
 """
+import base64
 import html
 import json
 import os
@@ -18,7 +19,7 @@ from urllib.parse import parse_qs, urlparse
 if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from skeleton.core import live, registry
+from skeleton.core import live, pdf_text, registry
 from skeleton.core.model import CANNED, StubModel
 from skeleton.core.pipeline import run
 from skeleton.core.schema import AggregationError
@@ -41,6 +42,10 @@ JOBS_PAGE = WEB / "jobs.html"
 # speech is well under 25 MB, and no JSON the page sends comes near 1 MB.
 MAX_AUDIO_BYTES = 25 * 1024 * 1024
 MAX_JSON_BYTES = 1024 * 1024
+# A resume is decoded only in memory. The JSON envelope is larger because the
+# browser sends its local PDF as base64, so both limits are explicit.
+MAX_PDF_BYTES = 2 * 1024 * 1024
+MAX_PDF_JSON_BYTES = 3 * 1024 * 1024
 
 
 class BadRequest(Exception):
@@ -122,6 +127,38 @@ def resume_lines(payload):
             and isinstance(line.get("text"), str) for line in lines):
         raise BadRequest("resume must be a list of {line: integer, text: string} objects")
     return lines
+
+
+def read_pdf_resume(payload):
+    """Turn an opted-in PDF text layer into the numbered lines the model cites.
+
+    The raw file never reaches disk. Guarding consent and language before base64
+    decoding means an unconsented or unsupported resume is not read at all.
+    """
+    guard_payload = {"source": d7_credentials.RESUME, "consent": payload.get("consent"),
+                     "language": payload.get("language")}
+    try:
+        d7_credentials.guard(guard_payload)
+    except REFUSALS as refused:
+        return {"refused": str(refused)}
+    encoded = payload.get("pdf_base64")
+    if not isinstance(encoded, str):
+        raise BadRequest("pdf_base64 must be a base64 string")
+    max_encoded = ((MAX_PDF_BYTES + 2) // 3) * 4
+    if len(encoded) > max_encoded:
+        return {"refused": "This PDF is larger than 2 MB, so it was not read."}
+    try:
+        data = base64.b64decode(encoded, validate=True)
+    except (ValueError, UnicodeEncodeError):
+        raise BadRequest("pdf_base64 is not valid base64") from None
+    if len(data) > MAX_PDF_BYTES:
+        return {"refused": "This PDF is larger than 2 MB, so it was not read."}
+    try:
+        lines = pdf_text.extract_lines(data)
+    except pdf_text.PdfTextError as unreadable:
+        return {"refused": str(unreadable)}
+    return {"lines": [{"line": index, "text": text}
+                      for index, text in enumerate(lines, 1)]}
 
 
 def extract(payload):
@@ -288,6 +325,8 @@ class Handler(BaseHTTPRequestHandler):
             if parsed.path == "/api/transcribe":
                 language = parse_qs(parsed.query).get("language", [""])[0]
                 body = transcribe(self._read(MAX_AUDIO_BYTES), language)
+            elif parsed.path == "/api/resume-text":
+                body = read_pdf_resume(self._read_json(MAX_PDF_JSON_BYTES))
             elif parsed.path == "/api/extract":
                 body = extract(self._read_json())
             elif parsed.path == "/api/match":
@@ -316,9 +355,9 @@ class Handler(BaseHTTPRequestHandler):
             raise BadRequest(f"body must be between 0 and {limit} bytes")
         return self.rfile.read(length)
 
-    def _read_json(self):
+    def _read_json(self, limit=MAX_JSON_BYTES):
         try:
-            payload = json.loads(self._read(MAX_JSON_BYTES))
+            payload = json.loads(self._read(limit))
         except (UnicodeDecodeError, json.JSONDecodeError):
             raise BadRequest("body is not valid JSON") from None
         if not isinstance(payload, dict):
