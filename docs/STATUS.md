@@ -6,7 +6,9 @@
 方向 7 的一輪研究已完成（三個 agent 平行），框架、交接文件第 8 節、spec 皆已落檔。
 **現場優先原則仍凌駕一切。**
 
-最後驗證：2026-09-22（`bash bin/verify.sh` → GREEN，含 263 個骨架測試，於 `a54fdf4`）
+最後驗證：2026-09-22（`bash bin/verify.sh` → GREEN，含 263 個骨架測試，於 `10af15b`，分支 `feat/d7-figma-jobs-template`）
+
+**2026-09-22 清晨，`feat/d7-figma-jobs-template`（待合入）**：`/jobs` 改成 Figma「Matched Jobs」版面（左邊配對職缺卡、右邊 Why this matched，每個單元附上佐證它的那一行原文，並標明是廣告寫的還是職稱推定的；Apply 顯示審閱頁確認過的履歷），拿掉側欄、分頁、篩選、收藏，佐證包收進右欄「See full evidence pack →」；履歷改成 Figma「Template 50」版型（`skeleton/web/resume-template.{css,js}`，`/review` 與 `/jobs` 共用）。`/review` 交給 `/jobs` 的 session 多帶 `name`、`sections`、`via`。未做：`/intake` 路徑進 `/jobs` 的 Apply 只顯示純文字草稿（沒有 sections），沒有實際點過。
 
 ## 進行中
 
