@@ -9,11 +9,12 @@ AI for Social Enterprise Hackathon 2026（2026-09-21～09-22，UTS Startups, Ult
 
 ## 必讀脈絡
 
-`AI_CONTEXT.md` 是本專案的長效脈絡檔：官方賽事事實、已確認評審、研究過的問題領域、
-策略方向、角色分工、建構與 pitch 順序、要避開的做法。修改任何策略或研究結論前先讀它，
-且只在有新證據佐證時才更新。
+賽事研究、評審資料與策略文件（`AI_CONTEXT.md`、`docs/frameworks/`、`docs/research-brief-*`、
+`docs/team-brief-*`、`docs/event-materials/`、`reddit-x-research/`、`work/`）已於 2026-09-22
+從工作樹移除，因為本 repo 要對評審公開。內容仍在 git 歷史中：
+`git show <公開前的 commit>:AI_CONTEXT.md`。
 
-其中的「AI operating instructions」章節對本專案具約束力，特別是：
+以下規則對本專案仍然有效：
 區分官方要求／證據／推論／建議；未經當下核准不得聯絡受訪者、主辦方或合作夥伴；
 沒有證據就不得宣稱已完成訪談、驗證或測試。
 
@@ -27,5 +28,5 @@ bash bin/verify.sh
 
 ## 版本控制
 
-`work/` 下的 PNG／PDF 是 docx 排版流程的校稿輸出，已由 `.gitignore` 排除，
-可由 `work/*.py` 與 `work/*.swift` 重新產生。
+本 repo 公開，任何加入的檔案都會被所有人看到。研究草稿、受訪者資料、
+第三方名單與任何金鑰都不要提交。

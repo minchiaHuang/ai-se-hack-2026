@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 166 152" width="83" height="76" role="img" aria-label="BridgeWork">
+  <!-- Redrawn from the Figma "Logo" icon (node 10:44), which Figma holds only
+       as a bitmap. The canvas keeps Figma's 83x76 box, so an <img> sized like
+       the frame lines up with the design. -->
+  <defs>
+    <linearGradient id="arch" gradientUnits="userSpaceOnUse" x1="25" y1="116" x2="141" y2="116">
+      <stop offset="0" stop-color="#2563EB"/>
+      <stop offset=".55" stop-color="#139BA6"/>
+      <stop offset="1" stop-color="#0287C3"/>
+    </linearGradient>
+    <filter id="glow" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur stdDeviation="4"/>
+    </filter>
+  </defs>
+  <path d="M25 116 A58 57 0 0 1 141 116" fill="none" stroke="url(#arch)" stroke-width="13" stroke-linecap="round"/>
+  <g fill="none" stroke-width="10" stroke-linecap="round">
+    <line x1="43" y1="73" x2="43" y2="95" stroke="#2563EB"/>
+    <line x1="63" y1="51" x2="63" y2="95" stroke="#0B80C0"/>
+    <line x1="83" y1="35" x2="83" y2="95" stroke="#0EA5E9"/>
+    <line x1="103" y1="51" x2="103" y2="95" stroke="#10B981"/>
+    <line x1="123" y1="73" x2="123" y2="95" stroke="#059669"/>
+  </g>
+  <circle cx="83" cy="13" r="11" fill="#10B981" opacity=".35" filter="url(#glow)"/>
+  <circle cx="83" cy="13" r="8" fill="#10B981"/>
+</svg>

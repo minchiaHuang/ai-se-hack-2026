@@ -1,0 +1,110 @@
+<!-- @dsCard group="Components" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Job card</title>
+<link rel="stylesheet" href="../tokens.css">
+<style>
+* { box-sizing: border-box; }
+body { margin: 0; padding: var(--space-6); background: var(--bg); color: var(--fg);
+       font: var(--weight-regular) var(--text-md-size)/var(--text-md-line) var(--font); }
+h1 { margin: 0 0 var(--space-1); font-size: var(--text-lg-size); line-height: var(--text-lg-line);
+     font-weight: var(--weight-semibold); }
+p.note { margin: 0 0 var(--space-6); color: var(--fg-muted);
+         font-size: var(--text-sm-size); line-height: var(--text-sm-line); }
+.list { display: flex; flex-direction: column; gap: var(--space-4); max-width: 720px; }
+
+.job { display: grid; grid-template-columns: minmax(0, 1fr) 168px;
+       background: var(--surface); border-radius: var(--radius-card); box-shadow: var(--shadow-xs);
+       overflow: hidden; }
+.job.selected { box-shadow: var(--shadow-xl), 0 0 0 2px var(--brand); }
+.body { padding: var(--space-5); min-width: 0; }
+.top { display: grid; grid-template-columns: 48px minmax(0, 1fr); gap: var(--space-3); align-items: start; }
+
+/* Logo tile. A real logo file when we have one; otherwise the company's initial
+   on a tint, so a missing file never leaves a hole in the row. */
+.logo { display: grid; place-items: center; width: 48px; height: 48px;
+        background: var(--surface); border: 1px solid var(--line-soft);
+        border-radius: var(--radius-icon); box-shadow: var(--shadow-xs); overflow: hidden; }
+.logo img { width: 100%; height: 100%; object-fit: contain; }
+.logo .initial { color: var(--fg-strong); font-size: var(--text-lg-size);
+                 line-height: var(--text-lg-line); font-weight: var(--weight-semibold); }
+
+h3 { margin: 0; font-size: var(--text-md-size); line-height: var(--text-md-line);
+     font-weight: var(--weight-semibold); }
+.company { margin: var(--space-1) 0 0; color: var(--fg-muted);
+           font-size: var(--text-sm-size); line-height: var(--text-sm-line); }
+.tags { display: flex; flex-wrap: wrap; gap: var(--space-1-5); margin-top: var(--space-3); }
+.tag { padding: 0 var(--space-2); border-radius: var(--radius-control); background: var(--bg);
+       color: var(--fg-strong); font-size: var(--text-sm-size); line-height: var(--text-sm-line);
+       font-weight: var(--weight-medium); }
+.tag.gap { background: var(--warning-tint); }
+
+.fit { display: flex; flex-direction: column; align-items: center; justify-content: center;
+       gap: var(--space-1); padding: var(--space-5) var(--space-3);
+       border-left: 1px solid var(--line-soft); text-align: center; }
+.ring { display: grid; place-items: center; width: 64px; height: 64px; border-radius: 50%;
+        background: conic-gradient(var(--success) calc(var(--pct) * 1%), var(--line-soft) 0); }
+.ring span { display: grid; place-items: center; width: 52px; height: 52px; border-radius: 50%;
+             background: var(--surface); font-size: var(--text-md-size);
+             line-height: var(--text-md-line); font-weight: var(--weight-semibold); }
+.fit .label { color: var(--fg-muted); font-size: var(--text-sm-size); line-height: var(--text-sm-line); }
+.fit .btn { width: 100%; margin-top: var(--space-1); padding: var(--space-2) var(--space-3);
+            background: var(--brand); border: 1px solid var(--brand); border-radius: var(--radius-control);
+            box-shadow: var(--shadow-xs); color: var(--white); cursor: pointer;
+            font-family: var(--font); font-size: var(--text-sm-size); line-height: var(--text-sm-line);
+            font-weight: var(--weight-semibold); }
+</style>
+</head>
+<body>
+<h1>Job card</h1>
+<p class="note">Built from the kit's card, featured icon and button. The logo tile falls back to the company's initial.</p>
+
+<div class="list">
+  <article class="job selected">
+    <div class="body">
+      <div class="top">
+        <div class="logo"><span class="initial">G</span></div>
+        <div>
+          <h3>Early Childhood Educator</h3>
+          <p class="company">G8 Education Ltd · Sydney, Sydney Region · Full time</p>
+          <div class="tags">
+            <span class="tag">CHCECE055 evidenced</span>
+            <span class="tag">HLTAID012 evidenced</span>
+            <span class="tag gap">1 unit missing</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="fit">
+      <div class="ring" style="--pct: 82"><span>82</span></div>
+      <span class="label">units matched</span>
+      <button class="btn">Save</button>
+    </div>
+  </article>
+
+  <article class="job">
+    <div class="body">
+      <div class="top">
+        <div class="logo"><span class="initial">C</span></div>
+        <div>
+          <h3>Cook</h3>
+          <p class="company">Catholic Healthcare · Sydney, Sydney Region · Permanent</p>
+          <div class="tags">
+            <span class="tag">SITHCCC027 evidenced</span>
+            <span class="tag gap">2 units missing</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="fit">
+      <div class="ring" style="--pct: 64"><span>64</span></div>
+      <span class="label">units matched</span>
+      <button class="btn">Save</button>
+    </div>
+  </article>
+</div>
+</body>
+</html>

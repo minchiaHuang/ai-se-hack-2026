@@ -1,79 +1,48 @@
-# STATUS
+# Status
 
-單行狀態：2026-09-21 開賽日。**六個方向的競品盤點全部完成，六個方向也全部保留**，
-各有一份可直接套用的框架（`docs/frameworks/`）。共用技術骨架已建好，可離線跑完
-黃金路徑與兩條失敗路徑。題目未定，等 10:00 現場挑戰陳述——現場優先原則凌駕一切。
+**BridgeWork** turns a refugee jobseeker's spoken work history, in their own
+language, into two things a caseworker can act on: an evidence pack mapped to
+Australian qualifications (ANZSCO/OSCA codes and VET units of competency), and
+matched job ads with a resume drafted for each one. Built for the AI for Social
+Enterprise Hackathon 2026 (UTS Startups, 21–22 September 2026).
 
-最後驗證：2026-09-21（`bash bin/verify.sh` → GREEN，含 25 個骨架測試；PR #1 合併 `6e54104` 後由 merge queue 執行）
+See `README.md` for what it does, how it runs, where AI is used, where a human
+decides, and the limits the team states openly.
 
-## 進行中
+## Run it
 
-- 題目選定：**六個方向全部在檯面上**。2026-09-21 撤回先前寫死的「淘汰／降級／通過」判決——
-  官方評分標準共七項加權：Problem-Solution Fit 20%、Usability 15%、Working Prototype 15%、
-  Effective Use of AI 15%、Social Impact Reasoning 15%、Problem Validation 10%、
-  Pathway to Sustainability 10%（完整清單見 `AI_CONTEXT.md`「Official event facts」），
-  **仍然沒有新穎性這一項**，用「已經有人做了」淘汰方向是加了一把評審沒有的尺。
-  證據全部保留，判決全部移除。
-  - 每個方向一份框架，同一套七格模板：`docs/frameworks/direction-{1,2,3,4,5,6}-*.md`
-  - 現場那張要拿在手上的：`docs/frameworks/onsite-matching-sheet.md`
-  - 唯二與競品無關的保留意見：**方向 4** 的使用者是個人租客不是社企（對象問題）；
-    **方向 5 支線 A（食品詐標）** 需要同位素鑑識，48 小時做不到（能力問題）。
-    兩者都寫在各自框架裡，不是淘汰。
+```
+python3 skeleton/app.py        # http://127.0.0.1:8000
+bash bin/verify.sh             # the whole check
+```
 
-  **交接文件：`docs/research-brief-2026-09-21.md`** —— 給接手研究的 agent，自足可讀。
-- 社群研究原始資料在 `reddit-x-research/`（兩輪 Reddit＋X 掃描，共 1,100 篇熱門貼文）。
+Standard library only: no dependency to install and no build step. Without API
+keys every page still runs, and says on screen what it could not do rather than
+filling the gap with invented text. `?mock=1` runs the flow against fixtures
+with no network at all.
 
-## 已知問題
+## Last verification
 
-- 真實模型 API 尚未接。骨架的 `skeleton/core/model.py` 目前是 stub，
-  介面已備妥，當天確定方向後才接——安裝任何相依套件需先取得核准。
-- 方向 3 卡在前置閘門：必須先能回答「Amplify 免費且有學術背書仍關閉，你憑什麼不一樣」。
+2026-09-22: `bash bin/verify.sh` → GREEN, 327 tests.
 
-## 更名紀錄（2026-09-21）
+## What is built
 
-- GitHub repo：`AI_Social_Enterprise_Hackathon_2026` → `ai-se-hack-2026`
-  （https://github.com/minchiaHuang/ai-se-hack-2026，PRIVATE）
-- 本地資料夾同步更名為 `ai-se-hack-2026`。
-- GitHub 會 redirect 舊 URL，但隊友若已 clone 應改用新 URL。
-- `.claude/orca-flow.json` 的 `"project"` 仍是賽事全名，那是顯示字串不是路徑，刻意不動。
+- `/` → `/start` → `/start/path`: the caseworker's entry, then two ways in.
+- `/interview`: the fixed questions read aloud in Mandarin, answers recorded and
+  transcribed, or an ElevenLabs AI interviewer the jobseeker talks to on their
+  own phone; the transcript is sorted into the questions, Mandarin verbatim.
+- `/upload`: a resume the jobseeker already has, in any language, translated and
+  tidied, shown side by side with the original.
+- `/review`: every section as a draft the caseworker edits and confirms, with the
+  occupation suggested from the resume and changeable.
+- `/jobs`: real Adzuna ads from a committed snapshot, each required unit quoted
+  from the ad it came from, gap training named, and a resume per job. Applying is
+  simulated and the page says so.
 
-## 下一步
+## Known limits
 
-1. ~~對方向 1 做競品盤點~~ —— **2026-09-21 完成**（判決已於同日撤回，證據保留）。免費端（PlanMind、Novida、
-   PWdWA 工具包）與付費端（MagMindLab $89）皆已佔據，申訴階段另有聯邦免費倡議者與法律代理。
-   完整競品表寫在 `docs/research-brief-2026-09-21.md` 第 5 節方向 1 末，不要重查。
-2. ~~方向 2 競品盤點~~ —— **2026-09-21 完成**（判決已於同日撤回，證據保留）。上架／訂價分支被 Thriftify（Oxfam GB，
-   無澳洲客戶）與 Thriftly 佔住，消費者棄置分支被免費的 Recycle Mate 佔住，工業纖維分選是
-   Matoha／Fibersort 的硬體層——**進貨端跨分支分流決策沒有人做，澳洲尤其空**。
-   付費方也找到了（Seamless 徵費基金、州政府傾倒紓困、社企自身處理成本）。
-3. ~~方向 3–6 競品盤點~~ —— **2026-09-21 全部完成**（判決已於同日撤回，證據保留）。
-   方向 3：免費且有學術背書的 Amplify 已因無人採用而關閉，是 viability 的不利證據；
-   方向 4：Dear Landlord 逾 10 萬使用者，且 NSW 租客工會公開警告 AI 租務建議；
-   方向 5：詐標端 ACCC 已接手、救助端在位者佔 80%+、同型社企 Yume Food 已清算。逐條理由見交接文件第 5 節各方向末與第 3 節排除表。
-4. **在六個方向中擇一**，或等 10:00 現場真實提案者出現（現場優先）。
-5. 人工開啟該檔第 4.5 節列出的文件（自動抓取皆 403 或逾時），確認要引用的數字。
-   **最優先是《Understanding the Impact Costs of WISE》**，它可能直接補上方向 6 的量化缺口。
-6. 確認賽前技術預備：AI 助手登入、prototyping 工具或 API 存取。
-7. 開賽後確定題目與堆疊，於 `bin/verify.sh` 的標記區段補上真正的測試。
-8. 通知設計與資料科學隊友新的 repo URL。
-
-**現場優先**：10:00 現場出現的真實問題，一律優先於上述任何方向（判準見交接文件第 7 節）。
-現場那張要拿在手上的是 **`docs/frameworks/onsite-matching-sheet.md`**。
-
-## 框架與骨架（2026-09-21 新增，分支 `feat/direction-frameworks`）
-
-- 設計規格：`docs/superpowers/specs/2026-09-21-direction-frameworks-design.md`
-- 三份框架（同一個七格模板的三個實例）：`docs/frameworks/direction-{2,3,6}-*.md`
-- **現場提案者辨識表**：`docs/frameworks/onsite-matching-sheet.md`
-- 技術骨架：`skeleton/`，跑法 `python3 skeleton/app.py` → http://127.0.0.1:8000
-  （`python3 -m skeleton.app` 也可；`--check` 為離線煙霧測試，不起伺服器）
-  - 一個殼、三個可插拔方向模組、一條共用管線
-  - **零外部套件、單次模型呼叫、不做 RAG／agent／vector DB**（`AI_CONTEXT.md`「Avoid」）
-  - stub 模型使黃金路徑可離線跑完，這同時就是 demo 備援
-  - 兩條寫進程式而非只寫在文件的保證：無來源的建議會被拒絕；低於信心門檻就扣住值改問人
-  - 方向 6 的倫理紅線在模型呼叫**之前**強制：個人層級欄位與小於 5 人的群體一律拒絕輸出
-  - demo 場景含兩條失敗路徑：低信心（扣住值）與群體過小（拒絕輸出）
-
-## 背景
-
-完整專案脈絡見 `AI_CONTEXT.md`（官方賽事事實、評審、研究過的問題領域、策略方向、角色分工）。
+- Three occupations have reference data: commercial cook, welder, aged care
+  worker. Anything else matches no jobs and says so rather than the nearest.
+- Mandarin is the validated demo language; Arabic is configured but has not been
+  checked with a native speaker, so it is not claimed.
+- The job board is a snapshot taken on 2026-09-21, so the demo runs offline.

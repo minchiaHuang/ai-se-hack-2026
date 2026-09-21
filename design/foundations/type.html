@@ -1,0 +1,81 @@
+<!-- @dsCard group="Foundations" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Type and space</title>
+<link rel="stylesheet" href="../tokens.css">
+<style>
+* { box-sizing: border-box; }
+body { margin: 0; padding: var(--space-6); background: var(--bg); color: var(--fg);
+       font: var(--weight-regular) var(--text-md-size)/var(--text-md-line) var(--font); }
+h1 { margin: 0 0 var(--space-1); font-size: var(--text-lg-size); line-height: var(--text-lg-line);
+     font-weight: var(--weight-semibold); }
+p.note { margin: 0 0 var(--space-6); color: var(--fg-muted);
+         font-size: var(--text-sm-size); line-height: var(--text-sm-line); }
+h2 { margin: var(--space-6) 0 var(--space-3); font-size: var(--text-sm-size);
+     line-height: var(--text-sm-line); font-weight: var(--weight-semibold); color: var(--fg-strong); }
+.card { background: var(--surface); border-radius: var(--radius-card); box-shadow: var(--shadow-xs);
+        padding: var(--space-6); }
+.spec { display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: var(--space-4);
+        align-items: baseline; padding: var(--space-3) 0; border-top: 1px solid var(--line-soft); }
+.spec:first-child { border-top: 0; }
+.spec .label { color: var(--fg-placeholder); font-size: var(--text-sm-size);
+               line-height: var(--text-sm-line); font-variant-numeric: tabular-nums; }
+.lg-semi { font-size: var(--text-lg-size); line-height: var(--text-lg-line); font-weight: var(--weight-semibold); }
+.md-semi { font-size: var(--text-md-size); line-height: var(--text-md-line); font-weight: var(--weight-semibold); }
+.md-med  { font-size: var(--text-md-size); line-height: var(--text-md-line); font-weight: var(--weight-medium); }
+.md-reg  { font-size: var(--text-md-size); line-height: var(--text-md-line); font-weight: var(--weight-regular); }
+.sm-med  { font-size: var(--text-sm-size); line-height: var(--text-sm-line); font-weight: var(--weight-medium); }
+.sm-reg  { font-size: var(--text-sm-size); line-height: var(--text-sm-line); font-weight: var(--weight-regular); }
+.bars { display: flex; align-items: flex-end; gap: var(--space-3); }
+.bar { text-align: center; }
+.bar .fill { background: var(--brand); border-radius: 2px; width: 24px; }
+.bar .n { margin-top: var(--space-1-5); color: var(--fg-placeholder);
+          font-size: var(--text-sm-size); line-height: var(--text-sm-line); font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body>
+<h1>Type and space</h1>
+<p class="note">Inter, the kit's six text styles, and the 4px grid its layers are laid out on.</p>
+
+<h2>Text styles</h2>
+<div class="card">
+  <div class="spec"><span class="label">Text lg / Semibold<br>18 / 28 / 600</span>
+    <span class="lg-semi">Tell me a little about yourself</span></div>
+  <div class="spec"><span class="label">Text md / Semibold<br>16 / 24 / 600</span>
+    <span class="md-semi">Tell me a little about yourself</span></div>
+  <div class="spec"><span class="label">Text md / Medium<br>16 / 24 / 500</span>
+    <span class="md-med">Tell me a little about yourself</span></div>
+  <div class="spec"><span class="label">Text md / Regular<br>16 / 24 / 400</span>
+    <span class="md-reg">Tell me a little about yourself</span></div>
+  <div class="spec"><span class="label">Text sm / Medium<br>14 / 20 / 500</span>
+    <span class="sm-med">Tell me a little about yourself</span></div>
+  <div class="spec"><span class="label">Text sm / Regular<br>14 / 20 / 400</span>
+    <span class="sm-reg">Tell me a little about yourself</span></div>
+</div>
+
+<h2>Spacing</h2>
+<div class="card">
+  <div class="bars">
+    <div class="bar"><div class="fill" style="height:4px"></div><div class="n">4</div></div>
+    <div class="bar"><div class="fill" style="height:6px"></div><div class="n">6</div></div>
+    <div class="bar"><div class="fill" style="height:8px"></div><div class="n">8</div></div>
+    <div class="bar"><div class="fill" style="height:12px"></div><div class="n">12</div></div>
+    <div class="bar"><div class="fill" style="height:16px"></div><div class="n">16</div></div>
+    <div class="bar"><div class="fill" style="height:20px"></div><div class="n">20</div></div>
+    <div class="bar"><div class="fill" style="height:24px"></div><div class="n">24</div></div>
+    <div class="bar"><div class="fill" style="height:32px"></div><div class="n">32</div></div>
+  </div>
+</div>
+
+<h2>Radius and elevation</h2>
+<div class="card">
+  <div class="spec"><span class="label">Control · 8px</span>
+    <span style="display:inline-block;width:120px;height:40px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-control);box-shadow:var(--shadow-xs)"></span></div>
+  <div class="spec"><span class="label">Card · 16px · shadow xl</span>
+    <span style="display:inline-block;width:120px;height:56px;background:var(--surface);border-radius:var(--radius-card);box-shadow:var(--shadow-xl)"></span></div>
+</div>
+</body>
+</html>

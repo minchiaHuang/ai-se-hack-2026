@@ -1,0 +1,729 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BridgeWork interview</title>
+<style>
+/* BridgeWork theme and layout from the Figma "BridgeWork" file, interview frame
+   10:83, the same tokens as review.html. Inline and without a web-font download:
+   the page must render offline from the stdlib server, so Inter is used only
+   when the machine already has it. */
+:root {
+  --primary: #1B4B5A;
+  --primary-light: #2E7D96;
+  --accent: #E8874A;
+  --success: #4C9A6B;
+  --bg: #F7F5F1;
+  --text: #2B2B2B;
+  --muted: #5b6168;
+  --soft: #868686;
+  --card: #fff;
+  --panel: #e4e6e4;
+  --line: #d9d4cb;
+  --shadow: 0 12px 16px rgba(0, 0, 0, .14);
+  --warn: #7a4a00;
+  --warn-bg: #fff3d6;
+  --stop: #9b1111;
+  --stop-bg: #fdecec;
+  --focus: #ffbf00;
+}
+* { box-sizing: border-box; }
+html { font-size: 18px; }
+body {
+  margin: 0; background: var(--bg); color: var(--text);
+  font: 1rem/1.5 Inter, system-ui, -apple-system, "Segoe UI", "PingFang SC", "Noto Sans CJK SC", sans-serif;
+}
+header.top { display: flex; align-items: center; gap: 1.25rem; padding: 12px 24px;
+             background: var(--card); box-shadow: 0 2px 8px rgba(0, 0, 0, .06); }
+.brand { display: flex; align-items: center; gap: 10px; }
+.brand img { width: 40px; height: 40px; }
+.wordmark { font-size: 1.5rem; margin: 0; letter-spacing: -.01em; line-height: 1; }
+.wordmark b { color: #111; font-weight: 700; }
+.wordmark span { color: var(--primary-light); font-weight: 400; }
+.step { color: var(--muted); font-weight: 500; font-size: .85rem; }
+.progress { margin-left: auto; color: var(--muted); font-weight: 500; font-size: .85rem; white-space: nowrap; }
+main { max-width: 1280px; margin: 0 auto; padding: 16px 0 48px; }
+h2 { font-size: 1.2rem; margin: 0 0 .25rem; }
+p { margin: .3rem 0; }
+.muted { color: var(--muted); }
+.small { font-size: .88rem; }
+button, textarea { font: inherit; }
+:focus-visible { outline: 4px solid var(--focus); outline-offset: 2px; }
+button {
+  min-height: 44px; padding: .35rem 1rem; border-radius: 5px; cursor: pointer;
+  border: 2px solid var(--primary); background: var(--primary); color: #fff; font-weight: 500;
+}
+button.secondary { background: var(--card); color: var(--primary); }
+button.go { background: var(--accent); border-color: var(--accent); color: #1f1a15; }
+button:disabled { background: #d1d5db; border-color: #9ca3af; color: #333; cursor: not-allowed; }
+[hidden] { display: none !important; }
+
+.banner { padding: .5rem .8rem; border-radius: 6px; margin: 0 24px .75rem; font-weight: 600; }
+.banner.mock { background: var(--card); border: 2px dashed var(--line); font-weight: 500; }
+.banner.offline { background: var(--warn-bg); color: var(--warn); border: 2px solid var(--warn); }
+.banner.error { background: var(--stop-bg); color: var(--stop); border: 2px solid var(--stop); }
+
+.start { max-width: 640px; margin: 8vh auto; background: var(--card); border-radius: 12px;
+         box-shadow: var(--shadow); padding: 28px 32px; }
+.start h2 { color: var(--primary); }
+.consent { display: flex; gap: .55rem; align-items: flex-start; margin: 1rem 0; cursor: pointer; }
+.consent input { width: 22px; height: 22px; flex: none; margin-top: .15rem; accent-color: var(--primary); }
+.back { color: var(--muted); font-size: .88rem; font-weight: 600; text-decoration: none; }
+.back:hover { color: var(--primary); text-decoration: underline; }
+.phone { margin-top: 1.5rem; padding-top: 1.2rem; border-top: 1px solid var(--line); }
+.phone h3 { color: var(--primary); margin: 0 0 .3rem; font-size: 1rem; }
+#talk-url { word-break: break-all; font-weight: 600; color: var(--primary); }
+.turns { list-style: none; padding: 0; margin: 1rem 0; max-height: 50vh; overflow-y: auto; }
+.turns li { margin: .4rem 0; padding: .5rem .7rem; border-radius: 8px; background: var(--panel); }
+.turns li.agent { background: var(--bg); color: var(--muted); }
+.turns .who { display: block; font-size: .75rem; font-weight: 700; color: var(--accent); }
+
+/* Figma: "Current Question" in accent, then the question in primary, English on
+   the left and Mandarin right-aligned on the right, both the same size and weight. */
+.question { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 48px; align-items: start;
+            padding: 20px 47px 0 60px; margin-bottom: 36px; }
+.label { color: var(--accent); font-weight: 700; font-size: 20px; line-height: 1.2; margin: 0 0 14px; }
+.q-en, .q-zh { color: var(--primary); font-size: 30px; font-weight: 700; line-height: 1.25; margin: 0; }
+.q-zh { text-align: right; margin-top: 38px; } /* level with the English, under the label */
+/* Most of the team's questions are far longer than the Figma sample; at 30px they
+   would push the cards below the fold. */
+.question.long .q-en, .question.long .q-zh { font-size: 22px; line-height: 1.35; }
+
+/* The two transcript cards run to the page edges, as in Figma, with the voice
+   controls between them. */
+.stage { display: grid; grid-template-columns: minmax(0, 467fr) minmax(220px, 346fr) minmax(0, 467fr);
+         align-items: stretch; }
+.card { border-radius: 12px; box-shadow: var(--shadow); min-height: 597px;
+        display: flex; flex-direction: column; gap: 28px; padding: 110px 44px 28px; }
+.card.en { background: var(--panel); }
+.card.zh { background: var(--card); padding: 110px 48px 28px 62px; }
+.card label { font-weight: 700; font-size: 20px; line-height: 1.2; color: #000; }
+.card.zh label { text-align: right; }
+/* Editable, but reads as flowing text: no box until the caseworker is in it. */
+.card textarea { flex: 1; min-height: 240px; width: 100%; padding: 4px 6px; margin: 0 -6px;
+                 border: 0; border-radius: 6px; background: transparent; resize: none;
+                 color: var(--soft); font-size: 20px; font-weight: 600; line-height: 1.5; }
+.card.zh textarea { line-height: 2; }
+.card textarea:focus { outline: 2px solid rgba(27, 75, 90, .3); outline-offset: 2px; color: var(--text); }
+.card .hint { color: var(--soft); font-size: .75rem; }
+.centre { display: flex; flex-direction: column; align-items: center; padding: 46px 16px 0; }
+
+/* The voice orb: Figma's gradient ellipse, still when idle, breathing and glowing
+   while the question plays (teal) or while recording (accent). */
+.voice { width: 240px; height: 240px; border-radius: 50%; display: grid; place-items: center; position: relative;
+         background: linear-gradient(210deg, var(--primary) 13%, #2BCDFF 95%);
+         box-shadow: 0 4px 4px rgba(0, 0, 0, .25); }
+.voice .core { color: rgba(255, 255, 255, .85); font-size: .8rem; font-weight: 600; letter-spacing: .08em;
+               text-transform: uppercase; margin-top: 150px; }
+.voice.speaking { animation: breathe 1.6s ease-in-out infinite, glow-teal 1.6s ease-in-out infinite; }
+.voice.recording { animation: breathe 1.2s ease-in-out infinite, glow-accent 1.2s ease-in-out infinite; }
+@keyframes breathe { 50% { transform: scale(1.05); } }
+@keyframes glow-teal {
+  0%, 100% { box-shadow: 0 4px 4px rgba(0, 0, 0, .25), 0 0 0 0 rgba(43, 205, 255, .45); }
+  50% { box-shadow: 0 4px 4px rgba(0, 0, 0, .25), 0 0 0 22px rgba(43, 205, 255, 0); }
+}
+@keyframes glow-accent {
+  0%, 100% { box-shadow: 0 4px 4px rgba(0, 0, 0, .25), 0 0 0 0 rgba(232, 135, 74, .6); }
+  50% { box-shadow: 0 4px 4px rgba(0, 0, 0, .25), 0 0 0 22px rgba(232, 135, 74, 0); }
+}
+@media (prefers-reduced-motion: reduce) { .voice { animation: none !important; } }
+.buttons { display: flex; gap: 60px; margin-top: 52px; }
+.round { width: 67px; height: 67px; min-height: 0; padding: 0; border-radius: 50%; border: 0;
+         background: var(--card); box-shadow: 0 4px 15px rgba(0, 0, 0, .25); display: grid; place-items: center; }
+.round svg { width: 29.4px; height: 29.4px; display: block; }
+.round.on { box-shadow: 0 4px 15px rgba(0, 0, 0, .25), 0 0 0 3px var(--accent); }
+.round:disabled { background: var(--card); border: 0; opacity: .45; }
+.status { min-height: 2.6rem; margin: 10px 0 0; font-weight: 600; text-align: center; font-size: .85rem; color: var(--muted); }
+.next { min-width: 129px; height: 50px; margin-top: 42px; font-size: 20px; padding: 0 22px; }
+.next:disabled { background: var(--primary); border-color: var(--primary); color: #fff; opacity: .45; }
+
+@media (max-width: 900px) {
+  .question, .stage { grid-template-columns: 1fr; gap: 16px; }
+  .question { padding: 12px 16px 0; }
+  .q-zh { text-align: left; margin-top: 0; }
+  .centre { order: -1; padding-top: 0; }
+  .card, .card.zh { min-height: 0; padding: 24px; }
+  .card textarea { min-height: 140px; }
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <!-- /logo.svg comes with the entry pages; until it is served the wordmark stands alone. -->
+  <div class="brand">
+    <img src="/logo.svg" alt="" onerror="this.hidden = true">
+    <p class="wordmark"><b>Bridge</b><span>Work</span></p>
+  </div>
+  <span class="step">Interview</span>
+  <span id="progress" class="progress" aria-live="polite"></span>
+</header>
+<main>
+  <p id="mock-banner" class="banner mock" hidden>Mock mode: scripted answers from a fictional cook, no backend. Nothing is recorded or sent.</p>
+  <p id="offline" class="banner offline" role="status" hidden></p>
+  <p id="error" class="banner error" role="alert" hidden></p>
+
+  <section id="start" class="start" hidden>
+    <h2>Questions for the resume</h2>
+    <p class="muted">Each question is read aloud in Mandarin. The jobseeker answers in their own words; the answer is
+      transcribed and translated into English. You can correct both before moving on, and nothing is final until you
+      confirm the resume on the next page.</p>
+    <!-- NEEDS DECISION: the brief asks for no consent step here. This one mirrors
+         intake.html's, because recording someone's voice without asking is not a
+         call a page should make on its own. -->
+    <label class="consent">
+      <input type="checkbox" id="consent">
+      <span>The jobseeker agrees that their answers are recorded, transcribed by a speech service and translated into English.</span>
+    </label>
+    <button id="begin" class="go" disabled>Start the interview</button>
+
+    <div class="phone">
+      <h3>Or: the jobseeker talks with an AI interviewer on their phone</h3>
+      <p class="muted">It asks the same questions in Mandarin. When they hang up, the answers come back here,
+        sorted by question, for you to check on the next page.</p>
+      <button id="call" class="secondary" disabled>Start the phone interview</button>
+    </div>
+    <p><a class="back" id="back" href="/start/path">&larr; Back</a></p>
+  </section>
+
+  <section id="call-panel" class="start" hidden>
+    <h2>Phone interview</h2>
+    <p id="talk-link" hidden>On the jobseeker's phone, open
+      <a id="talk-url" target="_blank" rel="noopener"></a> and tap the call button.</p>
+    <p id="call-status" class="muted" aria-live="polite"></p>
+    <ol id="call-turns" class="turns" lang="zh-Hans"></ol>
+    <button id="call-review" class="go" hidden>Review the answers &rarr;</button>
+  </section>
+
+  <section id="interview" hidden>
+    <div id="question" class="question">
+      <div>
+        <p class="label">Current Question · <span id="section"></span></p>
+        <p id="q-en" class="q-en"></p>
+      </div>
+      <p id="q-zh" class="q-zh" lang="zh-Hans"></p>
+    </div>
+
+    <div class="stage">
+      <div class="card en">
+        <label for="answer-en">Translated contents</label>
+        <textarea id="answer-en" lang="en"></textarea>
+        <span class="hint">English draft. Correct it with the jobseeker before moving on.</span>
+      </div>
+
+      <div class="centre">
+        <div id="voice" class="voice" aria-hidden="true"><div class="core" id="voice-label">Ready</div></div>
+        <div class="buttons">
+          <button id="play" class="round" title="Play the question again" aria-label="Play the question again"></button>
+          <button id="record" class="round" title="Record the answer" aria-label="Record the answer"></button>
+        </div>
+        <button id="next" class="next">Next &rarr;</button>
+        <p id="status" class="status" aria-live="polite"></p>
+      </div>
+
+      <div class="card zh">
+        <label for="answer-zh" lang="zh-Hans">原文</label>
+        <textarea id="answer-zh" lang="zh-Hans"></textarea>
+        <span class="hint">What was said, as transcribed. Several recordings are added one after another.</span>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+"use strict";
+
+// ?mock=1 runs the whole interview against the fixtures below and makes no /api/
+// request at all: the demo video is recorded in it.
+const params = new URLSearchParams(location.search);
+const MOCK = params.get("mock") === "1";
+// ?quiet=1 hides the mock banner for the demo video; nothing else changes with it.
+const QUIET = params.get("quiet") === "1";
+
+// Read by /review. sessionStorage keeps the answers to this tab.
+const INTERVIEW_KEY = "d7.interview";
+// Written by /start; handed to /review untouched as "person".
+const PERSON_KEY = "d7.person";
+// Written by /upload. /review prefers it over d7.interview, so an upload earlier in
+// this tab would otherwise show the uploaded resume instead of this interview.
+const SECTIONS_KEY = "d7.sections";
+const LANGUAGE = "zh";
+// Both flags ride along, so a demo opened quiet stays quiet on /review.
+const FLAGS = [MOCK && "mock=1", QUIET && "quiet=1"].filter(Boolean).join("&");
+const REVIEW_URL = (location.protocol === "file:" ? "review.html" : "/review") + (FLAGS ? "?" + FLAGS : "");
+
+// ---------------------------------------------------------------- fixtures
+// The team's questions exactly as GET /api/interview/questions serves them.
+const FIXTURE_QUESTIONS = {"questions": [{"id": "profile", "section": "Profile", "en": "Tell me a little about yourself, and what work you hope to find here.", "zh": "请简单介绍一下你自己，还有你希望在这里找什么工作。"}, {"id": "education", "section": "Education", "en": "Where did you go to school, and what did you learn there?", "zh": "你在哪里读书？学的是什么？"}, {"id": "employment", "section": "Employment", "en": "What was your last job, and what did you do each day?", "zh": "你最近一份工作是做什么的？每天做哪些事？"}, {"id": "volunteer", "section": "Volunteer Experience", "en": "Have you done any unpaid work, or helped your community?", "zh": "你做过无偿的工作，或者帮助过你的社区吗？"}, {"id": "skills", "section": "Technical Skills", "en": "What are you good at? Tools, machines, computers, languages — anything.", "zh": "你擅长什么？工具、机器、电脑、语言，什么都可以。"}, {"id": "certificates", "section": "Certificate", "en": "Do you have any certificates, licences, or training records?", "zh": "你有证书、执照，或者培训记录吗？"}]};
+// The mock interviewee's answers: exactly the team's mock_interview_answers.json
+// (fictional cook Li Wei), the same answers review.html's MOCK_INTERVIEW carries.
+const MOCK_ANSWERS = [{"id": "profile", "answer_zh": "我叫李伟，做了六年厨师，一直是餐厅的主厨。我最自豪的是每天能给一百五十个客人做饭，从来没有出过食品安全问题。我希望在这里继续在厨房工作。", "answer_en": "My name is Li Wei. I have worked as a cook for six years, always as the head cook of a restaurant. What I am most proud of is cooking for 150 guests a day without ever having a food safety problem. I hope to keep working in a kitchen here."}, {"id": "education", "answer_zh": "我在成都的一所职业技术学校学烹饪，二零一二年到二零一四年读了两年。在那里学了中餐的基本功，还有厨房卫生。", "answer_en": "I studied cooking at a vocational school in Chengdu, for two years from 2012 to 2014. There I learned the basics of Chinese cooking, and kitchen hygiene."}, {"id": "employment", "answer_zh": "我最近的工作是在成都一家叫蓉香楼的餐厅当主厨，从二零一六年做到二零二二年，一共六年。每天早上从头熬高汤、做汤和酱汁，准备羊肉、牛肉和鸡肉的菜。生的和熟的食物分开放，每个班次都记录冷库的温度。", "answer_en": "My most recent job was head cook at a restaurant called Rongxiang Lou in Chengdu, from 2016 to 2022, six years in total. Every morning I made stocks, soups and sauces from scratch, and prepared lamb, beef and chicken dishes. I kept raw and cooked food apart, and recorded the cool-room temperature every shift."}, {"id": "volunteer", "answer_zh": "有。去年开始每个星期六在社区中心的食物分发站帮忙，大概做了一年。我负责整理捐来的食物，检查保质期，然后帮忙给大家做热饭。", "answer_en": "Yes. Since last year I have helped every Saturday at the food distribution point at the community centre, for about a year. I sort donated food, check the use-by dates, and help cook hot meals for people."}, {"id": "skills", "answer_zh": "我会用商用厨房的设备，像蒸烤箱、大炒锅和切片机。会说普通话和四川话，英语还在学。", "answer_en": "I can use commercial kitchen equipment, such as combi ovens, large woks and slicers. I speak Mandarin and Sichuanese, and I am still learning English."}, {"id": "certificates", "answer_zh": "我有中国的中式烹调师证书。在澳大利亚还没有考任何证书。", "answer_en": "I have a Chinese cook certificate for Chinese cuisine from China. I have not taken any certificate in Australia yet."}];
+
+// Figma's play and stop glyphs (frame 10:83, nodes 38:5 and 38:15). Figma has no
+// record glyph; the dot is drawn in the same grey so the pair reads as one set.
+const ICONS = {
+  play: '<svg viewBox="0 0 29.4 29.4" aria-hidden="true"><path d="M27.5625 14.7C27.5633 15.0119 27.4833 15.3188 27.3303 15.5906C27.1774 15.8625 26.9567 16.0902 26.6897 16.2515L10.143 26.3738C9.86403 26.5447 9.54451 26.6379 9.21745 26.644C8.89039 26.65 8.56764 26.5687 8.28253 26.4083C8.00014 26.2504 7.7649 26.0201 7.60101 25.7412C7.43711 25.4623 7.35047 25.1447 7.35 24.8212V4.5788C7.35047 4.25526 7.43711 3.9377 7.60101 3.65875C7.7649 3.3798 8.00014 3.14954 8.28253 2.99165C8.56764 2.83127 8.89039 2.74991 9.21745 2.75597C9.54451 2.76202 9.86403 2.85528 10.143 3.02611L26.6897 13.1484C26.9567 13.3098 27.1774 13.5374 27.3303 13.8093C27.4833 14.0812 27.5633 14.388 27.5625 14.7Z" fill="black" fill-opacity="0.5"/></svg>',
+  stop: '<svg viewBox="0 0 29.4 29.4" aria-hidden="true"><path d="M24.8062 6.34741V23.0526C24.8056 23.5175 24.6207 23.9632 24.2919 24.2919C23.9632 24.6207 23.5175 24.8056 23.0526 24.8062H6.34741C5.8825 24.8056 5.4368 24.6207 5.10806 24.2919C4.77931 23.9632 4.59436 23.5175 4.59375 23.0526V6.34741C4.59436 5.8825 4.77931 5.4368 5.10806 5.10806C5.4368 4.77931 5.8825 4.59436 6.34741 4.59375H23.0526C23.5175 4.59436 23.9632 4.77931 24.2919 5.10806C24.6207 5.4368 24.8056 5.8825 24.8062 6.34741Z" fill="black" fill-opacity="0.5"/></svg>',
+  record: '<svg viewBox="0 0 29.4 29.4" aria-hidden="true"><circle cx="14.7" cy="14.7" r="10.5" fill="black" fill-opacity="0.5"/></svg>',
+};
+
+// ---------------------------------------------------------------- state
+const state = {
+  questions: [],
+  index: 0,
+  answers: [],        // the contract's answers, one per question passed
+  consent: false,
+  audio: null,        // the <audio> playing the current question
+  audioUrls: {},      // question id -> object URL, so a replay costs no second call
+  recorder: null,
+  mockTimer: null,
+  mockAnswered: {},   // question id -> true once the scripted answer was given
+  speaking: false,
+  busy: false,
+};
+
+const $ = id => document.getElementById(id);
+const current = () => state.questions[state.index];
+
+function showError(message) {
+  $("error").textContent = message || "";
+  $("error").hidden = !message;
+}
+
+// Offline notices stack for the current question: one service may be down while
+// another answers, and the caseworker needs to know which part to type by hand.
+function addOffline(message) {
+  const box = $("offline");
+  box.textContent = box.hidden ? message : box.textContent + " " + message;
+  box.hidden = false;
+}
+
+function clearOffline() {
+  $("offline").textContent = "";
+  $("offline").hidden = true;
+}
+
+function setStatus(message) { $("status").textContent = message || ""; }
+
+// Offline and refused answers are both 200s; either one means nothing came back.
+function unanswered(body) {
+  if (body && body.refused) return body.refused;
+  if (body && body.offline) return body.reason || "the service is offline.";
+  return "";
+}
+
+// ---------------------------------------------------------------- network
+async function postJson(path, json) {
+  const response = await fetch(path, { method: "POST", headers: { "Content-Type": "application/json" },
+                                       body: JSON.stringify(json) });
+  if (!response.ok) throw new Error(path + " answered HTTP " + response.status);
+  return response;
+}
+
+async function loadQuestions() {
+  if (MOCK) return FIXTURE_QUESTIONS.questions;
+  const response = await fetch("/api/interview/questions");
+  if (!response.ok) throw new Error("the questions answered HTTP " + response.status);
+  return (await response.json()).questions;
+}
+
+// ---------------------------------------------------------------- speaking
+function stopSpeaking() {
+  clearTimeout(state.mockTimer);
+  if (state.audio) { state.audio.pause(); state.audio = null; }
+  state.speaking = false;
+}
+
+// Mock has no audio: the indicator "speaks" for about as long as reading takes,
+// capped so the video does not wait on the long questions.
+function mockSpeak(question) {
+  state.speaking = true; render();
+  setStatus("Reading the question aloud…");
+  state.mockTimer = setTimeout(() => {
+    state.speaking = false;
+    setStatus("");
+    render();
+  }, Math.min(6000, 1500 + 40 * question.zh.length));
+}
+
+async function audioFor(question) {
+  if (state.audioUrls[question.id]) return { url: state.audioUrls[question.id] };
+  const response = await postJson("/api/speak", { text: question.zh, language: LANGUAGE });
+  if ((response.headers.get("Content-Type") || "").startsWith("audio/")) {
+    state.audioUrls[question.id] = URL.createObjectURL(await response.blob());
+    return { url: state.audioUrls[question.id] };
+  }
+  return { missing: unanswered(await response.json()) || "no audio came back." };
+}
+
+async function speak() {
+  const question = current();
+  stopSpeaking();
+  // Mock asks for the real voice too: the recorded demo is the one place the
+  // question being read aloud has to be heard. When the call cannot be made —
+  // no key, no network, the offline backup this mode exists for — the branch
+  // below falls back to the silent indicator without a banner.
+  state.speaking = true; render();
+  setStatus("Fetching the spoken question…");
+  let got;
+  try {
+    got = await audioFor(question);
+  } catch (err) {
+    got = { missing: err.message + "." };
+  }
+  // The caseworker may have moved on, or started recording, while the audio was on its way.
+  if (question !== current()) return;
+  if (state.recorder) { state.speaking = false; render(); return; }
+  if (got.missing) {
+    // Mock keeps its offline behaviour exactly as it was: the indicator reads
+    // for about as long as the question takes, and no banner interrupts a take.
+    if (MOCK) { stopSpeaking(); return mockSpeak(question); }
+    state.speaking = false; setStatus(""); render();
+    addOffline("Not read aloud: " + got.missing + " Read the Mandarin question to the jobseeker from the screen.");
+    return;
+  }
+  const audio = new Audio(got.url);
+  state.audio = audio;
+  audio.onended = () => { if (state.audio === audio) { state.audio = null; state.speaking = false; setStatus(""); render(); } };
+  setStatus("Reading the question aloud…");
+  try {
+    await audio.play();
+  } catch (err) {
+    // A browser that blocks autoplay still lets the play button work.
+    state.audio = null; state.speaking = false; render();
+    setStatus("Press ▶ to hear the question.");
+  }
+}
+
+// ---------------------------------------------------------------- answering
+function append(id, text) {
+  const box = $(id);
+  const kept = box.value.trim();
+  box.value = kept ? kept + "\n" + text.trim() : text.trim();
+}
+
+// One recorded segment: transcribed into 原文, then translated into English. Each
+// step that gets nothing back says so and leaves that box for the caseworker.
+async function handleSegment(blob) {
+  const question = current();
+  state.busy = true; render();
+  setStatus("Transcribing…");
+  let zh = "";
+  try {
+    if (MOCK) {
+      zh = await wait(900, mockAnswer(question).answer_zh);
+    } else {
+      const response = await fetch("/api/transcribe?language=" + LANGUAGE,
+                                   { method: "POST", headers: { "Content-Type": blob.type || "audio/webm" }, body: blob });
+      if (!response.ok) throw new Error("/api/transcribe answered HTTP " + response.status);
+      const body = await response.json();
+      // Offline transcribe hands back placeholder text; it is never shown as what was said.
+      const missing = body.refused || (body.offline ? "the speech service is offline." : "");
+      if (missing) {
+        addOffline("Not transcribed: " + missing + " Type what was said into 原文 and the English into Translated contents.");
+      } else if (!String(body.text || "").trim()) {
+        addOffline("Nothing was heard in that recording. Record again, or type the answer in.");
+      } else {
+        zh = body.text;
+      }
+    }
+    if (question !== current() || !zh) return;
+    append("answer-zh", zh);
+    setStatus("Translating…");
+    let en = "";
+    if (MOCK) {
+      en = await wait(900, mockAnswer(question).answer_en);
+    } else {
+      const body = await (await postJson("/api/translate", { text: zh, source: LANGUAGE })).json();
+      const missing = unanswered(body);
+      if (missing) addOffline("Not translated: " + missing + " Type the English into Translated contents.");
+      else en = body.en;
+    }
+    if (question === current() && en) append("answer-en", en);
+  } catch (err) {
+    showError("That recording was not processed: " + err.message + " Record again, or type the answer in.");
+  } finally {
+    state.busy = false;
+    setStatus("");
+    render();
+  }
+}
+
+const wait = (ms, value) => new Promise(resolve => setTimeout(() => resolve(value), ms));
+const mockAnswer = question => MOCK_ANSWERS.find(a => a.id === question.id);
+
+// Mock "record" runs as long as the answer would take to say, then goes through
+// the same transcribe and translate steps as real audio. Stop ends it early.
+function mockRecord() {
+  const question = current();
+  if (state.recorder) {
+    clearTimeout(state.recorder.timer);
+    state.recorder = null;
+    state.mockAnswered[question.id] = true;
+    return handleSegment(null);
+  }
+  stopSpeaking();
+  state.recorder = { timer: setTimeout(mockRecord, Math.min(7000, 1500 + 60 * mockAnswer(question).answer_zh.length)) };
+  setStatus("Recording… press ■ when the answer is finished.");
+  render();
+}
+
+async function toggleRecord() {
+  if (MOCK) return mockRecord();
+  if (state.recorder) {
+    state.recorder.stop();
+    return;
+  }
+  stopSpeaking();
+  showError("");
+  let stream;
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  } catch (err) {
+    showError("Microphone not available: " + err.message + ". Type the answer in instead.");
+    render();
+    return;
+  }
+  const chunks = [];
+  const recorder = new MediaRecorder(stream);
+  recorder.ondataavailable = event => { if (event.data.size) chunks.push(event.data); };
+  recorder.onstop = () => {
+    stream.getTracks().forEach(track => track.stop());
+    const discarded = recorder.discard;
+    state.recorder = null;
+    render();
+    if (!discarded) handleSegment(new Blob(chunks, { type: "audio/webm" }));
+  };
+  state.recorder = recorder;
+  recorder.start();
+  setStatus("Recording… press ■ when the answer is finished.");
+  render();
+}
+
+// ---------------------------------------------------------------- phone call
+// The call runs at ElevenLabs; this page only polls its transcript. The poll is
+// slow on purpose: a turn takes several seconds to say anyway.
+const CALL_POLL_MS = 3000;
+const CALL_STATUS = { "initiated": "Ringing…", "in-progress": "On the call. What is said appears below.",
+                      "processing": "The call has ended. Sorting the answers…" };
+
+function showTurns(turns) {
+  const list = $("call-turns");
+  list.replaceChildren(...turns.map(turn => {
+    const item = document.createElement("li");
+    item.className = turn.role === "agent" ? "agent" : "user";
+    const who = document.createElement("span");
+    who.className = "who";
+    who.textContent = turn.role === "agent" ? "AI interviewer" : "Jobseeker";
+    item.append(who, turn.text);
+    return item;
+  }));
+  list.scrollTop = list.scrollHeight;
+}
+
+function callFinished(answers) {
+  state.answers = answers;
+  $("call-status").textContent = "The call has ended. Check the transcript, then review the answers.";
+  $("call-review").hidden = false;
+}
+
+function mockCall() {
+  const turns = [];
+  FIXTURE_QUESTIONS.questions.forEach((question, n) => {
+    turns.push({ role: "agent", text: question.zh }, { role: "user", text: MOCK_ANSWERS[n].answer_zh });
+  });
+  let shown = 0;
+  $("call-status").textContent = CALL_STATUS["in-progress"];
+  state.mockTimer = setInterval(() => {
+    shown += 1;
+    showTurns(turns.slice(0, shown));
+    if (shown < turns.length) return;
+    clearInterval(state.mockTimer);
+    callFinished(FIXTURE_QUESTIONS.questions.map((question, n) => ({
+      id: question.id, section: question.section, question_en: question.en, question_zh: question.zh,
+      answer_zh: MOCK_ANSWERS[n].answer_zh, answer_en: MOCK_ANSWERS[n].answer_en,
+    })));
+  }, 800);
+}
+
+async function pollCall(conversationId) {
+  let body;
+  try {
+    const response = await fetch("/api/call/result?id=" + encodeURIComponent(conversationId));
+    if (!response.ok) throw new Error("the call answered HTTP " + response.status);
+    body = await response.json();
+  } catch (err) {
+    // One missed poll is venue wifi, not a failed call: try again.
+    $("call-status").textContent = "Could not reach the call (" + err.message + "). Trying again…";
+    return setTimeout(() => pollCall(conversationId), CALL_POLL_MS);
+  }
+  if (body.turns) showTurns(body.turns);
+  if (body.status === "failed") return showError("The call failed. Check the number and try again.");
+  if (!body.done) {
+    $("call-status").textContent = CALL_STATUS[body.status] || unanswered(body) || "Waiting for the call…";
+    return setTimeout(() => pollCall(conversationId), CALL_POLL_MS);
+  }
+  if (body.offline) addOffline(body.reason);
+  if (body.unplaced && body.unplaced.length) {
+    addOffline(body.unplaced.length + " answer(s) did not fit a question and are only in the transcript above.");
+  }
+  callFinished(body.answers);
+}
+
+// Waits for the jobseeker to start talking on their phone. Only a conversation
+// that began after this page started waiting is taken, never an older one.
+async function waitForTalk(since) {
+  let body;
+  try {
+    const response = await fetch("/api/talk/latest?since=" + since);
+    if (!response.ok) throw new Error("the service answered HTTP " + response.status);
+    body = await response.json();
+  } catch (err) {
+    $("call-status").textContent = "Could not reach the service (" + err.message + "). Trying again…";
+    return setTimeout(() => waitForTalk(since), CALL_POLL_MS);
+  }
+  if (body.offline) return showError(body.reason);
+  if (body.waiting) {
+    $("call-status").textContent = "Waiting for the jobseeker to start the call…";
+    return setTimeout(() => waitForTalk(since), CALL_POLL_MS);
+  }
+  pollCall(body.conversation_id);
+}
+
+async function startCall() {
+  if (!state.consent) return;
+  showError("");
+  clearOffline();
+  $("start").hidden = true;
+  $("call-panel").hidden = false;
+  if (MOCK) return mockCall();
+  // A minute of slack for a phone and laptop whose clocks disagree.
+  const since = Math.floor(Date.now() / 1000) - 60;
+  try {
+    const response = await fetch("/api/talk/link");
+    if (!response.ok) throw new Error("the link answered HTTP " + response.status);
+    const body = await response.json();
+    if (body.offline) throw new Error(body.reason);
+    $("talk-url").href = body.url;
+    $("talk-url").textContent = body.url;
+    $("talk-link").hidden = false;
+  } catch (err) {
+    showError("The phone interview could not start: " + err.message);
+    $("call-panel").hidden = true;
+    $("start").hidden = false;
+    return;
+  }
+  waitForTalk(since);
+}
+
+// ---------------------------------------------------------------- moving on
+function showQuestion() {
+  const question = current();
+  $("section").textContent = question.section;
+  $("q-en").textContent = question.en;
+  $("q-zh").textContent = question.zh;
+  $("question").classList.toggle("long", question.en.length > 60);
+  $("answer-en").value = "";
+  $("answer-zh").value = "";
+  clearOffline();
+  showError("");
+  setStatus("");
+  render();
+  speak();
+}
+
+// What the caseworker left in the boxes is the answer, empty or not: skipping a
+// question is allowed, and /review drafts nothing for an empty one.
+function next() {
+  const question = current();
+  stopSpeaking();
+  state.answers[state.index] = {
+    id: question.id, section: question.section,
+    question_en: question.en, question_zh: question.zh,
+    answer_zh: $("answer-zh").value.trim(), answer_en: $("answer-en").value.trim(),
+  };
+  if (state.index < state.questions.length - 1) {
+    state.index += 1;
+    return showQuestion();
+  }
+  handOver();
+}
+
+function handOver() {
+  try {
+    const handed = { language: LANGUAGE, answers: state.answers };
+    const person = readPerson();
+    if (person) handed.person = person;
+    sessionStorage.setItem(INTERVIEW_KEY, JSON.stringify(handed));
+    sessionStorage.removeItem(SECTIONS_KEY);
+  } catch (err) {
+    showError("The answers could not be handed to the review page: " + err.message);
+    return;
+  }
+  location.href = REVIEW_URL;
+}
+
+// A missing or unreadable d7.person only means /start was skipped; the interview
+// still hands over.
+function readPerson() {
+  try {
+    return JSON.parse(sessionStorage.getItem(PERSON_KEY) || "null");
+  } catch (err) {
+    return null;
+  }
+}
+
+// ---------------------------------------------------------------- render
+function render() {
+  const total = state.questions.length;
+  const recording = !!state.recorder;
+  const question = current();
+  $("progress").textContent = $("interview").hidden || !total ? "" : "Question " + (state.index + 1) + " of " + total;
+  $("begin").disabled = !state.consent;
+  $("call").disabled = !state.consent;
+
+  const voice = $("voice");
+  voice.classList.toggle("speaking", state.speaking && !recording);
+  voice.classList.toggle("recording", recording);
+  $("voice-label").textContent = recording ? "Listening" : state.speaking ? "Speaking" : state.busy ? "Working" : "Ready";
+
+  const record = $("record");
+  record.classList.toggle("on", recording);
+  record.innerHTML = recording ? ICONS.stop : ICONS.record;
+  record.setAttribute("aria-label", recording ? "Stop recording" : "Record the answer");
+  record.title = record.getAttribute("aria-label");
+  // Mock has one scripted answer per question; a second take would repeat it.
+  record.disabled = state.busy || (MOCK && question && state.mockAnswered[question.id] && !recording);
+  $("play").disabled = state.busy || recording;
+  // Never blocked by a service being down; only by work still in flight.
+  $("next").disabled = state.busy || recording;
+  $("next").innerHTML = state.index === total - 1 ? "Finish and review &rarr;" : "Next &rarr;";
+}
+
+// ---------------------------------------------------------------- start
+$("mock-banner").hidden = !MOCK || QUIET;
+$("play").innerHTML = ICONS.play;
+$("consent").addEventListener("change", event => { state.consent = event.target.checked; render(); });
+$("begin").addEventListener("click", () => {
+  if (!state.consent) return;
+  $("start").hidden = true;
+  $("interview").hidden = false;
+  showQuestion();
+});
+$("play").addEventListener("click", speak);
+$("record").addEventListener("click", toggleRecord);
+$("next").addEventListener("click", next);
+$("call").addEventListener("click", startCall);
+$("back").href = (location.protocol === "file:" ? "path.html" : "/start/path") + (FLAGS ? "?" + FLAGS : "");
+$("call-review").addEventListener("click", handOver);
+
+loadQuestions().then(questions => {
+  state.questions = questions;
+  $("start").hidden = false;
+  render();
+}).catch(err => {
+  showError("The interview questions could not be loaded: " + err.message + ". Reload the page to try again.");
+});
+</script>
+</body>
+</html>
