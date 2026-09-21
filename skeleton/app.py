@@ -36,6 +36,14 @@ SCENARIOS = json.loads(
     (Path(__file__).resolve().parent / "demo_data" / "payloads.json").read_text(encoding="utf-8")
 )
 WEB = Path(__file__).resolve().parent / "web"
+# An unknown path used to fall through to the scenario list, so a typo showed an
+# unstyled developer page listing the three directions the team dropped.
+NOT_FOUND_PAGE = b"""<!doctype html><meta charset="utf-8"><title>Not found - BridgeWork</title>
+<style>body{font:16px/1.6 Inter,system-ui,-apple-system,sans-serif;max-width:32rem;
+margin:18vh auto;padding:0 1rem;color:#1b2a33}h1{font-size:1.3rem}a{color:#1b4b5a}</style>
+<h1>This page does not exist</h1>
+<p><a href="/">Go to the BridgeWork homepage</a></p>
+"""
 INTAKE_PAGE = WEB / "intake.html"
 # The board the intake hands over to, carrying the pack in sessionStorage.
 JOBS_PAGE = WEB / "jobs.html"
@@ -431,6 +439,8 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json(200, reader(parsed.query))
             except BadRequest as bad:
                 return self._json(400, {"error": str(bad)})
+        if parsed.path not in ("/scenarios", "/run") or not dev_pages_visible():
+            return self._send(404, "text/html; charset=utf-8", NOT_FOUND_PAGE)
         scenario = parse_qs(parsed.query).get("s", [None])[0]
         if parsed.path == "/run" and scenario in SCENARIOS:
             body = render_result(scenario)
@@ -517,6 +527,14 @@ def check():
     """Offline smoke check: render every scenario, print nothing on success."""
     for key in SCENARIOS:
         render_result(key)
+
+
+def dev_pages_visible():
+    """Whether to serve /scenarios and /run. They are a developer tool: they
+    list the three earlier directions, which would only mislead someone who
+    opened the live demo and mistyped a path. A host hands the port over in
+    PORT, so they show on a laptop and not on a deployment."""
+    return not os.environ.get("PORT")
 
 
 def listen_address():
