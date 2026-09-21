@@ -1,8 +1,9 @@
 # 框架 — 方向 5：食物系統
 
 研究簡報 `docs/research-brief-2026-09-21.md` 第 3 節與第 5 節對本方向下的是 **✂️ 淘汰**。
-**該判定已撤回**：六個方向全部回到檯面上。評分只有 quality／impact reasoning／viability 三項，
-**沒有新穎性項目**，因此「已經有人做了」不是自動出局的理由，viability 才是。
+**該判定已撤回**：六個方向全部回到檯面上。七項加權評分標準裡
+**沒有新穎性項目**（清單見 `AI_CONTEXT.md`〈Official event facts〉），
+因此「已經有人做了」不是自動出局的理由，Pathway to Sustainability 才是。
 本檔不重下通過／淘汰判定，只把形狀與證據擺好。
 填的是 `docs/superpowers/specs/2026-09-21-direction-frameworks-design.md` 的七格模板。
 

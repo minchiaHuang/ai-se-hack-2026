@@ -33,7 +33,10 @@
   **Eva Sheluhina（ElevenLabs Forward Deployed Engineer）**
 - 贊助／夥伴：UTS Startups、Social Impact Hub、SECNA、**ElevenLabs**、Goods 4 Good、
   **Lovable**、**Base44**、Red Bull、HackHQ、Spark Festival
-- 評分標準只有三項：**quality／impact reasoning／viability**
+- 評分為七項加權標準（2026-09-21 自官方頁面查證，取代先前記為三項的轉述）：
+  **Problem–Solution Fit 20%／Usability 15%／Working Prototype 15%／Effective Use of AI 15%／
+  Social Impact Reasoning 15%／Problem Validation 10%／Pathway to Sustainability 10%**
+  ——**沒有新穎性這一項**
 
 ### 機構事實修正（曾經搞錯過，不要再錯）
 
@@ -152,7 +155,7 @@ X 的主流是「經費失控、詐騙猖獗」（互動量高一個量級）。
 **2026-09-21 更新 —— 六個方向的競品盤點全部完成，六個方向也全部保留。**
 
 ⚠️ **先前寫在本檔的「淘汰／降級／通過」判決已於 2026-09-21 撤回。**
-撤回理由：評分標準只有 quality／impact reasoning／viability，**沒有新穎性這一項**。
+撤回理由：評分的七項加權標準裡**沒有新穎性這一項**（清單見 `AI_CONTEXT.md`〈Official event facts〉）。
 先前用「已經有人做了」當作淘汰理由，是加了一把評審沒有的尺。
 競品存在通常代表需求被驗證過，對 viability 是**有利**證據，同時是一個必須正面回答的問題。
 
@@ -210,7 +213,7 @@ X 追 @criprights 等倡議帳號在推薦什麼工具。
 **免費產品**、**已上市的付費產品**、以及**政府免費申訴代理**三層佔據。
 
 **這代表什麼**：需求被三方獨立驗證過（有人免費做、有人收費賣得掉、政府願意撥款），
-對 impact reasoning 與 viability 都是有利證據。代價是我們必須能回答
+對 Social Impact Reasoning 與 Pathway to Sustainability 都是有利證據。代價是我們必須能回答
 「$89 的 MagMindLab 與免費的 PlanMind 都在了，你做的哪裡不一樣」。
 答不出來就不要選它；答得出來它就是六個方向裡社群痛感最具體的一個。
 

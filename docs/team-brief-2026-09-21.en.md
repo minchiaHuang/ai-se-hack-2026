@@ -13,9 +13,9 @@ into something that works rather than a blank editor.
 ## Where we landed
 
 An earlier pass eliminated four directions for having existing competitors. **That was withdrawn.**
-The judging criteria are quality, impact reasoning and viability — there is no novelty criterion, so
+None of the seven weighted judging criteria rewards novelty (the list is in `AI_CONTEXT.md`), so
 "someone already does this" was a test the judges never set. A competitor usually means demand is
-proven, which helps viability. It is a question to answer, not a disqualification.
+proven, which helps Pathway to Sustainability. It is a question to answer, not a disqualification.
 
 | Direction | The strongest argument for it |
 | --- | --- |

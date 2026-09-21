@@ -10,8 +10,8 @@
 
 ## 第一步：聽到這些話 → 對應框架
 
-**六個方向全部在檯面上。** 先前的「淘汰／降級」判決已撤回——評分標準只有
-quality／impact reasoning／viability，**沒有新穎性這一項**，所以「已經有人做了」不是淘汰理由。
+**六個方向全部在檯面上。** 先前的「淘汰／降級」判決已撤回——七項加權評分標準裡
+**沒有新穎性這一項**（完整清單與權重見本檔末），所以「已經有人做了」不是淘汰理由。
 
 | 聽到的話（或近似意思） | 對應 | 我們手上已有什麼 |
 |---|---|---|
@@ -79,5 +79,9 @@ quality／impact reasoning／viability，**沒有新穎性這一項**，所以�
 - **James Hornitzky**（Social Traders **Digital Enablement Specialist**，非主管職）—— 認證與社會採購
 - **Eva Sheluhina**（ElevenLabs Forward Deployed Engineer）—— 技術落地與可行性
 
-評分標準只有三項：**quality／impact reasoning／viability**。
+評分為七項加權標準（2026-09-21 自官方頁面 https://hackhq.io/events/o6v6DgCLc4 查證）：
+**Problem–Solution Fit 20%／Usability 15%／Working Prototype 15%／Effective Use of AI 15%／
+Social Impact Reasoning 15%／Problem Validation 10%／Pathway to Sustainability 10%**——沒有新穎性這一項。
+**Working Prototype 與 Usability 合計 30%，Problem Validation 自成 10%**，所以在現場找到真實提案者
+不只是策略偏好，它直接對應一個計分項。
 本輪研究對 viability 最有殺傷力的發現是兩具屍體，要預先準備好那一題。

@@ -9,7 +9,7 @@ Amplify 的解讀已於 2026-09-21 修訂為下方版本。
 > **「免費、學術背書、1,200 萬澳幣專案做過的東西都收攤了，你憑什麼不一樣？」**
 >
 > 這題一定會被問，所以要事先備好答案。但它**不是否決票**——
-> 評分標準只有 quality／impact reasoning／viability，**沒有 novelty 這一項**。
+> 七項加權評分標準裡**沒有 novelty 這一項**（清單見 `AI_CONTEXT.md`〈Official event facts〉）。
 > 「前人做過」本身不扣分，扣分的是答不出採用問題。
 >
 > **EVIDENCE**（CSI 官方公告 https://www.csi.edu.au/amplify-social-impact/amplify-social-impact-online/ ，2026-09-21 查證）：

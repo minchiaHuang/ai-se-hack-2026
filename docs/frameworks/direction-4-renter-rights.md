@@ -1,8 +1,8 @@
 # 框架 — 方向 4：租屋權益
 
 競品盤點原判定為 **✂️ 淘汰**（2026-09-21，見 `docs/research-brief-2026-09-21.md` §3 表列與 §5 方向 4 末）。
-**該判定已撤回**：六個方向全部回到檯面上。評分為 quality／impact reasoning／viability，
-**沒有原創性項目**，因此「已經有人做了」本身不構成淘汰理由。
+**該判定已撤回**：六個方向全部回到檯面上。七項加權評分標準裡
+**沒有原創性項目**（清單見 `AI_CONTEXT.md`〈Official event facts〉），因此「已經有人做了」本身不構成淘汰理由。
 
 但本方向有**兩個與競品無關的嚴重問題**，下面兩個閘門必須先過。
 本檔填的是 `docs/superpowers/specs/2026-09-21-direction-frameworks-design.md` 的七格模板。
