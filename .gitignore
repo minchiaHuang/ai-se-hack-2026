@@ -32,3 +32,6 @@ venv/
 
 # Node
 node_modules/
+
+# The team working log, kept out of the public repo
+docs/STATUS.internal.md
