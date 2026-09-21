@@ -55,3 +55,10 @@ class Links(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class JobsPage(unittest.TestCase):
+    def test_the_employer_mark_does_not_call_itself(self):
+        # It once did, and the board rendered its count but not a single card.
+        body = re.search(r"function initialsMark\(job\) \{(.*?)\n\}", page("jobs"), re.S).group(1)
+        self.assertNotIn("initialsMark(", body)

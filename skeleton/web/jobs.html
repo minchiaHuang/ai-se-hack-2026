@@ -406,7 +406,7 @@ function initials(job) {
 // the same between renders. Lightness is fixed at 92% behind 28% text, which
 // clears 7:1 at every hue.
 function initialsMark(job) {
-  const mark = initialsMark(job);
+  const mark = el("div", { class: "initials", "aria-hidden": "true" }, initials(job));
   let hash = 0;
   for (const ch of employerLine(job)) hash = (hash * 31 + ch.codePointAt(0)) >>> 0;
   mark.style.setProperty("--mark-h", String(hash % 360));
