@@ -12,6 +12,7 @@ from unittest import mock
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
+from skeleton import app
 from skeleton.app import Handler
 from skeleton.directions import d7_sections
 
@@ -158,6 +159,62 @@ class Route(unittest.TestCase):
         status, body = self.post({"answers": [1, 2]})
         self.assertEqual(status, 400)
         self.assertIn("answers", body["error"])
+
+
+def constant(name):
+    page = app.REVIEW_PAGE.read_text(encoding="utf-8")
+    return json.loads(page.split(f"const {name} = ")[1].split(";\n")[0])
+
+
+def join(*parts):
+    return ", ".join(p.strip() for p in parts if p and p.strip())
+
+
+def resume_lines(s):
+    """Python copy of resumeLines() in review.html, only to pin the fixture layout."""
+    out = []
+
+    def block(title, rows):
+        rows = [r.strip() for r in rows if r and r.strip()]
+        if rows:
+            out.extend([title] + rows)
+    block("PROFILE", [s["profile"]])
+    block("WORK EXPERIENCE", [x for e in s["employment"] for x in
+                              (join(e["position"], e["company"], e["location"], e["dates"]), e["description"])])
+    block("VOLUNTEER EXPERIENCE", [x for e in s["volunteer"] for x in
+                                   (join(e["role"], e["location"], e["dates"]), e["description"])])
+    block("EDUCATION", [x for e in s["education"] for x in
+                        (join(e["major"], e["school"], e["location"], e["dates"]), e["description"])])
+    block("SKILLS", s["skills"])
+    block("CERTIFICATES", s["certificates"])
+    return out
+
+
+class MockFixtures(unittest.TestCase):
+    """?mock=1 on /review is the demo video; its fixtures must agree with the server."""
+
+    def test_the_mock_questions_are_the_teams(self):
+        path = app.Path(app.__file__).parent / "demo_data" / "reference" / "interview_questions.json"
+        questions = {q["id"]: q for q in json.loads(path.read_text(encoding="utf-8"))["questions"]}
+        for answer in constant("MOCK_INTERVIEW")["answers"]:
+            with self.subTest(id=answer["id"]):
+                self.assertEqual(answer["question_en"], questions[answer["id"]]["en"])
+                self.assertEqual(answer["question_zh"], questions[answer["id"]]["zh"])
+
+    def test_the_mock_lines_are_built_from_the_mock_sections(self):
+        self.assertEqual(resume_lines(constant("FIXTURE_SECTIONS")), constant("FIXTURE_REVIEW_LINES"))
+
+    def test_the_mock_board_is_what_the_server_returns(self):
+        texts = constant("FIXTURE_REVIEW_LINES")
+        lines = [{"line": i + 1, "text": t, "en": t} for i, t in enumerate(texts)]
+        units = [{"code": code, "sources": item["sources"]}
+                 for item in constant("FIXTURE_REVIEW_EXTRACT")["suggestions"]
+                 if item["field"] == "units_evidenced"
+                 for code in item["value"].replace(",", ";").split(";") if code.strip()]
+        body = app.match({"source": "resume", "occupation": "cookery",
+                          "evidenced_units": units, "resume": lines})
+        body.pop("resume")
+        self.assertEqual(constant("FIXTURE_REVIEW_MATCH"), body)
 
 
 if __name__ == "__main__":
