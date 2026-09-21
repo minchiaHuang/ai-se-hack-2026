@@ -8,9 +8,9 @@
 <script src="/resume-template.js"></script>
 <style>
 /* A job board the way SEEK's graduate site lays one out: one column of cards,
-   each complete with its own Apply and "why a match", and a narrow side
-   column. Everything else is inline so the page renders offline from the
-   stdlib server. */
+   and each job on its own page (?job=<id>) with the match, the ad and Apply.
+   Everything else is inline so the page renders offline from the stdlib
+   server. */
 :root {
   /* BridgeWork theme from the Figma "Design Theme" frame, the same tokens as
      review.html. --ink is Figma's --text. */
@@ -77,7 +77,9 @@ main { max-width: 1240px; margin: 0 auto; padding: 26px 24px 48px; }
 .jobs { display: flex; flex-direction: column; gap: 18px; }
 .job-card { padding: 24px 28px; border-radius: 10px; background: var(--card); box-shadow: 0 0 0 1px var(--line); }
 .card-top { display: grid; grid-template-columns: minmax(0, 1fr) 72px; gap: 1.2rem; }
-.card-top h3 { margin: 0; font-size: 1.35rem; line-height: 1.25; color: var(--primary); }
+.card-top h3 { margin: 0; font-size: 1.35rem; line-height: 1.25; }
+.card-top h3 a { color: var(--primary); text-decoration: none; }
+.card-top h3 a:hover { text-decoration: underline; }
 .company-row { display: flex; flex-wrap: wrap; align-items: center; gap: .45rem .6rem; margin: .45rem 0 .7rem; }
 .company-row .company { font-size: .95rem; }
 .tag { padding: .12rem .5rem; border-radius: 4px; font-size: .74rem; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; }
@@ -96,9 +98,6 @@ main { max-width: 1240px; margin: 0 auto; padding: 26px 24px 48px; }
 .btn { display: inline-flex; align-items: center; min-height: 44px; padding: 0 1.2rem; border: 1px solid var(--primary);
        border-radius: 6px; background: var(--card); color: var(--primary); font-weight: 600; text-decoration: none; cursor: pointer; }
 .btn.go { border-color: var(--accent); background: var(--accent); color: var(--on-fill); font-weight: 700; }
-.btn[aria-expanded=true] { background: var(--pill); }
-.btn.go[aria-expanded=true] { background: var(--accent); box-shadow: inset 0 0 0 2px var(--on-fill); }
-.btn:disabled { border-color: var(--success); background: var(--success); color: var(--on-fill); cursor: default; }
 /* "Jobs by Adzuna" is a licence requirement, not decoration: Adzuna's terms
    require the mark to link to the ad and to be drawn at no less than
    116x23 px. Do not shrink these two values or drop the link. */
@@ -109,9 +108,7 @@ main { max-width: 1240px; margin: 0 auto; padding: 26px 24px 48px; }
 .empty { color: var(--muted); font-style: italic; }
 .list-foot { margin: 16px 0 0; }
 
-/* ------------------------------------------------------------ expanded card */
-.more { margin-top: 1.2rem; padding-top: 1.1rem; border-top: 1px solid var(--line); }
-.more h4 { margin: 0 0 .45rem; font-size: .95rem; color: var(--primary); }
+/* ------------------------------------------------------------ match and evidence */
 .cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem 2rem; }
 .skills { margin: 0; padding: 0; list-style: none; display: grid; gap: .3rem; }
 .skills li { position: relative; padding-left: 1.5rem; }
@@ -119,9 +116,9 @@ main { max-width: 1240px; margin: 0 auto; padding: 26px 24px 48px; }
 .skills.ok li::before { content: "\2713"; color: var(--ok); }
 .skills.miss li::before { content: "+"; color: var(--miss); }
 .note { padding: .5rem .7rem; border-radius: 6px; background: var(--pill); font-size: .9rem; }
-.details { margin-top: 1rem; }
+.details { margin-top: 1.6rem; padding-top: 1rem; border-top: 1px solid var(--line); }
 .details summary { cursor: pointer; color: var(--primary); font-weight: 700; font-size: .92rem; }
-.details h4 { margin: 1rem 0 .4rem; }
+.details h4 { margin: 1rem 0 .4rem; font-size: .95rem; color: var(--primary); }
 .units { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
 .unit { padding: .5rem .8rem; border-radius: 4px; font-size: .88rem; }
 .unit.ok { background: var(--ok-bg); }
@@ -137,15 +134,28 @@ main { max-width: 1240px; margin: 0 auto; padding: 26px 24px 48px; }
 .draft-text { margin: .6rem 0 0; padding: .6rem .7rem; border-radius: 8px; background: var(--pill); white-space: pre-wrap;
               overflow-wrap: anywhere; font: .8rem/1.4 ui-monospace, Menlo, Consolas, monospace; }
 
-/* ------------------------------------------------------------ side column */
-.side { position: sticky; top: 16px; max-height: calc(100vh - 32px); overflow: auto; border-radius: 10px;
-        background: var(--card); box-shadow: 0 0 0 1px var(--line); }
-.side h2 { margin: 0; padding: 14px 18px; border-bottom: 1px solid var(--line); font-size: 1rem; }
-.side-row { padding: 12px 18px; border-bottom: 1px solid var(--line); }
-.side-row .label { margin: 0; font-size: .8rem; color: var(--muted); }
-.side-row .value { margin: .1rem 0 0; font-weight: 700; }
-.side .details { margin: 0; padding: 12px 18px; }
-.side .details[open] summary { margin-bottom: .6rem; }
+/* ------------------------------------------------------------ a job's own page */
+.back { margin: 0 0 14px; }
+.back a, a.link { color: var(--primary); font-weight: 700; }
+.employer { display: flex; align-items: center; gap: 1rem; margin-bottom: 18px; }
+.employer p { margin: 0; font-size: 1.3rem; font-weight: 700; }
+.detail { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 24px; align-items: start; }
+.detail-main, .detail-side { padding: 28px 32px; border-radius: 10px; background: var(--card); box-shadow: 0 0 0 1px var(--line); }
+.detail-main h1 { margin: 0 0 1.2rem; font-size: 1.8rem; line-height: 1.2; }
+.detail-main > section > h2 { margin: 1.6rem 0 .5rem; font-size: 1.15rem; }
+.summary-box { padding: 20px 24px; border-radius: 8px; background: var(--info-bg); }
+.summary-box > h2 { margin: 0 0 .8rem; font-size: 1.15rem; }
+.summary-box h3 { margin: 0 0 .45rem; font-size: .95rem; color: var(--primary); }
+.about { color: var(--muted); }
+.apply-section { margin-top: 1.6rem; padding-top: 1rem; border-top: 1px solid var(--line); }
+.detail-side { position: sticky; top: 16px; padding: 22px 24px; }
+.btn.wide { width: 100%; justify-content: center; }
+.btn.done { border-color: var(--success); background: var(--success); color: var(--on-fill); font-weight: 700; cursor: default; }
+.job-info { margin: 1.2rem 0 .8rem; }
+.info-row { margin: 0 0 .9rem; }
+.job-info dt { font-size: .75rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.job-info dd { margin: .1rem 0 0; }
+.detail-side .adzuna { margin-left: 0; }
 .card { margin: .5rem 0; padding: .6rem .8rem; border-radius: 8px; box-shadow: 0 0 0 1px var(--line); font-size: .88rem; }
 .card h4 { margin: 0; font-size: .8rem; color: var(--muted); }
 .card .value { margin: .1rem 0; font-size: 1rem; font-weight: 700; overflow-wrap: anywhere; }
@@ -163,13 +173,15 @@ main { max-width: 1240px; margin: 0 auto; padding: 26px 24px 48px; }
 
 @media (max-width: 1000px) {
   .board { grid-template-columns: 1fr; }
-  .side { position: static; max-height: none; order: -1; }
+  .detail { grid-template-columns: 1fr; }
+  .detail-side { position: static; order: -1; }
 }
 @media (max-width: 560px) {
   .job-card { padding: 18px; }
   .card-top { grid-template-columns: minmax(0, 1fr) 48px; }
   .initials { width: 48px; height: 48px; font-size: 1rem; }
   .resume-box { padding: 16px; }
+  .detail-main, .detail-side { padding: 18px; }
   .adzuna { margin-left: 0; }
 }
 
@@ -208,8 +220,9 @@ main { max-width: 1240px; margin: 0 auto; padding: 26px 24px 48px; }
       <div class="jobs" id="jobs"></div>
       <p class="list-foot"><button type="button" class="link" id="show-all"></button></p>
     </section>
-    <aside class="side" id="side" aria-labelledby="h-side"></aside>
   </div>
+
+  <div id="detail-view" hidden></div>
 </main>
 
 <script>
@@ -266,7 +279,8 @@ const state = {
   via: session ? session.via || null : null, // "interview" or "upload", from /review only
   q: "",
   showAll: false,    // false lists only the jobs with at least one unit evidenced
-  open: null,        // { id, part: "why" | "apply" }: the one card expanded, if any
+  job: null,         // on a job's own page (?job=<id>), that job
+  applying: false,   // on a job's page, whether the application is showing
   applied: null,     // { id: ISO time }, see readApplied()
 };
 
@@ -367,24 +381,6 @@ function renderPack() {
     el("p", { class: "small muted" }, extract.metric_name + ": " + extract.metric_value)];
 }
 
-// The side column: what the pack says about the person, in two lines, and the
-// whole pack folded beneath. Shown to the jobseeker and caseworker only.
-function renderSide() {
-  const occupation = state.extract.suggestions.find(item => item.field === "anzsco_code");
-  const skills = new Set(evidencedUnits(state.extract).map(unit => unit.code)).size;
-  $("side").replaceChildren(
-    el("h2", { id: "h-side" }, (firstName() ? firstName() + "'s" : "The jobseeker's") + " skills"),
-    occupation ? el("div", { class: "side-row" }, el("p", { class: "label" }, "Occupation"),
-                    el("p", { class: "value" }, occupation.value)) : null,
-    el("div", { class: "side-row" }, el("p", { class: "label" }, "Skills with evidence"),
-       el("p", { class: "value" }, skills + " recognised Australian skills")),
-    el("details", { class: "details" },
-      el("summary", {}, "Show full evidence pack"),
-      el("p", { class: "small muted" }, "Everything mapped from this " + sourceWord() + " to Australian occupations and units. " +
-                                        "Shown to the jobseeker and caseworker only, never to an employer."),
-      renderPack()));
-}
-
 // ---------------------------------------------------------------- jobs
 // The whole board: every job, the occupation's first. A server older than
 // "all_jobs" still gives a board of the occupation's jobs.
@@ -413,13 +409,12 @@ function listedJobs(match) {
     (!q || (job.title + " " + employerLine(job)).toLowerCase().includes(q)));
 }
 
-// One card open at a time; pressing the same button again closes it.
-function toggle(id, part) {
-  const same = state.open && state.open.id === id && state.open.part === part;
-  state.open = same ? null : { id, part };
-  render();
-  const button = document.querySelector('[data-job="' + CSS.escape(id) + '"][data-part="' + part + '"]');
-  if (button) button.focus({ preventScroll: true });
+// A job's own page is this page with ?job=<id>; the demo flags ride along.
+// "#apply" opens it with the application already showing.
+function jobUrl(job, apply) {
+  const query = new URLSearchParams(FLAGS);
+  query.set("job", job.id);
+  return (location.protocol === "file:" ? "jobs.html" : "/jobs") + "?" + query + (apply ? "#apply" : "");
 }
 
 // How many of the skills this job asks for the evidence covers. An ad with
@@ -430,11 +425,15 @@ const NO_COVERAGE = {
   not_mapped: "Ad not mapped to units",
 };
 
-function matchTag(job) {
+function matchText(job) {
   const required = job.matched.length + job.missing.length;
-  if (!required) return el("span", { class: "tag plain" }, NO_COVERAGE[job.units_status] || "No units to count");
-  return el("span", { class: "tag " + (job.matched.length ? "ok" : "plain") },
-            job.matched.length + " of " + required + (required === 1 ? " skill" : " skills") + " matched");
+  if (!required) return NO_COVERAGE[job.units_status] || "No units to count";
+  return job.matched.length + " of " + required + (required === 1 ? " skill" : " skills") + " matched";
+}
+
+function matchTag(job) {
+  const counted = job.matched.length + job.missing.length > 0;
+  return el("span", { class: "tag " + (counted && job.matched.length ? "ok" : "plain") }, matchText(job));
 }
 
 // A required unit is either quoted from the ad itself or rests on the job
@@ -460,56 +459,12 @@ function adzunaLink(job) {
   return job.redirect_url ? el("a", { class: "adzuna", href: job.redirect_url, target: "_blank", rel: "noopener" }, text) : null;
 }
 
-// "Why a match": the skills in plain words, then, folded, what the caseworker
-// may need to check: each unit's code, the line that evidences it and where
-// the requirement comes from.
-function renderWhy(job) {
-  const courses = Object.fromEntries((state.match.all_courses || state.match.courses || []).map(c => [c.code, c]));
-  const unit = (u, evidenced) => {
-    const quote = evidenced ? (u.sources || []).map(citedText).find(Boolean) : "";
-    const course = courses[u.code];
-    return el("li", { class: "unit " + (evidenced ? "ok" : "miss") },
-      el("span", { class: "code" }, u.code, " ", el("span", { class: "title" }, u.title)),
-      quote ? el("q", {}, quote) : null,
-      !evidenced ? el("p", {}, "Nothing in this " + sourceWord() + " covers this one yet." +
-                              (course ? " Gap training: " + course.qualification + "." : "")) : null,
-      basisLine(u));
-  };
-  // The two empty cases are different facts and are never merged: one ad was
-  // read and asked for nothing checkable, the other was never read at all.
-  if (job.units_status === "none_named") {
-    return el("div", { class: "more" }, el("p", { class: "note" },
-      "This ad is too short to name the skills it needs, so there is nothing to match against."));
-  }
-  if (job.units_status === "not_mapped") {
-    return el("div", { class: "more" }, el("p", { class: "note" }, "This ad has not been matched against skills yet."));
-  }
-  return el("div", { class: "more" },
-    job.for_occupation ? null : el("p", { class: "note" },
-      "This job is for a " + job.occupation_label + ". It asks for skills from another trade; it is listed so no job is hidden, not as a match."),
-    el("div", { class: "cols" },
-      job.matched.length ? el("div", {}, el("h4", {}, "Why " + (firstName() || "the jobseeker") + " is a match"),
-        el("ul", { class: "skills ok" }, job.matched.map(u => el("li", {}, u.title)))) : null,
-      job.missing.length ? el("div", {}, el("h4", {}, "Skills to build"),
-        el("ul", { class: "skills miss" }, job.missing.map(u => el("li", {}, u.title)))) : null),
-    el("details", { class: "details" },
-      el("summary", {}, "Show evidence details"),
-      job.matched.length ? [el("h4", {}, evidencedHeading()),
-        el("ul", { class: "units" }, job.matched.map(u => unit(u, true)))] : null,
-      job.missing.length ? [el("h4", {}, "Not evidenced yet"),
-        el("ul", { class: "units" }, job.missing.map(u => unit(u, false))),
-        el("p", { class: "small muted" }, "The caseworker decides whether to apply anyway.")] : null));
-}
-
 function renderJobCard(job) {
   const at = state.applied[job.id];
-  const open = state.open && state.open.id === job.id ? state.open.part : null;
-  const button = (part, label, cls) => el("button", { type: "button", class: "btn " + cls, "data-job": job.id, "data-part": part,
-    "aria-expanded": String(open === part), onclick: () => toggle(job.id, part) }, label);
   return el("article", { class: "job-card", "data-id": job.id, "aria-labelledby": "t-" + job.id },
     el("div", { class: "card-top" },
       el("div", {},
-        el("h3", { id: "t-" + job.id }, job.title),
+        el("h3", { id: "t-" + job.id }, el("a", { href: jobUrl(job) }, job.title)),
         el("div", { class: "company-row" },
           el("span", { class: "company" }, employerLine(job)),
           job.contract_time || job.employment_type ? el("span", { class: "tag info" }, job.contract_time || job.employment_type) : null,
@@ -522,14 +477,101 @@ function renderJobCard(job) {
         job.snippet ? el("p", { class: "snippet" }, job.snippet) : null),
       el("div", { class: "initials", "aria-hidden": "true" }, initials(job))),
     el("div", { class: "actions" },
-      at ? el("button", { type: "button", class: "btn", disabled: true }, "Applied ✓ " + timeOf(at))
-         : button("apply", "Apply", "go"),
-      button("why", "Why a match", ""),
-      job.redirect_url ? el("a", { class: "btn", href: job.redirect_url, target: "_blank", rel: "noopener" }, "View ad ↗") : null,
-      adzunaLink(job)),
-    el("p", { class: "status small", id: "status-" + job.id, role: "status", "aria-live": "polite" }),
-    open === "why" ? renderWhy(job) : null,
-    open === "apply" ? renderApply(job) : null);
+      at ? el("span", { class: "btn done" }, "Applied ✓ " + timeOf(at))
+         : el("a", { class: "btn go", href: jobUrl(job, true) }, "Apply"),
+      el("a", { class: "btn", href: jobUrl(job) }, "View job"),
+      adzunaLink(job)));
+}
+
+// ---------------------------------------------------------------- one job
+// The match in plain words, as the job site's own summary box would put it.
+function renderSummary(job) {
+  // The two empty cases are different facts and are never merged: one ad was
+  // read and asked for nothing checkable, the other was never read at all.
+  const note = job.units_status === "none_named"
+      ? "This ad is too short to name the skills it needs, so there is nothing to match against."
+    : job.units_status === "not_mapped" ? "This ad has not been matched against skills yet."
+    : !job.for_occupation ? "This job is for a " + job.occupation_label +
+        ". It asks for skills from another trade; it is listed so no job is hidden, not as a match."
+    : "";
+  return el("section", { class: "summary-box", "aria-labelledby": "h-summary" },
+    el("h2", { id: "h-summary" }, "Match summary"),
+    note ? el("p", {}, note) : null,
+    el("div", { class: "cols" },
+      job.matched.length ? el("div", {}, el("h3", {}, "Why " + (firstName() || "the jobseeker") + " is a match"),
+        el("ul", { class: "skills ok" }, job.matched.map(u => el("li", {}, u.title)))) : null,
+      job.missing.length ? el("div", {}, el("h3", {}, "Skills to build"),
+        el("ul", { class: "skills miss" }, job.missing.map(u => el("li", {}, u.title)))) : null));
+}
+
+// What the caseworker may need to check, folded: each unit's code, the line
+// that evidences it, where the requirement comes from, then the whole pack.
+function renderEvidence(job) {
+  const courses = Object.fromEntries((state.match.all_courses || state.match.courses || []).map(c => [c.code, c]));
+  const unit = (u, evidenced) => {
+    const quote = evidenced ? (u.sources || []).map(citedText).find(Boolean) : "";
+    const course = courses[u.code];
+    return el("li", { class: "unit " + (evidenced ? "ok" : "miss") },
+      el("span", { class: "code" }, u.code, " ", el("span", { class: "title" }, u.title)),
+      quote ? el("q", {}, quote) : null,
+      !evidenced ? el("p", {}, "Nothing in this " + sourceWord() + " covers this one yet." +
+                              (course ? " Gap training: " + course.qualification + "." : "")) : null,
+      basisLine(u));
+  };
+  return el("details", { class: "details" },
+    el("summary", {}, "Show evidence details"),
+    job.matched.length ? [el("h4", {}, evidencedHeading()),
+      el("ul", { class: "units" }, job.matched.map(u => unit(u, true)))] : null,
+    job.missing.length ? [el("h4", {}, "Not evidenced yet"),
+      el("ul", { class: "units" }, job.missing.map(u => unit(u, false))),
+      el("p", { class: "small muted" }, "The caseworker decides whether to apply anyway.")] : null,
+    el("h4", {}, "Full evidence pack"),
+    el("p", { class: "small muted" }, "Everything mapped from this " + sourceWord() + " to Australian occupations and units. " +
+                                      "Shown to the jobseeker and caseworker only, never to an employer."),
+    renderPack());
+}
+
+function infoRow(label, value) {
+  return value ? el("div", { class: "info-row" }, el("dt", {}, label), el("dd", {}, value)) : null;
+}
+
+function renderDetail(job) {
+  const view = $("detail-view");
+  const back = el("p", { class: "back" }, el("a", { href: asRoute("/jobs", "jobs.html") }, "← Back to jobs"));
+  if (!job) {
+    view.replaceChildren(back, el("section", { class: "nothing" },
+      el("h2", {}, "This job is not on the list"),
+      el("p", {}, "It may belong to another resume built in this tab.")));
+    return;
+  }
+  document.title = job.title + " - Bridge Work";
+  const at = state.applied[job.id];
+  view.replaceChildren(back,
+    el("div", { class: "employer" }, el("div", { class: "initials", "aria-hidden": "true" }, initials(job)),
+       el("p", {}, employerLine(job))),
+    el("div", { class: "detail" },
+      el("article", { class: "detail-main", "aria-labelledby": "h-job" },
+        el("h1", { id: "h-job" }, job.title),
+        renderSummary(job),
+        job.snippet ? el("section", { "aria-labelledby": "h-about" },
+          el("h2", { id: "h-about" }, "About the job"),
+          el("p", { class: "about" }, job.snippet),
+          job.redirect_url ? el("p", {}, el("a", { class: "link", href: job.redirect_url, target: "_blank", rel: "noopener" },
+                                            "Read the full ad on Adzuna ↗")) : null) : null,
+        job.units_status && job.units_status !== "mapped" ? null : renderEvidence(job),
+        state.applying ? renderApply(job) : null),
+      el("aside", { class: "detail-side", "aria-label": "Job info" },
+        at ? el("span", { class: "btn done wide" }, "Applied ✓ " + timeOf(at))
+           : el("button", { type: "button", class: "btn go wide", id: "apply", onclick: openApply }, "Apply"),
+        el("p", { class: "status small", id: "apply-status", role: "status", "aria-live": "polite" }),
+        el("dl", { class: "job-info" },
+          infoRow("Job type", job.contract_time || job.employment_type),
+          infoRow("Contract", job.contract_type),
+          infoRow("Location", job.location),
+          infoRow("Salary", job.salary),
+          infoRow("Occupation", job.occupation_label),
+          infoRow("Skills matched", matchText(job))),
+        adzunaLink(job))));
 }
 
 // ---------------------------------------------------------------- apply
@@ -571,23 +613,37 @@ function timeOf(iso) {
   return new Date(iso).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 }
 
+function openApply() {
+  state.applying = true;
+  renderDetail(state.job);
+  const section = $("h-apply");
+  section.scrollIntoView({ behavior: "smooth", block: "start" });
+  section.focus({ preventScroll: true });
+}
+
+function closeApply() {
+  state.applying = false;
+  renderDetail(state.job);
+  const button = $("apply");
+  if (button) button.focus();
+}
+
 function confirmApply(job) {
   state.applied[job.id] = new Date().toISOString();
   writeApplied();
-  state.open = null;
-  render();
-  $("status-" + job.id).textContent = "Application recorded at " + timeOf(state.applied[job.id]) + ". Nothing was sent.";
-  const card = document.querySelector('.job-card[data-id="' + CSS.escape(job.id) + '"]');
-  if (card) card.scrollIntoView({ block: "nearest" });
+  state.applying = false;
+  renderDetail(job);
+  $("apply-status").textContent = "Application recorded at " + timeOf(state.applied[job.id]) + ". Nothing was sent.";
+  window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
-// The confirmation opens under the card, not in a browser dialog: the resume
+// The confirmation is part of the page, not a browser dialog: the resume
 // confirmed on the review page, who sends it, and what this demo does not do.
 function renderApply(job) {
   const resume = state.match.resumes ? state.match.resumes[job.id] : null;
   const sections = session.sections;
-  return el("div", { class: "more" },
-    el("h4", {}, "The resume that goes with this application"),
+  return el("section", { class: "apply-section", "aria-labelledby": "h-apply" },
+    el("h2", { id: "h-apply", tabindex: "-1" }, "Apply with this resume"),
     // Reached from /review the resume is the one the caseworker confirmed there;
     // from the older intake there are no sections, only the drafted text.
     sections ? el("div", { class: "resume-box" }, ResumeTemplate.render(sections, { name: state.name }))
@@ -597,7 +653,7 @@ function renderApply(job) {
     el("div", { class: "actions" },
       el("button", { type: "button", class: "btn go", onclick: () => confirmApply(job) }, "Confirm application"),
       el("button", { type: "button", class: "btn", onclick: () => window.print() }, "Print"),
-      el("button", { type: "button", class: "btn", onclick: () => toggle(job.id, "apply") }, "Cancel")),
+      el("button", { type: "button", class: "btn", onclick: closeApply }, "Cancel")),
     el("p", { class: "small muted" }, "Demo: recorded in this browser tab only. Nothing is sent to an employer, by email or to Adzuna."));
 }
 
@@ -622,15 +678,26 @@ $("nothing-link").href = asRoute("/start/path", "path.html");
 if (!session) {
   // Nothing built in this tab: say so and point back, instead of an empty board.
   $("board-view").remove();
+  $("detail-view").remove();
   $("nothing").hidden = false;
+} else if (params.has("job")) {
+  // One job's page. The list stays out of it; the browser's back returns to it.
+  $("board-view").remove();
+  $("detail-view").hidden = false;
+  state.applied = readApplied();
+  state.job = boardJobs(state.match).find(job => job.id === params.get("job")) || null;
+  state.applying = location.hash === "#apply" && Boolean(state.job) && !state.applied[state.job.id];
+  document.addEventListener("keydown", event => { if (event.key === "Escape" && state.applying) closeApply(); });
+  renderDetail(state.job);
+  if (state.applying) $("h-apply").scrollIntoView({ block: "start" });
 } else {
+  $("detail-view").remove();
   state.applied = readApplied();
   $("job-search").addEventListener("input", event => { state.q = event.target.value; render(); });
   $("show-all").addEventListener("click", () => { state.showAll = !state.showAll; render(); });
-  document.addEventListener("keydown", event => {
-    if (event.key === "Escape" && state.open) toggle(state.open.id, state.open.part);
-  });
-  renderSide();
+  // Coming back from a job's page the browser may restore this page as it was;
+  // read the applications again so one made there shows here.
+  window.addEventListener("pageshow", event => { if (event.persisted) { state.applied = readApplied(); render(); } });
   render();
 }
 </script>
