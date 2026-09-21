@@ -19,7 +19,7 @@ from urllib.parse import parse_qs, urlparse
 if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from skeleton.core import live, pdf_text, registry
+from skeleton.core import interview, live, pdf_text, registry
 from skeleton.core.model import CANNED, StubModel
 from skeleton.core.pipeline import run
 from skeleton.core.schema import AggregationError
@@ -245,6 +245,32 @@ def transcribe(audio, language):
     return live.transcribe(audio, language)
 
 
+def _interview_text(payload, language_field):
+    """The text and language of a translate or speak request, checked the way
+    transcribe checks its language: nothing unsupported is sent anywhere."""
+    text, language = payload.get("text"), payload.get(language_field)
+    if not isinstance(text, str) or not text.strip():
+        raise BadRequest("text must be a non-empty string")
+    if language not in d7_credentials.SUPPORTED_LANGUAGES:
+        return None, {"refused": f"{language}: not supported. This demo runs in "
+                                 f"{', '.join(d7_credentials.SUPPORTED_LANGUAGES)}."}
+    return text.strip(), None
+
+
+def translate(payload):
+    text, refused = _interview_text(payload, "source")
+    return refused or interview.translate(text, payload["source"])
+
+
+def speak(payload):
+    text, refused = _interview_text(payload, "language")
+    if refused:
+        return refused
+    if len(text) > interview.MAX_SPEAK_CHARS:
+        raise BadRequest(f"text must be at most {interview.MAX_SPEAK_CHARS} characters")
+    return interview.speak(text)
+
+
 def match(payload):
     """Real job ads, gap courses and a draft resume tailored to each job.
 
@@ -326,6 +352,8 @@ class Handler(BaseHTTPRequestHandler):
             return self._send(200, "text/html; charset=utf-8", JOBS_PAGE.read_bytes())
         if parsed.path == "/review":
             return self._send(200, "text/html; charset=utf-8", REVIEW_PAGE.read_bytes())
+        if parsed.path == "/api/interview/questions":
+            return self._json(200, interview.questions())
         scenario = parse_qs(parsed.query).get("s", [None])[0]
         if parsed.path == "/run" and scenario in SCENARIOS:
             body = render_result(scenario)
@@ -349,6 +377,12 @@ class Handler(BaseHTTPRequestHandler):
                 body = match(self._read_json())
             elif parsed.path == "/api/resume-sections":
                 body = resume_sections(self._read_json())
+            elif parsed.path == "/api/translate":
+                body = translate(self._read_json())
+            elif parsed.path == "/api/speak":
+                body = speak(self._read_json())
+                if isinstance(body, bytes):
+                    return self._send(200, "audio/mpeg", body)
             else:
                 return self._json(404, {"error": f"{parsed.path}: no such endpoint"})
         except BadRequest as bad:
