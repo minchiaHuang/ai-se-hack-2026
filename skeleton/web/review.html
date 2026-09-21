@@ -185,6 +185,9 @@ const QUIET = params.get("quiet") === "1";
 
 // Handed over by /interview. sessionStorage keeps it to this tab.
 const INTERVIEW_KEY = "d7.interview";
+// Written by /start. The interview no longer asks for a phone or email, so the
+// name and contacts on the resume come from what was typed there.
+const PERSON_KEY = "d7.person";
 // Handed over by /upload: sections already translated and edited there.
 const UPLOAD_KEY = "d7.sections";
 // Handed on to /jobs: the same key and shape intake.html writes.
@@ -215,7 +218,7 @@ const LABEL = Object.fromEntries(SECTIONS.map(s => [s.key, s.label]));
 // ---------------------------------------------------------------- fixtures
 // The mock interviewee's answers: exactly the team's mock_interview_answers.json
 // (fictional cook Li Wei), with the questions from interview_questions.json.
-const MOCK_INTERVIEW = {"language": "zh", "answers": [{"id": "profile", "section": "Profile", "question_en": "Could you tell me a little bit about yourself? What are you most proud of, and what kind of work are you hoping to do here?", "question_zh": "可以简单介绍一下你自己吗？你最引以为傲的是什么？你希望在这里找什么样的工作？", "answer_zh": "我叫李伟，做了六年厨师，一直是餐厅的主厨。我最自豪的是每天能给一百五十个客人做饭，从来没有出过食品安全问题。我希望在这里继续在厨房工作。", "answer_en": "My name is Li Wei. I have worked as a cook for six years, always as the head cook of a restaurant. What I am most proud of is cooking for 150 guests a day without ever having a food safety problem. I hope to keep working in a kitchen here."}, {"id": "contacts", "section": "Contacts", "question_en": "What is the best phone number and email address for employers to reach you?", "question_zh": "雇主联系你最好用哪个电话号码和电子邮箱？", "answer_zh": "我的电话是 0400 000 000，邮箱是 liwei.cook@example.com。", "answer_en": "My phone number is 0400 000 000, and my email is liwei.cook@example.com."}, {"id": "education", "section": "Education", "question_en": "Let's talk about your education. What did you study, and what was the name of your school or university? Where was it located, and which years did you attend? Is there anything specific you'd like to highlight about what you learned there?", "question_zh": "我们来谈谈你的教育背景。你学的是什么专业？学校或大学叫什么名字？在哪里？哪几年就读？在那里学到的东西，有没有什么特别想强调的？", "answer_zh": "我在成都的一所职业技术学校学烹饪，二零一二年到二零一四年读了两年。在那里学了中餐的基本功，还有厨房卫生。", "answer_en": "I studied cooking at a vocational school in Chengdu, for two years from 2012 to 2014. There I learned the basics of Chinese cooking, and kitchen hygiene."}, {"id": "employment", "section": "Employment", "question_en": "I'd love to hear about your past work. What was your most recent job title, and what was the name of the company? Where was this job located? How long did you work there, and what were your main daily tasks?", "question_zh": "我想听听你过去的工作经历。你最近一份工作的职位是什么？公司叫什么名字？在哪里？你在那里工作了多久？每天主要做哪些工作？", "answer_zh": "我最近的工作是在成都一家叫蓉香楼的餐厅当主厨，从二零一六年做到二零二二年，一共六年。每天早上从头熬高汤、做汤和酱汁，准备羊肉、牛肉和鸡肉的菜。生的和熟的食物分开放，每个班次都记录冷库的温度。", "answer_en": "My most recent job was head cook at a restaurant called Rongxiang Lou in Chengdu, from 2016 to 2022, six years in total. Every morning I made stocks, soups and sauces from scratch, and prepared lamb, beef and chicken dishes. I kept raw and cooked food apart, and recorded the cool-room temperature every shift."}, {"id": "volunteer", "section": "Volunteer Experience", "question_en": "Have you ever done any unpaid work or volunteered to help your community? If so, what was your role, and where and when did you do this? Could you describe what you actually did to help out?", "question_zh": "你有没有做过无偿工作，或者当志愿者帮助你的社区？如果有，你的角色是什么？在哪里、什么时候？可以说说你具体做了哪些事情吗？", "answer_zh": "有。去年开始每个星期六在社区中心的食物分发站帮忙，大概做了一年。我负责整理捐来的食物，检查保质期，然后帮忙给大家做热饭。", "answer_en": "Yes. Since last year I have helped every Saturday at the food distribution point at the community centre, for about a year. I sort donated food, check the use-by dates, and help cook hot meals for people."}, {"id": "skills", "section": "Technical Skills", "question_en": "What practical skills do you have? For example, are you good with any computer programs, specific tools, driving certain vehicles, or speaking multiple languages?", "question_zh": "你有哪些实用技能？比如会用哪些电脑软件、特定工具，会驾驶哪些车辆，或者会说几种语言？", "answer_zh": "我会用商用厨房的设备，像蒸烤箱、大炒锅和切片机。会说普通话和四川话，英语还在学。", "answer_en": "I can use commercial kitchen equipment, such as combi ovens, large woks and slicers. I speak Mandarin and Sichuanese, and I am still learning English."}, {"id": "certificates", "section": "Certificate", "question_en": "Do you have any official certificates, licenses, or special training records? This could be a driver's license, a safety card, or any professional training you completed.", "question_zh": "你有没有正式的证书、执照或者专业培训记录？比如驾照、安全证（safety card），或者你完成过的任何职业培训。", "answer_zh": "我有中国的中式烹调师证书。在澳大利亚还没有考任何证书。", "answer_en": "I have a Chinese cook certificate for Chinese cuisine from China. I have not taken any certificate in Australia yet."}]};
+const MOCK_INTERVIEW = {"language": "zh", "answers": [{"id": "profile", "section": "Profile", "question_en": "Tell me a little about yourself, and what work you hope to find here.", "question_zh": "请简单介绍一下你自己，还有你希望在这里找什么工作。", "answer_zh": "我叫李伟，做了六年厨师，一直是餐厅的主厨。我最自豪的是每天能给一百五十个客人做饭，从来没有出过食品安全问题。我希望在这里继续在厨房工作。", "answer_en": "My name is Li Wei. I have worked as a cook for six years, always as the head cook of a restaurant. What I am most proud of is cooking for 150 guests a day without ever having a food safety problem. I hope to keep working in a kitchen here."}, {"id": "education", "section": "Education", "question_en": "Where did you study, and what did you study there?", "question_zh": "你在哪里读书？学的是什么？", "answer_zh": "我在成都的一所职业技术学校学烹饪，二零一二年到二零一四年读了两年。在那里学了中餐的基本功，还有厨房卫生。", "answer_en": "I studied cooking at a vocational school in Chengdu, for two years from 2012 to 2014. There I learned the basics of Chinese cooking, and kitchen hygiene."}, {"id": "employment", "section": "Employment", "question_en": "What was your last job, and what did you do each day?", "question_zh": "你最近一份工作是做什么的？每天做哪些事？", "answer_zh": "我最近的工作是在成都一家叫蓉香楼的餐厅当主厨，从二零一六年做到二零二二年，一共六年。每天早上从头熬高汤、做汤和酱汁，准备羊肉、牛肉和鸡肉的菜。生的和熟的食物分开放，每个班次都记录冷库的温度。", "answer_en": "My most recent job was head cook at a restaurant called Rongxiang Lou in Chengdu, from 2016 to 2022, six years in total. Every morning I made stocks, soups and sauces from scratch, and prepared lamb, beef and chicken dishes. I kept raw and cooked food apart, and recorded the cool-room temperature every shift."}, {"id": "volunteer", "section": "Volunteer Experience", "question_en": "Have you done any unpaid work, or helped your community?", "question_zh": "你做过无偿的工作，或者帮助过你的社区吗？", "answer_zh": "有。去年开始每个星期六在社区中心的食物分发站帮忙，大概做了一年。我负责整理捐来的食物，检查保质期，然后帮忙给大家做热饭。", "answer_en": "Yes. Since last year I have helped every Saturday at the food distribution point at the community centre, for about a year. I sort donated food, check the use-by dates, and help cook hot meals for people."}, {"id": "skills", "section": "Technical Skills", "question_en": "What are you good at? Tools, machines, computers, languages — anything.", "question_zh": "你擅长什么？工具、机器、电脑、语言，什么都可以。", "answer_zh": "我会用商用厨房的设备，像蒸烤箱、大炒锅和切片机。会说普通话和四川话，英语还在学。", "answer_en": "I can use commercial kitchen equipment, such as combi ovens, large woks and slicers. I speak Mandarin and Sichuanese, and I am still learning English."}, {"id": "certificates", "section": "Certificate", "question_en": "Do you have any certificates, licences, or training records?", "question_zh": "你有证书、执照，或者培训记录吗？", "answer_zh": "我有中国的中式烹调师证书。在澳大利亚还没有考任何证书。", "answer_en": "I have a Chinese cook certificate for Chinese cuisine from China. I have not taken any certificate in Australia yet."}]};
 // The contract has no name field; the mock fills the page-only name with the
 // fictional interviewee's so the preview reads like a resume.
 const MOCK_NAME = "Li Wei";
@@ -356,6 +359,26 @@ function readUpload() {
   return null;
 }
 
+// A missing or unreadable d7.person only means /start was skipped: the resume
+// then shows the blanks, and the caseworker types them in as before.
+function readPerson() {
+  try {
+    return JSON.parse(sessionStorage.getItem(PERSON_KEY) || "null");
+  } catch (err) {
+    return null;
+  }
+}
+
+// Only fills what is empty, so nothing the model drafted or the caseworker typed
+// is overwritten.
+function seedFromPerson() {
+  const person = readPerson();
+  if (!person) return;
+  if (!state.name) state.name = person.name || "";
+  if (!state.sections.contacts.phone) state.sections.contacts.phone = person.phone || "";
+  if (!state.sections.contacts.email) state.sections.contacts.email = person.email || "";
+}
+
 async function draftAll() {
   const body = await call("/api/resume-sections", { answers: state.interview.answers });
   if (body && body.offline) return { offline: body.reason || "The resume service is offline." };
@@ -372,6 +395,7 @@ async function start() {
     $("panel-note").textContent = "Translated from the resume the jobseeker brought. Check each section with them " +
                                   "and edit anything that is wrong or missing.";
     if (MOCK && !state.name) state.name = MOCK_NAME;
+    seedFromPerson();
     $("loading").hidden = true;
     $("review").hidden = false;
     render();
@@ -394,6 +418,7 @@ async function start() {
     state.sections = emptySections();
     showError("Could not draft the resume: " + err.message + ". Type the sections in from the answers below.");
   }
+  seedFromPerson();
   $("loading").hidden = true;
   $("review").hidden = false;
   render();
