@@ -1,0 +1,87 @@
+/* BridgeWork design tokens, taken from the Untitled UI community kit
+   ("❖ 70+ modals & popups UI Kit", Figma file KYWUHL795TJwqHRANibwch).
+   Every value below was read out of a node in that file, not from memory:
+
+     701:62721  Form 01            neutrals, brand, type scale, shadows, input, button
+     701:59219  Warning modal      warning tint and its ring
+     701:59223  Destructive modal  error red, error tint and its ring
+
+   The kit publishes no variables or styles, so these are the raw values its
+   layers carry. The one token with no source in the kit is --success; see below.
+
+   Contrast, measured against the surface each colour is used on:
+     white on --brand ........ 4.96:1   AA for text, below AAA
+     --fg-placeholder on white  4.74:1   AA for text, the tightest pair here
+     --fg-muted on white ..... 7.82:1
+     --fg-strong on white .... 10.37:1
+     --fg on white ........... 17.93:1 */
+
+:root {
+  /* ---- neutrals (Untitled UI Neutral ramp) */
+  --white: #ffffff;
+  --neutral-200: #e5e5e5;
+  --neutral-300: #d4d4d4;
+  --neutral-500: #737373;
+  --neutral-600: #525252;
+  --neutral-700: #404040;
+  --neutral-900: #171717;
+
+  /* ---- brand and semantics */
+  --brand: #7f56d9;          /* Brand/600 */
+  --error: #d92d20;          /* Error/600 */
+  --error-tint: #fee4e2;     /* Error/100 */
+  --error-ring: #fef3f2;     /* Error/50  */
+  --warning-tint: #fef0c7;   /* Warning/100 */
+  --warning-ring: #fffaeb;   /* Warning/50  */
+  /* No node in the free kit carries a success green; the kit's success states
+     are all brand purple. This is BridgeWork's own, kept because it already
+     passed contrast on the tint below (4.9:1) and the jobs board needs a
+     colour that is not the brand for "this one fits". */
+  --success: #2f6b47;
+  --success-tint: #e4f0e8;
+
+  /* ---- surfaces and text */
+  --bg: var(--neutral-200);
+  --surface: var(--white);
+  --line: var(--neutral-300);
+  --line-soft: var(--neutral-200);
+  --fg: var(--neutral-900);           /* headings */
+  --fg-strong: var(--neutral-700);    /* labels, secondary button text */
+  --fg-muted: var(--neutral-600);     /* supporting text */
+  --fg-placeholder: var(--neutral-500);
+  --overlay: rgba(10, 10, 10, .7);
+
+  /* ---- type: Inter, the kit's six text styles */
+  --font: Inter, system-ui, -apple-system, "Segoe UI", "PingFang SC", "Noto Sans CJK SC", sans-serif;
+  --text-lg-size: 18px;   --text-lg-line: 28px;
+  --text-md-size: 16px;   --text-md-line: 24px;
+  --text-sm-size: 14px;   --text-sm-line: 20px;
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+
+  /* ---- spacing: the kit's 4px grid, only the steps it actually uses */
+  --space-1: 4px;
+  --space-1-5: 6px;
+  --space-2: 8px;
+  --space-2-5: 10px;  /* the kit's control padding; off the 4px grid but it is what the layers use */
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+
+  /* ---- radii */
+  --radius-control: 8px;   /* inputs, buttons */
+  --radius-icon: 10px;     /* square featured icon */
+  --radius-card: 16px;     /* modal and card */
+  --radius-round: 28px;    /* round featured icon */
+
+  /* ---- elevation */
+  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, .05);
+  --shadow-xl: 0 20px 24px -4px rgba(0, 0, 0, .1), 0 8px 8px -4px rgba(0, 0, 0, .04);
+
+  /* ---- focus. The kit shows no focus ring; this is BridgeWork's, kept because
+     the interview is operated by people who may be navigating by keyboard. */
+  --focus: #ffbf00;
+}

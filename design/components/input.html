@@ -1,0 +1,70 @@
+<!-- @dsCard group="Components" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Input</title>
+<link rel="stylesheet" href="../tokens.css">
+<style>
+* { box-sizing: border-box; }
+body { margin: 0; padding: var(--space-6); background: var(--bg); color: var(--fg);
+       font: var(--weight-regular) var(--text-md-size)/var(--text-md-line) var(--font); }
+h1 { margin: 0 0 var(--space-1); font-size: var(--text-lg-size); line-height: var(--text-lg-line);
+     font-weight: var(--weight-semibold); }
+p.note { margin: 0 0 var(--space-6); color: var(--fg-muted);
+         font-size: var(--text-sm-size); line-height: var(--text-sm-line); }
+.card { max-width: 592px; background: var(--surface); border-radius: var(--radius-card);
+        box-shadow: var(--shadow-xs); padding: var(--space-6);
+        display: flex; flex-direction: column; gap: var(--space-4); }
+
+/* The kit's input: 14px side padding, 10px top and bottom, 8px radius, 1px
+   Neutral/300 border, shadow xs. Label is Text sm / Medium, 6px above. */
+.field { display: flex; flex-direction: column; gap: var(--space-1-5); }
+.field > label { color: var(--fg-strong); font-size: var(--text-sm-size);
+                 line-height: var(--text-sm-line); font-weight: var(--weight-medium); }
+.control { width: 100%; padding: var(--space-2-5) 14px; background: var(--surface);
+           border: 1px solid var(--line); border-radius: var(--radius-control);
+           box-shadow: var(--shadow-xs); color: var(--fg);
+           font-family: var(--font); font-size: var(--text-md-size); line-height: var(--text-md-line); }
+.control::placeholder { color: var(--fg-placeholder); }
+.control:focus-visible { outline: 3px solid var(--focus); outline-offset: 1px; border-color: var(--brand); }
+textarea.control { min-height: 120px; resize: vertical; padding: var(--space-3) 14px; }
+.row { display: flex; gap: var(--space-4); }
+.row > .field { flex: 1 0 0; min-width: 0; }
+.hint { color: var(--fg-muted); font-size: var(--text-sm-size); line-height: var(--text-sm-line); }
+.field.bad .control { border-color: var(--error); }
+.field.bad .hint { color: var(--error); }
+</style>
+</head>
+<body>
+<h1>Input</h1>
+<p class="note">14 / 10 padding, 8px radius, Neutral 300 border, shadow xs — the kit's input field, node 701:78038.</p>
+
+<div class="card">
+  <div class="field">
+    <label for="name">Full name</label>
+    <input id="name" class="control" placeholder="As it appears on your documents">
+  </div>
+  <div class="row">
+    <div class="field">
+      <label for="phone">Contact number</label>
+      <input id="phone" class="control" type="tel" value="0400 000 000">
+    </div>
+    <div class="field">
+      <label for="lang">Language</label>
+      <select id="lang" class="control"><option>中文 (Chinese)</option><option>العربية (Arabic)</option></select>
+    </div>
+  </div>
+  <div class="field bad">
+    <label for="email">Email</label>
+    <input id="email" class="control" value="liwei.cook@example">
+    <span class="hint">That address is missing its ending, such as .com</span>
+  </div>
+  <div class="field">
+    <label for="about">What you did each day</label>
+    <textarea id="about" class="control" placeholder="Made stocks, soups and sauces from scratch every morning…"></textarea>
+  </div>
+</div>
+</body>
+</html>
