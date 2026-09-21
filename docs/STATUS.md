@@ -6,7 +6,12 @@
 方向 7 的一輪研究已完成（三個 agent 平行），框架、交接文件第 8 節、spec 皆已落檔。
 **現場優先原則仍凌駕一切。**
 
-最後驗證：2026-09-22（`bash bin/verify.sh` → GREEN，含 313 個骨架測試，於 `47e5980`）
+最後驗證：2026-09-22（`bash bin/verify.sh` → GREEN，含 317 個骨架測試，於 `bda90cc`）
+
+- 2026-09-22 在 Orca 內建瀏覽器把整條流程點過一遍（`?mock=1&quiet=1`，首頁 → `/start` → `/start/path` → 電話面試 → `/review` → `/jobs` → 職缺頁 → Apply；另走上傳路徑）。
+  PR #33（`0c7dc30`）：`/jobs` 一張卡都沒畫出來（#31 合併時雇主配色函式呼叫自己），已修。
+  PR #34（`bda90cc`）：題數文字、首頁「submitted」誇大、「Why Li is a match」用了姓、首頁空白圖示、`/interview` 與 `/review` 加返回鍵、上傳時的載入文字；
+  `tests/test_links.py` 會在有 node 時對每頁的 script 跑 `node --check`。
 
 - PR #31 合併點 `7fad17f`；PR #32 d7-back-links：`/upload` 返回改到 `/start/path`（原本回舊的 `/intake`），`/interview` 交給 `/review` 時保留 `?quiet=1`，新增連結測試 `tests/test_links.py`，合併點 `47e5980`。
 
