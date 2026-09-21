@@ -36,6 +36,15 @@ drafting), `ELEVENLABS_API_KEY` (speech to text, the spoken questions, the phone
 Without them every page still works and says on screen what it could not do — nothing is invented
 to fill the gap.
 
+The phone interviewer needs an agent as well as the key. `python3 -m skeleton.tools.phone_agent`
+creates one and prints the ids to set (`ELEVENLABS_AGENT_ID`, and `ELEVENLABS_PHONE_NUMBER_ID` to
+dial out rather than hand over a link); re-run it with `--update-agent` after changing the
+questions or the prompt. Without an agent, `/interview` says so and points at the browser
+interview instead.
+
+`/scenarios` lists the earlier directions' pipelines. It is a developer page, served only when no
+`PORT` is set in the environment, so a deployment does not carry it.
+
 ## The flow
 
 `/` → `/start` (who the session is for) → `/start/path`, then either:

@@ -37,7 +37,9 @@ CONVERSATIONS_URL = API + "/conversations?agent_id={agent}&call_start_after_unix
 TALK_URL = "https://elevenlabs.io/app/talk-to?agent_id={agent}"
 # The default eleven_flash_v2 speaks English only; v2.5 is the multilingual one.
 TTS_MODEL = "eleven_flash_v2_5"
-SETUP = "Run python3 -m skeleton.tools.phone_agent once and set the IDs it prints."
+# Shown on screen, so it tells the two people at the desk what to do instead
+# of naming a command. The setup command is in the README.
+FALLBACK = 'Use "Start the interview" above to record the answers in this browser instead.'
 
 FIRST_MESSAGE = ("你好，我是帮你整理工作经历的AI助手。接下来大概十分钟，我会问你一些关于学习和工作的问题，"
                  "你用中文回答就可以。我们开始吧：{first}")
@@ -165,7 +167,7 @@ def start_call(to_number, post=None, api_key=None, agent_id=None, phone_number_i
     agent = _env(agent_id, "ELEVENLABS_AGENT_ID")
     number = _env(phone_number_id, "ELEVENLABS_PHONE_NUMBER_ID")
     if not (key and agent and number):
-        return _offline("The phone interview is not set up. " + SETUP)
+        return _offline("The phone interview is not set up. " + FALLBACK)
     payload = {"agent_id": agent, "agent_phone_number_id": number, "to_number": to_number}
     try:
         body = (post or live._post_json)(OUTBOUND_URL, _headers(key), payload)
@@ -180,7 +182,7 @@ def talk_link(agent_id=None):
     """{"url": ...} of the agent's public talk page, for the jobseeker's phone."""
     agent = _env(agent_id, "ELEVENLABS_AGENT_ID")
     if not agent:
-        return _offline("The AI interviewer is not set up. " + SETUP)
+        return _offline("The AI interviewer is not set up. " + FALLBACK)
     return {"url": TALK_URL.format(agent=urllib.parse.quote(agent, safe=""))}
 
 
@@ -190,7 +192,7 @@ def latest_conversation(since, get=None, api_key=None, agent_id=None):
     key = _env(api_key, "ELEVENLABS_API_KEY")
     agent = _env(agent_id, "ELEVENLABS_AGENT_ID")
     if not (key and agent):
-        return _offline("The AI interviewer is not set up. " + SETUP)
+        return _offline("The AI interviewer is not set up. " + FALLBACK)
     url = CONVERSATIONS_URL.format(agent=urllib.parse.quote(agent, safe=""), since=int(since))
     try:
         listed = (get or _get_json)(url, {"xi-api-key": key}).get("conversations") or []
@@ -267,7 +269,7 @@ def call_result(conversation_id, get=None, post=None, api_key=None, anthropic_ke
     """The call's status and turns so far; once done, the seven answers too."""
     key = _env(api_key, "ELEVENLABS_API_KEY")
     if not key:
-        return _offline("No ELEVENLABS_API_KEY is set. " + SETUP)
+        return _offline("The phone interview is not connected. " + FALLBACK)
     url = CONVERSATION_URL.format(id=urllib.parse.quote(conversation_id, safe=""))
     try:
         conversation = (get or _get_json)(url, {"xi-api-key": key})

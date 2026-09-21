@@ -130,14 +130,15 @@ class StartCall(unittest.TestCase):
         self.assertEqual(payload, {"agent_id": "agent_1", "agent_phone_number_id": "phnum_1",
                                    "to_number": "+61400000000"})
 
-    def test_missing_setup_is_offline_and_names_the_setup_command(self):
+    def test_missing_setup_is_offline_and_points_at_the_browser_interview(self):
         for missing in ("api_key", "agent_id", "phone_number_id"):
             with self.subTest(missing=missing):
                 env = dict(self.ENV, **{missing: ""})
                 post = recording({})
                 body = phone.start_call("+61400000000", post=post, **env)
                 self.assertTrue(body["offline"])
-                self.assertIn("skeleton.tools.phone_agent", body["reason"])
+                self.assertNotIn("python3", body["reason"])
+                self.assertIn("Start the interview", body["reason"])
                 self.assertEqual(post.sent, [])
 
     def test_a_refused_call_is_offline_with_the_services_reason(self):
@@ -230,10 +231,14 @@ class TalkLink(unittest.TestCase):
         body = phone.talk_link(agent_id="agent_1")
         self.assertEqual(body, {"url": "https://elevenlabs.io/app/talk-to?agent_id=agent_1"})
 
-    def test_no_agent_is_offline_and_names_the_setup_command(self):
+    def test_no_agent_is_offline_and_tells_the_reader_what_to_do_instead(self):
+        # The reason is shown on screen, so on the live site a judge read a
+        # red banner telling them to run a Python command. It now points at
+        # the browser interview, and the setup command lives in the README.
         body = phone.talk_link(agent_id="")
         self.assertTrue(body["offline"])
-        self.assertIn("skeleton.tools.phone_agent", body["reason"])
+        self.assertNotIn("python3", body["reason"])
+        self.assertIn("Start the interview", body["reason"])
 
 
 class LatestConversation(unittest.TestCase):
