@@ -84,6 +84,17 @@ header.top nav a:hover { text-decoration: underline; }
 .proof h3 { margin: 0 0 8px; color: var(--primary); font-size: 22px; }
 .proof p { margin: 0; color: var(--body); }
 
+/* The only numbers on the page. They describe the problem, not our own impact,
+   and they carry their source, which AI_CONTEXT.md requires. */
+.stats { padding: 80px; display: grid; grid-template-columns: repeat(2, minmax(0, 200px)) minmax(0, 1fr); gap: 56px; align-items: start; }
+.stats .fig b { display: block; color: var(--primary); font-size: 76px; line-height: 1; font-weight: 700; letter-spacing: -.03em; }
+.stats .fig span { display: block; margin-top: 10px; color: var(--accent); font-size: 13px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
+.stats .fig p { margin: 14px 0 0; color: var(--body); }
+.stats .note { border-left: 3px solid var(--accent); padding-left: 32px; }
+.stats .note .quote { margin: 0; font-size: 20px; line-height: 1.55; }
+.stats .note cite { display: block; max-width: 620px; margin-top: 18px; font-style: normal; font-size: 13px; line-height: 1.7; color: var(--muted); }
+.stats .note cite a { color: var(--primary); }
+
 .eyebrow { margin: 0 0 12px; color: var(--accent); font-size: 13px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
 h2 { margin: 0; color: var(--primary); font-size: 40px; line-height: 1.18; font-weight: 700; }
 
@@ -137,6 +148,8 @@ footer small { display: block; padding-top: 20px; border-top: 1px solid rgba(255
 
 @media (max-width: 1100px) {
   .skills, .who { grid-template-columns: minmax(0, 1fr); }
+  .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 40px; }
+  .stats .note { grid-column: 1 / -1; border-left: 0; border-top: 1px solid var(--line); padding: 24px 0 0; }
 }
 @media (max-width: 760px) {
   header.top { height: 68px; padding: 0 16px; gap: 12px; }
@@ -149,6 +162,9 @@ footer small { display: block; padding-top: 20px; border-top: 1px solid rgba(255
   .hero h1 { font-size: 36px; }
   .hero .lede { font-size: 17px; }
   .proof { grid-template-columns: minmax(0, 1fr); padding: 32px 16px; gap: 24px; }
+  .stats { grid-template-columns: minmax(0, 1fr); padding: 48px 16px; gap: 32px; }
+  .stats .fig b { font-size: 56px; }
+  .stats .note .quote { font-size: 17px; }
   h2 { font-size: 30px; }
   .how, .skills, .who { padding: 56px 16px; }
   .steps { grid-template-columns: minmax(0, 1fr); gap: 24px; }
@@ -173,8 +189,8 @@ footer small { display: block; padding-top: 20px; border-top: 1px solid rgba(255
 <section class="hero">
   <div class="hero-copy">
     <p class="pill">Built for refugee employment</p>
-    <h1>Work experience should not be lost in translation.</h1>
-    <p class="lede">BridgeWork helps caseworkers turn a client’s spoken story — in any language — into a clear, job-ready English resume, then shows which Sydney jobs it fits and why.</p>
+    <h1>Turning spoken experience into Australian resumes.</h1>
+    <p class="lede">Your client speaks in their own language. You get a resume to check, and Sydney jobs that match it.</p>
     <div class="actions">
       <a class="btn primary" href="/start" data-route>Start a resume</a>
       <!-- No data-route: the demo sets ?mock=1 itself, whatever the page was opened with. -->
@@ -183,27 +199,43 @@ footer small { display: block; padding-top: 20px; border-top: 1px solid rgba(255
   </div>
 </section>
 
+<section class="stats" aria-label="Why refugees are shut out of work">
+  <div class="fig">
+    <b>88</b><span>Percentage points</span>
+    <p>Lower chance of being employed than other migrants, on arrival in Australia.</p>
+  </div>
+  <div class="fig">
+    <b>51</b><span>Percentage points</span>
+    <p>The gap that is still there five years later.</p>
+  </div>
+  <div class="note">
+    <p class="quote">“The primary driver is discrimination by employers due to how they screen candidates when they lack reliable information about overseas qualifications or experience.”</p>
+    <cite>Guo &amp; Tani, <i>British Journal of Industrial Relations</i>, 2026 (UNSW). 3,757 humanitarian and other migrants who arrived in Australia between 2013 and 2017.
+    <a href="https://doi.org/10.1111/bjir.70016">doi.org/10.1111/bjir.70016</a></cite>
+  </div>
+</section>
+
 <section class="proof" aria-label="What BridgeWork guarantees">
-  <div><h3>Any language</h3><p>Clients speak in the language that feels natural; the resume comes out in English.</p></div>
-  <div><h3>Every skill cites a source</h3><p>Each suggested skill links to the moment in the interview or the resume line it came from.</p></div>
-  <div><h3>Caseworker approves</h3><p>Nothing goes on the resume until the caseworker has reviewed every line.</p></div>
+  <div><h3>Any language</h3><p>The client speaks Dari, Arabic or Tigrinya. The resume comes out in English.</p></div>
+  <div><h3>Every skill cites a source</h3><p>Each skill links back to the sentence it came from.</p></div>
+  <div><h3>The caseworker decides</h3><p>Nothing reaches the resume until you approve it.</p></div>
 </section>
 
 <section class="how" id="how">
-  <p class="eyebrow">How it works</p>
-  <h2>From a conversation to an opportunity.</h2>
+  <p class="eyebrow">In one appointment</p>
+  <h2>How it works</h2>
   <ol class="steps">
-    <li><img src="/img/step-listen.jpg" alt="" loading="lazy"><div class="body"><span class="num">01</span><h3>Listen together</h3><p>The client tells their work story in their own language while the caseworker listens.</p></div></li>
-    <li><img src="/img/step-review.jpg" alt="" loading="lazy"><div class="body"><span class="num">02</span><h3>Review the draft</h3><p>AI turns the story into clear resume content. The caseworker edits and approves.</p></div></li>
-    <li><img src="/img/step-match.jpg" alt="" loading="lazy"><div class="body"><span class="num">03</span><h3>Match with evidence</h3><p>See which real Sydney jobs fit, which skills the ad asks for, and what still needs checking.</p></div></li>
+    <li><img src="/img/step-listen.jpg" alt="" loading="lazy"><div class="body"><span class="num">01</span><h3>Listen together</h3><p>The client tells their work story. You listen instead of typing.</p></div></li>
+    <li><img src="/img/step-review.jpg" alt="" loading="lazy"><div class="body"><span class="num">02</span><h3>Review the draft</h3><p>The draft comes back in English. You edit what is wrong.</p></div></li>
+    <li><img src="/img/step-match.jpg" alt="" loading="lazy"><div class="body"><span class="num">03</span><h3>Match with evidence</h3><p>Real Sydney ads, with the line in each ad that matched.</p></div></li>
   </ol>
 </section>
 
 <section class="skills">
   <div>
-    <p class="eyebrow">The skills are already there</p>
-    <h2>A kitchen, a warehouse, a family shop — it all counts.</h2>
-    <p class="copy">Years of work often disappear on an Australian resume because they were never written down in English. BridgeWork names those skills in the words employers use, and shows where each one came from.</p>
+    <p class="eyebrow">What gets missed</p>
+    <h2>The skills are already there</h2>
+    <p class="copy">Years of work disappear on an Australian resume because nobody wrote them down in English. BridgeWork names those skills in the words employers use, and shows where each one came from.</p>
   </div>
   <!-- The skill lines are illustrations of the kind of work, not claims about these people. -->
   <ul class="tiles">
@@ -217,17 +249,17 @@ footer small { display: block; padding-top: 20px; border-top: 1px solid rgba(255
 <section class="who" id="who">
   <img src="/img/team.jpg" alt="" loading="lazy">
   <div>
-    <p class="eyebrow">Who it’s for</p>
-    <h2>Built for the people who help others into work.</h2>
+    <p class="eyebrow">Caseworkers and employers</p>
+    <h2>Who it’s for</h2>
     <ul>
       <li>
         <h3>Caseworkers &amp; settlement services</h3>
-        <p>Spend the appointment listening, not typing. Leave with a resume draft you have checked.</p>
+        <p>Spend the appointment listening. Leave with a resume draft you have already checked.</p>
         <a class="button" href="/start" data-route>Get Started →</a>
       </li>
       <li>
         <h3>Employers</h3>
-        <p>See what a candidate has actually done, with the evidence behind each skill.</p>
+        <p>See what a candidate has done, and the evidence behind each skill.</p>
         <!-- There is no employer side yet, so this card cannot lead anywhere. -->
         <button class="button" type="button" disabled>Coming soon</button>
       </li>
@@ -239,8 +271,8 @@ footer small { display: block; padding-top: 20px; border-top: 1px solid rgba(255
 </section>
 
 <section class="cta">
-  <h2>Start with a conversation.</h2>
-  <p>One appointment. Any language. A resume the caseworker trusts.</p>
+  <h2>Start with a conversation</h2>
+  <p>One appointment, in any language.</p>
   <div class="actions">
     <a class="btn primary" href="/start" data-route>Start a resume</a>
   </div>
