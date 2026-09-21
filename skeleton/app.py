@@ -293,6 +293,13 @@ def call_result(query):
     return phone.call_result(conversation_id)
 
 
+def talk_latest(query):
+    since = parse_qs(query).get("since", [""])[0]
+    if not since.isdigit():
+        raise BadRequest("since must be unix seconds, a whole number")
+    return phone.latest_conversation(int(since))
+
+
 def speak(payload):
     text, refused = _interview_text(payload, "language")
     if refused:
@@ -398,9 +405,12 @@ class Handler(BaseHTTPRequestHandler):
             return self._send(200, "text/html; charset=utf-8", UPLOAD_PAGE.read_bytes())
         if parsed.path == "/api/interview/questions":
             return self._json(200, interview.questions())
-        if parsed.path == "/api/call/result":
+        if parsed.path == "/api/talk/link":
+            return self._json(200, phone.talk_link())
+        if parsed.path in ("/api/call/result", "/api/talk/latest"):
+            reader = call_result if parsed.path == "/api/call/result" else talk_latest
             try:
-                return self._json(200, call_result(parsed.query))
+                return self._json(200, reader(parsed.query))
             except BadRequest as bad:
                 return self._json(400, {"error": str(bad)})
         scenario = parse_qs(parsed.query).get("s", [None])[0]

@@ -196,6 +196,46 @@ class CallResult(unittest.TestCase):
         self.assertTrue(phone.call_result("conv_1", get=broken, api_key="key")["offline"])
 
 
+class TalkLink(unittest.TestCase):
+    def test_the_link_is_the_agents_public_talk_page(self):
+        body = phone.talk_link(agent_id="agent_1")
+        self.assertEqual(body, {"url": "https://elevenlabs.io/app/talk-to?agent_id=agent_1"})
+
+    def test_no_agent_is_offline_and_names_the_setup_command(self):
+        body = phone.talk_link(agent_id="")
+        self.assertTrue(body["offline"])
+        self.assertIn("skeleton.tools.phone_agent", body["reason"])
+
+
+class LatestConversation(unittest.TestCase):
+    ENV = {"api_key": "key", "agent_id": "agent_1"}
+
+    def listing(self, conversations):
+        def get(url, headers):
+            get.url = url
+            return {"conversations": conversations}
+        return get
+
+    def test_the_newest_conversation_since_the_page_started_waiting(self):
+        get = self.listing([{"conversation_id": "conv_2", "start_time_unix_secs": 200}])
+        body = phone.latest_conversation(150, get=get, **self.ENV)
+        self.assertEqual(body, {"conversation_id": "conv_2"})
+        self.assertIn("agent_id=agent_1", get.url)
+        self.assertIn("call_start_after_unix=150", get.url)
+
+    def test_nothing_yet_is_waiting_not_offline(self):
+        body = phone.latest_conversation(150, get=self.listing([]), **self.ENV)
+        self.assertEqual(body, {"waiting": True})
+
+    def test_an_older_conversation_is_never_picked(self):
+        get = self.listing([{"conversation_id": "conv_1", "start_time_unix_secs": 100}])
+        self.assertEqual(phone.latest_conversation(150, get=get, **self.ENV), {"waiting": True})
+
+    def test_missing_setup_or_no_network_is_offline(self):
+        self.assertTrue(phone.latest_conversation(150, get=broken, api_key="", agent_id="a")["offline"])
+        self.assertTrue(phone.latest_conversation(150, get=broken, **self.ENV)["offline"])
+
+
 class CallRoutes(Server):
     def get_status(self, path):
         try:
@@ -229,6 +269,24 @@ class CallRoutes(Server):
             status, body = self.get_status("/api/call/result?id=conv_1")
         self.assertEqual((status, body["status"]), (200, "in-progress"))
         result.assert_called_once_with("conv_1")
+
+    def test_talk_link_route(self):
+        with mock.patch.object(app.phone, "talk_link", return_value={"url": "u"}):
+            self.assertEqual(self.get_status("/api/talk/link"), (200, {"url": "u"}))
+
+    def test_talk_latest_passes_the_start_time_on(self):
+        with mock.patch.object(app.phone, "latest_conversation",
+                               return_value={"waiting": True}) as latest:
+            status, body = self.get_status("/api/talk/latest?since=1790000000")
+        self.assertEqual((status, body), (200, {"waiting": True}))
+        latest.assert_called_once_with(1790000000)
+
+    def test_talk_latest_needs_a_whole_number_start_time(self):
+        for query in ("", "?since=", "?since=abc", "?since=-5", "?since=1.5"):
+            with self.subTest(query=query), mock.patch.object(app.phone, "latest_conversation") as latest:
+                status, _ = self.get_status("/api/talk/latest" + query)
+                self.assertEqual(status, 400)
+                latest.assert_not_called()
 
     def test_a_malformed_conversation_id_is_refused(self):
         for query in ("", "?id=", "?id=../agents", "?id=a%20b"):

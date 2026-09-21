@@ -71,10 +71,7 @@ button:disabled { background: #d1d5db; border-color: #9ca3af; color: #333; curso
 .consent input { width: 22px; height: 22px; flex: none; margin-top: .15rem; accent-color: var(--primary); }
 .phone { margin-top: 1.5rem; padding-top: 1.2rem; border-top: 1px solid var(--line); }
 .phone h3 { color: var(--primary); margin: 0 0 .3rem; font-size: 1rem; }
-.phone-row { display: flex; gap: .6rem; flex-wrap: wrap; }
-.phone-row label { flex-basis: 100%; font-size: .85rem; }
-.phone-row input { flex: 1 1 12rem; min-height: 44px; padding: 0 .7rem; font: inherit;
-                   border: 2px solid var(--line); border-radius: 6px; }
+#talk-url { word-break: break-all; font-weight: 600; color: var(--primary); }
 .turns { list-style: none; padding: 0; margin: 1rem 0; max-height: 50vh; overflow-y: auto; }
 .turns li { margin: .4rem 0; padding: .5rem .7rem; border-radius: 8px; background: var(--panel); }
 .turns li.agent { background: var(--bg); color: var(--muted); }
@@ -179,19 +176,17 @@ button:disabled { background: #d1d5db; border-color: #9ca3af; color: #333; curso
     <button id="begin" class="go" disabled>Start the interview</button>
 
     <div class="phone">
-      <h3>Or: an AI interviewer phones the jobseeker</h3>
-      <p class="muted">It asks the same seven questions in Mandarin. When the call ends, the answers come back here,
+      <h3>Or: the jobseeker talks with an AI interviewer on their phone</h3>
+      <p class="muted">It asks the same seven questions in Mandarin. When they hang up, the answers come back here,
         sorted by question, for you to check on the next page.</p>
-      <div class="phone-row">
-        <label for="phone-number" class="muted">Phone number, international format</label>
-        <input id="phone-number" type="tel" placeholder="+61400000000" autocomplete="off">
-        <button id="call" class="secondary" disabled>Call</button>
-      </div>
+      <button id="call" class="secondary" disabled>Start the phone interview</button>
     </div>
   </section>
 
   <section id="call-panel" class="start" hidden>
     <h2>Phone interview</h2>
+    <p id="talk-link" hidden>On the jobseeker's phone, open
+      <a id="talk-url" target="_blank" rel="noopener"></a> and tap the call button.</p>
     <p id="call-status" class="muted" aria-live="polite"></p>
     <ol id="call-turns" class="turns" lang="zh-Hans"></ol>
     <button id="call-review" class="go" hidden>Review the answers &rarr;</button>
@@ -564,24 +559,50 @@ async function pollCall(conversationId) {
   callFinished(body.answers);
 }
 
+// Waits for the jobseeker to start talking on their phone. Only a conversation
+// that began after this page started waiting is taken, never an older one.
+async function waitForTalk(since) {
+  let body;
+  try {
+    const response = await fetch("/api/talk/latest?since=" + since);
+    if (!response.ok) throw new Error("the service answered HTTP " + response.status);
+    body = await response.json();
+  } catch (err) {
+    $("call-status").textContent = "Could not reach the service (" + err.message + "). Trying again…";
+    return setTimeout(() => waitForTalk(since), CALL_POLL_MS);
+  }
+  if (body.offline) return showError(body.reason);
+  if (body.waiting) {
+    $("call-status").textContent = "Waiting for the jobseeker to start the call…";
+    return setTimeout(() => waitForTalk(since), CALL_POLL_MS);
+  }
+  pollCall(body.conversation_id);
+}
+
 async function startCall() {
-  const to = $("phone-number").value.trim();
-  if (!state.consent || !to) return;
+  if (!state.consent) return;
   showError("");
   clearOffline();
   $("start").hidden = true;
   $("call-panel").hidden = false;
-  $("call-status").textContent = "Calling " + to + "…";
   if (MOCK) return mockCall();
+  // A minute of slack for a phone and laptop whose clocks disagree.
+  const since = Math.floor(Date.now() / 1000) - 60;
   try {
-    const body = await (await postJson("/api/call/start", { to })).json();
+    const response = await fetch("/api/talk/link");
+    if (!response.ok) throw new Error("the link answered HTTP " + response.status);
+    const body = await response.json();
     if (body.offline) throw new Error(body.reason);
-    pollCall(body.conversation_id);
+    $("talk-url").href = body.url;
+    $("talk-url").textContent = body.url;
+    $("talk-link").hidden = false;
   } catch (err) {
-    showError("The call was not placed: " + err.message);
+    showError("The phone interview could not start: " + err.message);
     $("call-panel").hidden = true;
     $("start").hidden = false;
+    return;
   }
+  waitForTalk(since);
 }
 
 // ---------------------------------------------------------------- moving on

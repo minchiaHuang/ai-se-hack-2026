@@ -1,4 +1,8 @@
-"""The phone interview: an ElevenLabs agent calls the jobseeker through Twilio.
+"""The phone interview: an ElevenLabs agent talks with the jobseeker.
+
+Two ways in, one agent: it rings them through Twilio, or they open the agent's
+public talk page on their own phone (no phone number needed, so it works on a
+Twilio trial account that cannot buy one).
 
 ElevenLabs holds the Twilio number and runs the call itself, so this server only
 makes outgoing HTTPS requests: no webhook, no tunnel, no websocket. The agent
@@ -27,6 +31,9 @@ CREATE_AGENT_URL = API + "/agents/create"
 PHONE_NUMBERS_URL = API + "/phone-numbers"
 OUTBOUND_URL = API + "/twilio/outbound-call"
 CONVERSATION_URL = API + "/conversations/{id}"
+CONVERSATIONS_URL = API + "/conversations?agent_id={agent}&call_start_after_unix={since}&page_size=5"
+# ElevenLabs' own page for an agent without authentication: anyone with the link can talk.
+TALK_URL = "https://elevenlabs.io/app/talk-to?agent_id={agent}"
 # The default eleven_flash_v2 speaks English only; v2.5 is the multilingual one.
 TTS_MODEL = "eleven_flash_v2_5"
 SETUP = "Run python3 -m skeleton.tools.phone_agent once and set the IDs it prints."
@@ -146,6 +153,33 @@ def start_call(to_number, post=None, api_key=None, agent_id=None, phone_number_i
     if not body.get("success") or not body.get("conversation_id"):
         return _offline("The call was not placed: " + str(body.get("message") or "no reason given"))
     return {"conversation_id": body["conversation_id"]}
+
+
+def talk_link(agent_id=None):
+    """{"url": ...} of the agent's public talk page, for the jobseeker's phone."""
+    agent = _env(agent_id, "ELEVENLABS_AGENT_ID")
+    if not agent:
+        return _offline("The AI interviewer is not set up. " + SETUP)
+    return {"url": TALK_URL.format(agent=urllib.parse.quote(agent, safe=""))}
+
+
+def latest_conversation(since, get=None, api_key=None, agent_id=None):
+    """The newest conversation with the agent that started at or after `since`
+    (unix seconds, when the page began waiting), or {"waiting": True}."""
+    key = _env(api_key, "ELEVENLABS_API_KEY")
+    agent = _env(agent_id, "ELEVENLABS_AGENT_ID")
+    if not (key and agent):
+        return _offline("The AI interviewer is not set up. " + SETUP)
+    url = CONVERSATIONS_URL.format(agent=urllib.parse.quote(agent, safe=""), since=int(since))
+    try:
+        listed = (get or _get_json)(url, {"xi-api-key": key}).get("conversations") or []
+    except Exception as error:
+        return _failure(error, "Looking for the conversation")
+    # The filter is the service's; checked again so an older talk is never handed over.
+    fresh = [c for c in listed if (c.get("start_time_unix_secs") or 0) >= since]
+    if not fresh:
+        return {"waiting": True}
+    return {"conversation_id": max(fresh, key=lambda c: c["start_time_unix_secs"])["conversation_id"]}
 
 
 def _turns(transcript):
