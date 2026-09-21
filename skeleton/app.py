@@ -42,6 +42,12 @@ JOBS_PAGE = WEB / "jobs.html"
 REVIEW_PAGE = WEB / "review.html"
 # The spoken interview that hands its answers to /review.
 INTERVIEW_PAGE = WEB / "interview.html"
+# The product's entry: the homepage, the client's details, then the choice
+# between the spoken interview and an uploaded resume.
+HOME_PAGE = WEB / "home.html"
+START_PAGE = WEB / "start.html"
+PATH_PAGE = WEB / "path.html"
+LOGO = WEB / "logo.svg"
 
 # A request past these is refused before it is read: a few minutes of webm
 # speech is well under 25 MB, and no JSON the page sends comes near 1 MB.
@@ -340,14 +346,16 @@ table{{border-collapse:collapse;width:100%}} td{{border-top:1px solid #ddd;paddi
 class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         parsed = urlparse(self.path)
+        # The root opens the product; the scenario list is a developer page at
+        # /scenarios. The pages read ?mock=1 themselves, so no redirect is needed.
         if parsed.path == "/":
-            # The root opens the product; the scenario list is a developer page.
-            # The query is kept so /?mock=1 still lands in mock mode.
-            self.send_response(302)
-            self.send_header("Location", "/intake" + (f"?{parsed.query}" if parsed.query else ""))
-            self.send_header("Content-Length", "0")
-            self.end_headers()
-            return
+            return self._send(200, "text/html; charset=utf-8", HOME_PAGE.read_bytes())
+        if parsed.path == "/start":
+            return self._send(200, "text/html; charset=utf-8", START_PAGE.read_bytes())
+        if parsed.path == "/start/path":
+            return self._send(200, "text/html; charset=utf-8", PATH_PAGE.read_bytes())
+        if parsed.path == "/logo.svg":
+            return self._send(200, "image/svg+xml", LOGO.read_bytes())
         if parsed.path == "/intake":
             return self._send(200, "text/html; charset=utf-8", INTAKE_PAGE.read_bytes())
         if parsed.path == "/jobs":

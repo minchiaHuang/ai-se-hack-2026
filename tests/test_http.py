@@ -119,20 +119,76 @@ class HttpRoundTrip(Server):
         finally:
             conn.close()
 
-    def test_the_root_redirects_to_the_intake(self):
+    def test_the_root_serves_the_homepage(self):
         status, headers = self.raw_get("/")
-        self.assertEqual(status, 302)
-        self.assertEqual(headers["Location"], "/intake")
-
-    def test_the_root_keeps_its_query_so_mock_mode_survives(self):
-        status, headers = self.raw_get("/?mock=1")
-        self.assertEqual(status, 302)
-        self.assertEqual(headers["Location"], "/intake?mock=1")
-
-    def test_the_root_lands_on_the_start_screen(self):
-        status, body = self.get("/")
         self.assertEqual(status, 200)
-        self.assertIn("How would you like to start?", body)
+        self.assertEqual(headers["Content-Type"], "text/html; charset=utf-8")
+        _, body = self.get("/")
+        self.assertIn("Breaking the language barrier", body)
+        self.assertIn('href="/start"', body)
+
+    def test_the_homepage_keeps_mock_mode_on_its_own(self):
+        # No redirect any more: the page carries ?mock=1 onto its links itself.
+        status, body = self.get("/?mock=1")
+        self.assertEqual(status, 200)
+        self.assertIn('carried.set("mock", "1")', body)
+
+    def test_the_homepage_quotes_no_caseworker(self):
+        """Figma's "Impact stories" quotes a caseworker no one interviewed;
+        AI_CONTEXT.md forbids presenting unvalidated testimony."""
+        _, body = self.get("/")
+        self.assertNotIn("Impact stories", body)
+        self.assertNotIn("I didn’t have to write anything", body)
+
+    def test_the_employer_card_leads_nowhere(self):
+        # There is no employer side, so its button is disabled rather than a link.
+        _, body = self.get("/")
+        self.assertIn("<button class=\"button\" type=\"button\" disabled>Coming soon</button>", body)
+
+    def test_the_personal_information_page_serves(self):
+        status, body = self.get("/start")
+        self.assertEqual(status, 200)
+        self.assertIn("Personal Information", body)
+        self.assertIn('"d7.person"', body)
+        self.assertIn("/start/path", body)
+
+    def test_the_personal_information_page_offers_only_supported_languages(self):
+        _, body = self.get("/start")
+        offered = [v for v in body.split('<option value="')[1:]]
+        self.assertEqual([v.split('"')[0] for v in offered],
+                         ["", *app.d7_credentials.SUPPORTED_LANGUAGES])
+
+    def test_the_mock_person_is_the_interviews_cook(self):
+        _, body = self.get("/start")
+        person = json.loads(body.split("const MOCK_PERSON = ")[1].split(";\n")[0])
+        self.assertEqual(person, {"name": "Li Wei", "phone": "0400 000 000",
+                                  "email": "liwei.cook@example.com", "language": "zh"})
+        interview = app.INTERVIEW_PAGE.read_text(encoding="utf-8")
+        self.assertIn(person["phone"], interview)
+        self.assertIn(person["email"], interview)
+
+    def test_the_choose_path_page_serves(self):
+        status, body = self.get("/start/path")
+        self.assertEqual(status, 200)
+        self.assertIn("How would you like to build this Resume?", body)
+        for href in ('href="/interview"', 'href="/upload"', 'href="/start"'):
+            with self.subTest(href=href):
+                self.assertIn(href, body)
+
+    def test_quiet_hides_only_the_mock_banner_on_the_entry_pages(self):
+        # &quiet=1 is for the demo video: the banner goes, mock mode stays.
+        for path in ("/", "/start", "/start/path"):
+            with self.subTest(path=path):
+                _, body = self.get(path)
+                self.assertIn('id="mock-banner"', body)
+                self.assertIn('.hidden = !MOCK || params.get("quiet") === "1"', body)
+
+    def test_the_logo_serves_as_svg(self):
+        status, headers = self.raw_get("/logo.svg")
+        self.assertEqual(status, 200)
+        self.assertEqual(headers["Content-Type"], "image/svg+xml")
+        with urlopen(f"http://127.0.0.1:{self.port}/logo.svg", timeout=5) as response:
+            self.assertTrue(response.read().startswith(b"<svg"))
 
     def test_the_scenario_list_serves_at_scenarios(self):
         status, body = self.get("/scenarios")

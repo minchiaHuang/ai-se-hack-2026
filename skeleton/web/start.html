@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BridgeWork personal information</title>
+<style>
+/* Figma "BridgeWork" frame "Staff Workstation View 1" (10:168), drawn at 1280
+   wide. Same tokens and header as home.html; inline, no web-font download. */
+:root {
+  --primary: #1B4B5A;
+  --accent: #E8874A;
+  --success: #4C9A6B;
+  --bg: #F7F5F1;
+  --text: #2B2B2B;
+  --muted: #868686;
+  --card: #fff;
+  --line: #d9d4cb;
+  --focus: #ffbf00;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--text);
+  font: 15px/1.35 Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+:focus-visible { outline: 4px solid var(--focus); outline-offset: 2px; }
+[hidden] { display: none !important; }
+
+.brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; }
+.brand img { width: 83px; height: 76px; }
+.wordmark { font-size: 40px; line-height: 1; letter-spacing: -.01em; white-space: nowrap; }
+.wordmark b { color: #000; font-weight: 700; }
+.wordmark span {
+  font-weight: 300; margin-left: 4px; color: #1f7f9c;
+  background: linear-gradient(#2bcdff, #1b4b5a); -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+header.top { height: 122px; padding: 0 43px; display: flex; align-items: center; background: var(--card); }
+
+.banner { margin: 0; padding: .5rem 43px; background: var(--card); border: 2px dashed var(--line); }
+
+main { max-width: 740px; margin: 0 auto; padding: 77px 0 96px; }
+h1 { color: var(--primary); font-size: 40px; font-weight: 700; margin: 0 0 22px; }
+form { background: var(--card); border-radius: 20px; padding: 35px 24px 48px; }
+.fields { max-width: 490px; margin: 0 auto; display: grid; grid-template-columns: 233fr 236fr; gap: 20px 21px; }
+.field { display: flex; flex-direction: column; gap: 5px; }
+.field.wide { grid-column: 1 / -1; }
+label { color: var(--muted); font-size: 15px; }
+input, select {
+  height: 41px; width: 100%; padding: 0 12px; border: 1px solid var(--muted); border-radius: 6px;
+  background: #fff; color: var(--text); font: 16px Inter, system-ui, sans-serif;
+}
+/* Figma draws its own "Arrow drop down" icon, so the native arrow is replaced. */
+select {
+  appearance: none; -webkit-appearance: none; padding-right: 44px;
+  background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E") no-repeat right 13px center / 24px;
+}
+button {
+  display: block; width: 100%; max-width: 492px; height: 62px; margin: 52px auto 0; border: 0; border-radius: 12px;
+  background: var(--primary); color: #fff; font: 500 20px Inter, system-ui, sans-serif; cursor: pointer;
+  box-shadow: 0 4px 4px rgba(0, 0, 0, .15);
+}
+
+@media (max-width: 760px) {
+  header.top { height: 76px; padding: 0 16px; }
+  .brand img { width: 55px; height: 50px; }
+  .wordmark { font-size: 28px; }
+  .banner { padding: .5rem 16px; }
+  main { padding: 40px 16px 64px; }
+  h1 { font-size: 30px; }
+  form { padding: 28px 20px 32px; }
+  .fields { grid-template-columns: minmax(0, 1fr); }
+  button { margin-top: 36px; }
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="/" data-route><img src="/logo.svg" alt=""><span class="wordmark"><b>Bridge</b><span>Work</span></span></a>
+</header>
+<p id="mock-banner" class="banner" hidden>Mock mode: a fictional cook's details are filled in. Nothing is recorded or sent.</p>
+
+<main>
+  <h1>Personal Information</h1>
+  <form id="person" novalidate>
+    <div class="fields">
+      <div class="field"><label for="name">Name</label><input id="name" autocomplete="off"></div>
+      <div class="field"><label for="phone">Contact Number</label><input id="phone" type="tel" autocomplete="off"></div>
+      <div class="field wide"><label for="email">Email</label><input id="email" type="email" autocomplete="off"></div>
+      <div class="field wide">
+        <label for="language">Native Language</label>
+        <!-- Only the languages the transcriber and translator are verified in;
+             the server refuses any other, so none is offered. -->
+        <select id="language" required>
+          <option value=""></option>
+          <option value="zh">Mandarin</option>
+          <option value="ar">Arabic</option>
+        </select>
+      </div>
+    </div>
+    <button type="submit">Start building resume →</button>
+  </form>
+</main>
+
+<script>
+const params = new URLSearchParams(location.search);
+const MOCK = params.get("mock") === "1";
+const carried = new URLSearchParams();
+if (MOCK) carried.set("mock", "1");
+if (MOCK && params.get("quiet") === "1") carried.set("quiet", "1");
+const suffix = carried.toString() ? "?" + carried : "";
+document.querySelectorAll("a[data-route]").forEach(a => { a.href = a.getAttribute("href") + suffix; });
+document.getElementById("mock-banner").hidden = !MOCK || params.get("quiet") === "1";
+
+const KEY = "d7.person";
+const FIELDS = ["name", "phone", "email", "language"];
+// The same fictional cook as mock_interview_answers.json in interview.html and review.html.
+const MOCK_PERSON = {"name": "Li Wei", "phone": "0400 000 000", "email": "liwei.cook@example.com", "language": "zh"};
+
+function saved() {
+  try { return JSON.parse(sessionStorage.getItem(KEY)); } catch { return null; }
+}
+
+// Coming back from /start/path shows what was typed; otherwise mock mode fills in the cook.
+const person = saved() || (MOCK ? MOCK_PERSON : null);
+if (person) FIELDS.forEach(f => { document.getElementById(f).value = person[f] || ""; });
+
+document.getElementById("person").addEventListener("submit", event => {
+  event.preventDefault();
+  const language = document.getElementById("language");
+  // Everything but the language is optional: the interview cannot start without it.
+  if (!language.value) { language.reportValidity(); language.focus(); return; }
+  const value = Object.fromEntries(FIELDS.map(f => [f, document.getElementById(f).value.trim()]));
+  try { sessionStorage.setItem(KEY, JSON.stringify(value)); } catch {}
+  location.href = "/start/path" + suffix;
+});
+</script>
+</body>
+</html>
