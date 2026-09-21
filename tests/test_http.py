@@ -138,6 +138,16 @@ class HttpRoundTrip(Server):
         self.assertIn("Turning spoken experience into Australian resumes.", body)
         self.assertIn('href="/start"', body)
 
+    def test_the_homepage_snaps_to_its_panels_but_never_traps_the_reader(self):
+        # "proximity", never "mandatory": mandatory catches a trackpad flick
+        # mid-gesture. The guards matter as much as the effect, so they are
+        # asserted rather than left to be deleted by accident.
+        _, body = self.get("/")
+        self.assertIn("scroll-snap-type: y proximity", body)
+        self.assertNotIn("mandatory", body)
+        self.assertIn("prefers-reduced-motion: no-preference", body)
+        self.assertIn("min-width: 900px", body)
+
     def test_the_homepage_offers_the_demo_in_mock_mode(self):
         # The demo button carries ?mock=1 itself, so it must not be rewritten
         # by the data-route script, which would drop mock mode on a live page.
