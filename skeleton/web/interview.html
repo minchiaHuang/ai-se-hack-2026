@@ -5,28 +5,28 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>BridgeWork interview</title>
 <style>
-/* BridgeWork theme and layout from the Figma "BridgeWork" file, interview frame
-   10:83, the same tokens as review.html. Inline and without a web-font download:
-   the page must render offline from the stdlib server, so Inter is used only
-   when the machine already has it. */
+/* Untitled UI community kit (Figma KYWUHL795TJwqHRANibwch), read from nodes
+   701:62721, 701:59219 and 701:59223. Names are unchanged so the rules below
+   are untouched; only the values moved. CARRIED marks a value the free kit
+   has no source for. Full token set and contrast notes: design/tokens.css. */
 :root {
-  --primary: #1B4B5A;
-  --primary-light: #2E7D96;
-  --accent: #E8874A;
-  --success: #4C9A6B;
-  --bg: #F7F5F1;
-  --text: #2B2B2B;
-  --muted: #5b6168;
-  --soft: #868686;
-  --card: #fff;
-  --panel: #e4e6e4;
-  --line: #d9d4cb;
-  --shadow: 0 12px 16px rgba(0, 0, 0, .14);
-  --warn: #7a4a00;
-  --warn-bg: #fff3d6;
-  --stop: #9b1111;
-  --stop-bg: #fdecec;
-  --focus: #ffbf00;
+  --primary: #7f56d9;  /* Brand/600 */
+  --primary-light: color-mix(in srgb, #7f56d9 65%, #ffffff);  /* derived from Brand/600, not a kit value */
+  --accent: #7f56d9;  /* Untitled UI has one brand; the accent role collapses into it */
+  --success: #2f6b47;  /* CARRIED: no green in the free kit */
+  --bg: #e5e5e5;  /* Neutral/200 */
+  --text: #171717;  /* Neutral/900 */
+  --muted: #525252;  /* Neutral/600, 7.82:1 on white */
+  --soft: #737373;  /* Neutral/500, 4.74:1 on white */
+  --card: #ffffff;  /* Base/White */
+  --panel: #e5e5e5;  /* Neutral/200 */
+  --line: #d4d4d4;  /* Neutral/300 */
+  --shadow: 0 20px 24px -4px rgba(0,0,0,.1), 0 8px 8px -4px rgba(0,0,0,.04);  /* Shadow/xl */
+  --warn: #7a4a00;  /* CARRIED: the kit has no warning text colour */
+  --warn-bg: #fef0c7;  /* Warning/100 */
+  --stop: #9b1111;  /* CARRIED: kit Error/600 on the error tint is 4.01:1, below AA */
+  --stop-bg: #fee4e2;  /* Error/100 */
+  --focus: #ffbf00;  /* CARRIED: the kit draws no focus ring */
 }
 * { box-sizing: border-box; }
 html { font-size: 18px; }

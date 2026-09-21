@@ -5,25 +5,27 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Bridge Work intake</title>
 <style>
-/* Projector-friendly: large type, high contrast, no external fonts. The page
-   must render offline from the stdlib server, so everything is inline. */
+/* Untitled UI community kit (Figma KYWUHL795TJwqHRANibwch), read from nodes
+   701:62721, 701:59219 and 701:59223. Names are unchanged so the rules below
+   are untouched; only the values moved. CARRIED marks a value the free kit
+   has no source for. Full token set and contrast notes: design/tokens.css. */
 :root {
-  --ink: #111;
-  --muted: #444;
-  --paper: #fff;
-  --panel: #f3f4f6;
-  --line: #9ca3af;
-  --accent: #0b4f9c;
-  --accent-ink: #fff;
-  --ok: #0f5c2e;
-  --ok-bg: #e3f4e8;
-  --warn: #7a4a00;
-  --warn-bg: #fff3d6;
-  --stop: #9b1111;
-  --stop-bg: #fdecec;
-  --gate: #3b1f7a;
-  --gate-bg: #efe9fb;
-  --focus: #ffbf00;
+  --ink: #171717;  /* Neutral/900 */
+  --muted: #525252;  /* Neutral/600, 7.82:1 on white */
+  --paper: #ffffff;  /* Base/White */
+  --panel: #e5e5e5;  /* Neutral/200 */
+  --line: #d4d4d4;  /* Neutral/300 */
+  --accent: #7f56d9;  /* Untitled UI has one brand; the accent role collapses into it */
+  --accent-ink: #ffffff;  /* white on Brand/600 is 4.96:1 */
+  --ok: #2f6b47;  /* CARRIED, as --success */
+  --ok-bg: #e4f0e8;  /* CARRIED, as --success */
+  --warn: #7a4a00;  /* CARRIED: the kit has no warning text colour */
+  --warn-bg: #fef0c7;  /* Warning/100 */
+  --stop: #9b1111;  /* CARRIED: kit Error/600 on the error tint is 4.01:1, below AA */
+  --stop-bg: #fee4e2;  /* Error/100 */
+  --gate: #171717;  /* Neutral/900, moved off purple now that the brand is purple */
+  --gate-bg: #e5e5e5;  /* Neutral/200 */
+  --focus: #ffbf00;  /* CARRIED: the kit draws no focus ring */
 }
 * { box-sizing: border-box; }
 html { font-size: 20px; }

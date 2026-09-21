@@ -5,41 +5,33 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Jobs - Bridge Work</title>
 <style>
-/* The job platform the intake hands over to. Layout and colour follow a common
-   job-board pattern (sidebar, tabbed top bar, filter pills, wide cards on grey,
-   a dark panel with a ring on each card, a profile column on the right); no
-   other product's name, marks or wording. Everything is inline so the page
-   renders offline from the stdlib server. */
+/* Untitled UI community kit (Figma KYWUHL795TJwqHRANibwch), read from nodes
+   701:62721, 701:59219 and 701:59223. Names are unchanged so the rules below
+   are untouched; only the values moved. CARRIED marks a value the free kit
+   has no source for. Full token set and contrast notes: design/tokens.css. */
 :root {
-  /* BridgeWork theme from the Figma "Design Theme" frame, the same tokens as
-     review.html. --ink is Figma's --text. */
-  --primary: #1B4B5A;
-  --accent: #E8874A;
-  --success: #4C9A6B;
-  --bg: #F7F5F1;
-  --ink: #2B2B2B;
-  --card: #fff;
-  --muted: #5b6168;
-  --line: #d9d4cb;
-  --pill: #efebe4;
-  /* The ring sits on a light panel: #4C9A6B on --primary is only 2.8:1, below
-     the 3:1 a graphic needs, and on --bg it is 3.1:1. */
+  --primary: #7f56d9;  /* Brand/600 */
+  --accent: #7f56d9;  /* Untitled UI has one brand; the accent role collapses into it */
+  --success: #2f6b47;  /* CARRIED: no green in the free kit */
+  --bg: #e5e5e5;  /* Neutral/200 */
+  --ink: #171717;  /* Neutral/900 */
+  --card: #ffffff;  /* Base/White */
+  --muted: #525252;  /* Neutral/600, 7.82:1 on white */
+  --line: #d4d4d4;  /* Neutral/300 */
+  --pill: #e5e5e5;  /* Neutral/200 */
   --ring: var(--success);
-  --ring-track: var(--line);
-  /* Text on a success tint: --success itself is too light for text (3.1:1). */
-  --ok: #2f6b47;
-  --ok-bg: #e4f0e8;
-  --warn: #7a4a00;
-  --warn-bg: #fff3d6;
-  --gate: #3b1f7a;
-  --gate-bg: #efe9fb;
-  --hit: #fff1a8;
-  --focus: #ffbf00;
-  /* Save and apply only. Dark text on both: white on either fails contrast,
-     and so does --ink on --success (4.1:1). */
+  --ring-track: #e5e5e5;  /* Neutral/200 */
+  --ok: #2f6b47;  /* CARRIED, as --success */
+  --ok-bg: #e4f0e8;  /* CARRIED, as --success */
+  --warn: #7a4a00;  /* CARRIED: the kit has no warning text colour */
+  --warn-bg: #fef0c7;  /* Warning/100 */
+  --gate: #171717;  /* Neutral/900, moved off purple now that the brand is purple */
+  --gate-bg: #e5e5e5;  /* Neutral/200 */
+  --hit: #fef0c7;  /* Warning/100 */
+  --focus: #ffbf00;  /* CARRIED: the kit draws no focus ring */
   --apply: var(--accent);
   --applied: var(--success);
-  --on-fill: #1f1a15;
+  --on-fill: #ffffff;  /* white clears both fills: 4.96:1 on brand, 6.33:1 on green */
 }
 * { box-sizing: border-box; }
 html { font-size: 17px; }
@@ -111,8 +103,10 @@ svg.i { flex: none; width: 1.05em; height: 1.05em; }
 .job-card.selected { box-shadow: 0 0 0 3px var(--primary); }
 .job-main { min-width: 0; padding: .7rem .8rem .8rem; }
 .job-top { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: .9rem; align-items: start; }
+/* --mark-h is set per card from a hash of the company name; see companyMark(). */
 .logo { display: grid; place-items: center; width: 64px; height: 64px; border: 1px solid var(--line); border-radius: 10px;
-        background: #fafafa; color: #c3c8cf; }
+        background: hsl(var(--mark-h, 0) 45% 92%); box-shadow: 0 1px 2px 0 rgba(0, 0, 0, .05); }
+.logo .mono { color: hsl(var(--mark-h, 0) 55% 28%); font-size: 1.35rem; font-weight: 700; letter-spacing: .02em; }
 .logo svg { width: 30px; height: 30px; }
 .tags { display: flex; flex-wrap: wrap; gap: .35rem; }
 .tag { padding: .05rem .45rem; border-radius: 6px; background: var(--pill); font-size: .78rem; font-weight: 600; }
@@ -711,12 +705,36 @@ function cardTags(job) {
           job.for_occupation ? null : el("span", { class: "tag" }, "Another occupation")];
 }
 
+// Every employer gets a mark of its own. Adzuna sends no logo, and a logo
+// fetched from the web would break the offline demo, so the mark is drawn from
+// the company's own initials. The hue is a hash of the name, so a company keeps
+// the same colour between renders and no two neighbours collide by accident.
+// Lightness is fixed at 92% behind 28% text, which clears 7:1 at every hue.
+function companyMark(name) {
+  const clean = (name || "").trim();
+  if (!clean) return { initials: "?", hue: 0 };
+  const initials = clean.split(/[^A-Za-z0-9]+/).filter(Boolean).slice(0, 2)
+                        .map(w => w[0].toUpperCase()).join("") || "?";
+  let hash = 0;
+  for (const ch of clean) hash = (hash * 31 + ch.codePointAt(0)) >>> 0;
+  return { initials, hue: hash % 360 };
+}
+
+function companyLogo(job) {
+  const mark = companyMark(job.company);
+  const el2 = el("div", { class: "logo" },
+    el("span", { class: "mono" }, mark.initials));
+  el2.style.setProperty("--mark-h", String(mark.hue));
+  el2.setAttribute("aria-hidden", "true");
+  return el2;
+}
+
 function renderJobCard(job, selected, meta) {
   return el("article", { class: "job-card" + (selected ? " selected" : ""), "data-id": job.id,
                          onclick: () => selectJob(job.id) },
     el("div", { class: "job-main" },
       el("div", { class: "job-top" },
-        el("div", { class: "logo" }, icon("building")),
+        companyLogo(job),
         el("div", {},
           el("div", { class: "tags" }, cardTags(job)),
           el("h3", {}, el("button", { type: "button", "aria-pressed": String(selected) }, job.title)),
