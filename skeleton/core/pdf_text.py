@@ -12,6 +12,8 @@ MAX_PAGES = 20
 MAX_STREAMS = 200
 MAX_DECOMPRESSED_STREAM = 512 * 1024
 MAX_TEXT_CHARS = 200 * 1024
+# Where a TJ positioning gap stops being kerning and becomes a word space.
+WORD_GAP = 200
 
 
 class PdfTextError(ValueError):
@@ -42,10 +44,19 @@ def extract_lines(data):
 
     cleaned = [_clean(line) for line in lines]
     cleaned = [line for line in cleaned if line]
-    if not cleaned or not _readable(cleaned):
+    if not cleaned:
         raise PdfTextError(
             "This PDF looks like a scan or a photo, so there is no readable text in it. "
             "Paste the text instead, or upload a .txt file."
+        )
+    if not _readable(cleaned):
+        # Text is there but its bytes are glyph numbers, not characters: a font
+        # with its own encoding and a ToUnicode map, which this reader does not
+        # follow. Handing the pipeline the mojibake would cite lines nobody wrote.
+        raise PdfTextError(
+            "The text in this PDF is stored in a form this reader cannot decode, "
+            "so it would come out as nonsense. Paste the text instead, or upload "
+            "a .txt file."
         )
     return cleaned
 
@@ -117,8 +128,7 @@ def _text_lines(content):
         elif operator == "TJ":
             value = operands.pop() if operands else []
             if isinstance(value, list):
-                _append(current, "".join(item for item in value
-                                         if isinstance(item, str) and not _is_number(item)))
+                _append(current, _array_text(value))
             operands.clear()
         elif operator in ("'", '"'):
             flush()
@@ -128,7 +138,28 @@ def _text_lines(content):
             operands.append(token)
         elif isinstance(token, list):
             operands.append(token)
+    flush()
     return lines
+
+
+def _array_text(items):
+    """A TJ array: its strings, with a space where the gap between two of them
+    is wide enough to be one. Only a PdfString is text - a plain str here is a
+    positioning number, and testing the text instead would drop a resume's
+    years and quantities, which read as numbers but are what the evidence cites.
+    """
+    parts = []
+    for item in items:
+        if isinstance(item, PdfString):
+            parts.append(item)
+            continue
+        gap = _number(item)
+        # Thousandths of the font size, subtracted from the position: a word
+        # space is 250-330 in most fonts and a kerning pair rarely passes 100.
+        # A space too many is collapsed by _clean; a word gap lost is not.
+        if gap is not None and gap <= -WORD_GAP and parts and not parts[-1].endswith(" "):
+            parts.append(" ")
+    return "".join(parts)
 
 
 def _append(current, text):
@@ -148,10 +179,6 @@ def _number(value):
         return float(value)
     except (TypeError, ValueError):
         return None
-
-
-def _is_number(value):
-    return _number(value) is not None
 
 
 def _tokens(content):
@@ -248,7 +275,10 @@ def _decode(raw):
 
 
 def _clean(text):
-    return re.sub(r"\s+", " ", text).strip()
+    """Tabs and stray line breaks inside one line become a space; runs of spaces
+    are kept. The gap a person typed between two columns is part of the line
+    they would read back, and this product quotes resume lines verbatim."""
+    return re.sub(r"[^\S ]+", " ", text).strip()
 
 
 def _readable(lines):
