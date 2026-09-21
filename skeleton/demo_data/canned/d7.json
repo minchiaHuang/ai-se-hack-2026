@@ -1,0 +1,50 @@
+[
+  {
+    "field": "anzsco_code",
+    "value": "351411 Cook",
+    "reason": "Three years cooking for 200 people a day in a camp kitchen.",
+    "confidence": 0.86,
+    "sources": [
+      [
+        "transcript",
+        "t=00:12"
+      ]
+    ]
+  },
+  {
+    "field": "osca_code",
+    "value": "322331 Cook",
+    "reason": "Same testimony; OSCA 2024 code for the same occupation.",
+    "confidence": 0.84,
+    "sources": [
+      [
+        "transcript",
+        "t=00:12"
+      ]
+    ]
+  },
+  {
+    "field": "units_evidenced",
+    "value": "SITXFSA005; SITXFSA006",
+    "reason": "Describes separating raw and cooked food and logging fridge temperatures.",
+    "confidence": 0.78,
+    "sources": [
+      [
+        "transcript",
+        "t=02:41"
+      ]
+    ]
+  },
+  {
+    "field": "qualification",
+    "value": "SIT30821 Certificate III in Commercial Cookery",
+    "reason": "Both food safety units sit in the core of this qualification.",
+    "confidence": 0.44,
+    "sources": [
+      [
+        "transcript",
+        "t=02:41"
+      ]
+    ]
+  }
+]
