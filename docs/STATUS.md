@@ -1,12 +1,12 @@
 # STATUS
 
-單行狀態：2026-09-21 晚。**方向 7 共 9 個 PR 已合入 `docs/direction-7-refugee-employment`（第一波 #5 d7-core、#3 d7-match、#2 d7-live、#4 d7-intake-ui；第二波 #6 d7-wire；#7 d7-resume 職缺板與逐職缺履歷；#8 d7-docs 給評審的英文 README；#9 d7-entry 起始畫面：口述或帶履歷兩個入口；#10 d7-docs2 README 補上起始畫面，合併點 `38925d7`），`/intake` 與三條 API 已接上。**
+單行狀態：2026-09-21 晚。**方向 7 共 10 個 PR 已合入 `docs/direction-7-refugee-employment`（第一波 #5 d7-core、#3 d7-match、#2 d7-live、#4 d7-intake-ui；第二波 #6 d7-wire；#7 d7-resume 職缺板與逐職缺履歷；#8 d7-docs 給評審的英文 README；#9 d7-entry 起始畫面：口述或帶履歷兩個入口；#10 d7-docs2 README 補上起始畫面；#11 d7-jobs 職缺頁：全部範例職缺、平台式版面、佐證與逐字稿分頁，合併點 `3c072ab`），`/intake` 與三條 API 已接上。**
 題目為方向 7：難民就業（口述經歷 → 佐證包 ＋ 媒合）。
 方向 6（WISE 就業成效申報）**正式放棄**，研究與證據原封保留為備案。
 方向 7 的一輪研究已完成（三個 agent 平行），框架、交接文件第 8 節、spec 皆已落檔。
 **現場優先原則仍凌駕一切。**
 
-最後驗證：2026-09-21（`bash bin/verify.sh` → GREEN，含 139 個骨架測試，於 `38925d7`）
+最後驗證：2026-09-21（`bash bin/verify.sh` → GREEN，含 145 個骨架測試，於 `3c072ab`）
 
 ## 進行中
 
