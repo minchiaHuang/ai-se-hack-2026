@@ -173,6 +173,27 @@ class Main(unittest.TestCase):
             self.assertNotIn(secret, text)
         self.assertIn("cookery: 1 jobs, 1 mapped units", out)
 
+    def test_the_app_id_in_adzunas_own_redirect_url_is_saved(self):
+        """Adzuna's tracking link carries the app id; it is the public link people click."""
+        tracked = dict(COOK, redirect_url="https://www.adzuna.com.au/land/ad/4821?se=x&v=id-123")
+        code, saved, _, err = run(get=searching({"cook": [tracked]}), env=KEYS)
+        self.assertEqual(code, 0, err)
+        self.assertIn("id-123", saved["jobs"][0]["redirect_url"])
+
+    def test_a_key_anywhere_or_the_app_id_outside_redirect_url_is_refused(self):
+        env = dict(KEYS, ANTHROPIC_API_KEY="sk-secret")
+        leaks = [
+            dict(COOK, description="Apply with id-123 today."),
+            dict(COOK, redirect_url="https://www.adzuna.com.au/land/ad/4821?k=key-456"),
+            dict(COOK, redirect_url="https://www.adzuna.com.au/land/ad/4821?k=sk-secret"),
+        ]
+        for leak in leaks:
+            code, saved, _, err = run(get=searching({"cook": [leak]}),
+                                     post=answering([]), env=env)
+            self.assertEqual(code, 1)
+            self.assertIsNone(saved)
+            self.assertIn("A key appeared in the snapshot", err)
+
     def test_a_failed_model_call_leaves_that_job_unmapped(self):
         def broken_post(*args):
             raise OSError("venue wifi")

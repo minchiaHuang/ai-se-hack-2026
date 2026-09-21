@@ -208,9 +208,15 @@ def main(get=None, post=None, out=SNAPSHOT, now=None):
     failed = map_jobs(jobs, occupations, anthropic_key, model, post)
 
     text = json.dumps(snapshot(jobs, now), ensure_ascii=False, indent=2) + "\n"
-    # A key in the snapshot would be committed to a public repo.
-    secrets = [s for s in (app_id, app_key, anthropic_key) if s]
-    if any(secret in text for secret in secrets):
+    # A key in the snapshot would be committed to a public repo. The app id
+    # is the one exception, and only inside redirect_url: Adzuna puts it in
+    # its own tracking link, the public URL a person clicks.
+    secrets = [s for s in (app_key, anthropic_key) if s]
+    outside_links = json.dumps(snapshot(
+        [{k: v for k, v in job.items() if k != "redirect_url"} for job in jobs], now),
+        ensure_ascii=False)
+    if (any(secret in text for secret in secrets)
+            or (app_id and app_id in outside_links)):
         print("A key appeared in the snapshot; nothing saved.", file=sys.stderr)
         return 1
     try:
