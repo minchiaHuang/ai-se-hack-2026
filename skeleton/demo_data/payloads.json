@@ -1,0 +1,57 @@
+{
+  "d2": {
+    "label": "Kettle on the sorting bench",
+    "item": "electric kettle",
+    "landfill_cost": 2.0,
+    "routes": [
+      "resell",
+      "repair station (Tue)",
+      "textile recycler",
+      "pass to shelter",
+      "landfill"
+    ]
+  },
+  "d2_lowconfidence": {
+    "label": "Unlabelled garment - low confidence path",
+    "item": "unlabelled garment",
+    "landfill_cost": 2.0,
+    "routes": [
+      "resell",
+      "repair station (Tue)",
+      "textile recycler",
+      "pass to shelter",
+      "landfill"
+    ]
+  },
+  "d3": {
+    "label": "Recertification questions",
+    "documents": [
+      "Annual Report 2025"
+    ],
+    "target_fields": [
+      "people_employed",
+      "beneficiary_group",
+      "surplus_reinvested"
+    ]
+  },
+  "d6": {
+    "label": "Outcomes Fund return - whole cohort",
+    "group_size": 40,
+    "placements": 12,
+    "prep_hours": 9.0,
+    "target_fields": [
+      "retention_6m",
+      "hours_growth",
+      "wage_subsidy_offset"
+    ]
+  },
+  "d6_small_group": {
+    "label": "Outcomes Fund return - one small site (REFUSED)",
+    "group_size": 3,
+    "placements": 3,
+    "prep_hours": 9.0,
+    "target_fields": [
+      "retention_6m"
+    ]
+  }
+}

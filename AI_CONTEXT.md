@@ -1,6 +1,6 @@
 # AI for Social Enterprise Hackathon 2026 — AI Context
 
-Last updated: 2026-09-17 (Australia/Sydney)
+Last updated: 2026-09-21 (Australia/Sydney) — official event page re-verified 2026-09-21 00:40 AEST
 
 ## Purpose
 
@@ -23,21 +23,31 @@ Keep confirmed facts, research inferences, and unknowns separate. Re-check time-
 - Daily time: Day 1 arrival and check-in begins at 8:30 AM; both days run 9:00 AM–5:00 PM AEST
 - Venue: UTS Startups, 3 Broadway, Ultimo NSW 2007, Australia
 - Hosts: The Moreneta Initiative and City Quokka
-- Day 1: 8:30 AM arrival and check-in; 10:15 AM problem-statement pitching; 10:45 AM team formation and start work; 1:00–3:00 PM non-technical mentorship; 3:00–5:00 PM technical mentorship; the Spark Festival Opening Celebration from 5:00–8:30 PM is optional
-- Day 2: build a working prototype and pitch; the Top 5 teams pitch to the full room
+- Day 1 (re-verified 2026-09-21; times moved 15 minutes earlier than the 2026-09-17 record): 8:30 AM arrival and check-in; 9:00 AM introduction; 9:30 AM intro to AI for social enterprise; 9:45 AM intro to problem validation; 10:00 AM idea and problem-statement pitching; 10:30 AM team formation and start work; 1:00–3:00 PM non-technical mentorship; 3:00–5:00 PM technical mentorship; the Spark Festival Opening Celebration from 5:00–8:30 PM is optional
+- Day 2: build a working prototype and pitch; the Top 5 teams pitch to the full room. The official page gives no itemised Day 2 timetable, only 9:00 AM–5:00 PM.
 - Recommended team size: 3–5
-- Official judging language: quality, impact reasoning, viability
+- Official judging criteria and weights, read from the official event page on 2026-09-21. This supersedes the earlier record "Official judging language: quality, impact reasoning, viability", which was a paraphrase and not the scored list. There is still no novelty criterion:
+  - Problem-Solution Fit — 20%
+  - Usability — 15%
+  - Working Prototype — 15%
+  - Effective Use of AI — 15%, described on the page as assessing how appropriately AI creates value
+  - Social Impact Reasoning — 15%, described as evaluating potential for meaningful positive change
+  - Problem Validation — 10%
+  - Pathway to Sustainability — 10%
+- Official event page: https://hackhq.io/events/o6v6DgCLc4 — the source of record for the facts in this section, and where projects are submitted
 - Attendance on both days: required by the FAQ
 - IP: retained by the team; partners and social enterprises do not automatically receive rights
 - Lunch: not provided; the organiser says nearby restaurant discounts are available
 - Refunds: available until 1 day before the event, according to the current official event page
 - Social-enterprise challenges: an organisation may sponsor a category prize or submit a video of up to 90 seconds for playback at the start of the hackathon
-- Known prizes:
+- Known prizes (re-verified 2026-09-21):
   - Partial Social Impact Fellowship scholarship valued at AUD 659 per winning team member, valid for the March 2027 cohort
+  - ElevenLabs ElevenCreative Pro for three months, valued at AUD 419 — NEW on the page since 2026-09-17
   - 12-month SECNA individual membership valued at AUD 150 per winning team member
   - Goods 4 Good prize pack per winning team member
-  - The Innovator's Playbook, sponsored by City Quokka, per winning team member
-  - Additional prizes: TBA
+  - 350 Base44 credits and merchandise — NEW on the page since 2026-09-17
+  - The Innovator's Playbook by Nathan Baird, valued at AUD 35, sponsored by City Quokka
+  - "Additional prizes: TBA" no longer appears on the page
 
 Official source: https://events.humanitix.com/ai-for-social-enterprise-hackathon
 
@@ -45,11 +55,12 @@ Organiser email update, 16 September 2026: the event is sold out; the Day 1 sche
 
 ## Confirmed judges
 
-The official event page names the following judges as of 8 September 2026. More judges are still to be announced; mentors are still being selected.
+The official event page names the following judges as re-verified on 21 September 2026. Mentors are still not named on the page.
 
 - Nandeeta Maharaj: founder of Goods 4 Good, SECNA Social Enterprise Champion, and founder of Made for Change.
 - Ramana Kirubagaran: Chief Information Officer at MultiLit; chairs its AI Steering Committee and oversees AI pilots. The event page also describes him as an IT-strategy adviser to Koorana Child and Family Services.
 - James Hornitzky: Digital Enablement Specialist at Social Traders, UTS PhD student researching the financial sustainability of social-enterprise innovation, and non-executive director of The Moreneta Initiative.
+- Eva Sheluhina: Forward Deployed Engineer at ElevenLabs — NEW, added to the page since the 2026-09-08 check. Web search reports prior experience at McKinsey and SAP and a focus on AI transformation and agentic workflows at scale; that background is search-derived, not stated on the official page, so treat the title/employer as official fact and the rest as unverified context.
 
 These biographies do not change the official criteria or justify claims about individual scoring preferences. They do reinforce the existing recommendation to show an ethical working workflow, practical adoption, financial viability, and outcome measurement.
 
@@ -128,6 +139,12 @@ These are evidence-based inferences, not official judging criteria.
 Do not claim Sourabh, John, Social Impact Hub, SECNA, UTS Startups, Spark representatives, or any other person is a judge unless the organiser announces this. The confirmed judges are named above.
 
 ## Partner ecosystem
+
+### Sponsors and partners listed on the official page (re-verified 2026-09-21)
+
+UTS Startups, Social Impact Hub, SECNA, ElevenLabs, Goods 4 Good, Lovable, Base44, Red Bull, HackHQ, Spark Festival.
+
+ElevenLabs, Lovable and Base44 were not in the 2026-09-17 record. EVIDENCE: they are named as partners and two of them back prizes (ElevenCreative Pro, Base44 credits), and one judge is an ElevenLabs engineer. INFERENCE, not official: sponsor tooling is likely to be available and voice or rapid-prototyping approaches are likely to be legible to at least one judge. This does not change the official judging criteria listed above, and must not be used to claim a scoring preference.
 
 ### Social Impact Hub
 
@@ -446,12 +463,12 @@ The organiser email offers a two-minute slot for participants who want to attrac
 
 ## Current unknowns to monitor
 
-- Additional judges and mentors
+- Mentors: still not named on the official page. Judges: four are now named (see above); whether more will be added is unknown.
 - Detailed scoring rubric and weights
 - Participating social enterprises or challenge statements
-- Additional prizes
 - Day 2 pitch duration and slide format
-- Available APIs, datasets, cloud credits, and sponsor tooling
+- Whether sponsor tooling (ElevenLabs, Lovable, Base44) comes with participant access or credits on the day, and under what terms
+- Available APIs, datasets and cloud credits beyond that sponsor tooling
 - Photography, consent, data handling, and demo-network arrangements
 
 ## AI operating instructions
