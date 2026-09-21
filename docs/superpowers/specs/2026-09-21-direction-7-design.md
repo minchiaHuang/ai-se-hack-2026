@@ -2,7 +2,7 @@
 
 **日期**：2026-09-21
 **分支**：`docs/direction-7-refugee-employment`
-**狀態**：設計已由 Tommy 核准（2026-09-21 傍晚），待實作
+**狀態**：設計已由 Tommy 核准（2026-09-21 傍晚）；已實作並合入本分支（`b980247`），§4／§7／§11 已對齊出貨程式碼
 **脈絡**：`docs/frameworks/direction-7-refugee-employment.md`（框架與證據）
 　　　　`docs/research-brief-2026-09-21.md` 第 8 節（研究原始紀錄）
 
@@ -88,17 +88,28 @@ SkillLab 的 ESCO 對映搬不過來——這正是它不在澳洲的原因。**
 | `Result.gaps` | 沒問到的欄位列出來，提示顧問補問 |
 | `Result.metric_*` | 吐出那一個數字 |
 
-### 新增的唯一檔案
+### 實際新增的檔案（對齊 `b980247` 出貨的程式碼）
 
-```
-skeleton/directions/d7_credentials.py
-```
+原設計寫的是「只新增一個檔案」。實作後新增的是下面這些，`pipeline.py` 與 `schema.py` 仍然沒改：
+
+| 檔案 | 做什麼 |
+|---|---|
+| `skeleton/directions/d7_credentials.py` | 方向模組：`guard()` 四條紅線、`prepare()`、`target_fields()`、`metric()` |
+| `skeleton/directions/d7_match.py` | B 線：職缺媒合（吻合度是「幾個單元已佐證」的計數，不是分數）、缺口單元→課程、依職缺產生履歷草稿；不呼叫模型 |
+| `skeleton/core/registry.py` | 讀參考資料：ANZSCO／OSCA 兩組代碼、單元、資格；`source_check()` 只證明資格 PDF 還在，不證明它是現行版本 |
+| `skeleton/core/live.py` | 用 `urllib` 直打 ElevenLabs Scribe（`scribe_v2`）與 Anthropic Messages API；任何失敗都退回離線，不拋例外；丟掉引用不存在的代碼或時間戳的模型輸出 |
+| `skeleton/web/intake.html` | 共桌 intake 頁：一個內嵌 vanilla JS 的 HTML 檔，含 `?mock=1` 無後端模式 |
+| `skeleton/demo_data/reference/occupations.json`、`jobs.json` | 三個職業的參考資料；六個代表性職缺（非真實職缺） |
+| `skeleton/demo_data/canned/d7*.json`、`payloads.json` 內的 d7 情境 | stub 模型的罐頭輸出與示範情境 |
+
+`skeleton/app.py` 另外接上 `/intake`、`/api/transcribe`、`/api/extract`、`/api/match`，
+並在有 `ANTHROPIC_API_KEY` 時改用 `live.LiveModel`（失敗時退回 stub）。
 
 ```python
-KEY = "d7_credentials"
+KEY = "d7"
 METRIC = "evidence items mapped to a transcript line"
 
-SUPPORTED_LANGUAGES = ("ar", "fa", "sw")   # 只列真的支援的，見 §7
+SUPPORTED_LANGUAGES = ("zh", "ar")   # 只列真的支援的，見 §7
 
 def guard(payload):
     """四條紅線。raise，不回傳旗標 —— 呼叫端沒有忽略的選項。"""
@@ -107,10 +118,11 @@ def prepare(payload):
     """逐字稿 → 受限抽取任務的輸入。不是生成，不是評分。"""
 
 def target_fields(payload):
-    """ANZSCO 代碼、RPL units、證據項目、正式評估旗標。"""
+    """anzsco_code、osca_code、qualification、units_evidenced。
+    法規門檻（gate）不問模型，由 registry 查表附上。"""
 
 def metric(shown, payload):
-    """N 項已對映。"""
+    """N 項已對映並指回逐字稿。"""
 ```
 
 ### `guard()` 的四條紅線
@@ -151,13 +163,16 @@ def metric(shown, payload):
 
 ## 7. 語言支援清單（依 ElevenLabs 實際能力，不是願望）
 
-| 語言 | Scribe STT 品質 | 納入 demo |
+**出貨的設定：`SUPPORTED_LANGUAGES = ("zh", "ar")`**（Tommy 2026-09-21 傍晚決定，取代原本的阿拉伯語／波斯語／史瓦希里語三語）。
+
+| 語言 | 納入 demo | 理由 |
 |---|---|---|
-| 阿拉伯語 | WER 10–20%「Good」 | ✅ |
-| 波斯語 Farsi | WER 5–10%「High」 | ✅ |
-| 史瓦希里語 | WER 5–10%「High」 | ✅ |
-| 普什圖語 | WER 25–50%「Moderate」 | ⚠️ 不納入，錯誤率太高 |
-| **Dari／Tigrinya／Rohingya／Hazaragi** | **不在清單上** | ❌ 拒絕畫面 |
+| 中文（Mandarin，送 Scribe 時用 `zho`） | ✅ 測試與錄影語言 | 團隊能逐字核對。ElevenLabs 對中文的準確率**未查證，不引用數字** |
+| 阿拉伯語 `ar` | ✅ 設定語言 | **未經母語者驗證，不宣稱效果** |
+| 波斯語 Farsi | ❌ 拒絕畫面 | 團隊沒人能核對；intake 頁保留此選項用來演示拒絕 |
+| 史瓦希里語 | ❌ 拒絕 | 團隊沒人能核對 |
+| 普什圖語 | ❌ 拒絕 | WER 25–50%「Moderate」，錯誤率太高 |
+| **Dari／Tigrinya／Rohingya／Hazaragi** | ❌ 拒絕畫面（Tigrinya 在 intake 頁用來演示） | **不在 ElevenLabs 清單上** |
 
 ## 8. 那一個數字
 
@@ -186,11 +201,13 @@ def metric(shown, payload):
 
 **驗證**：`bash bin/verify.sh` 必須維持 GREEN。
 
-## 11. 相依套件 —— 需要核准
+## 11. 相依套件 —— 零外部套件（已定案）
 
-`skeleton/core/model.py` 目前是 stub。接真實 API 需要安裝 SDK。
-依 `CLAUDE.md`：**安裝任何相依套件須先取得 Tommy 明確核准，列出套件名稱與理由。**
-骨架現況是**零外部套件**，這本身是 demo 備援的一部分。
+**出貨的堆疊只用 Python 標準函式庫 ＋ 一頁 vanilla JS，零外部套件、零建置步驟。**
+真實 API（ElevenLabs Scribe、Anthropic Messages）在 `skeleton/core/live.py` 用 `urllib.request` 直打，
+沒有安裝任何 SDK，因此不需要安裝核准。`skeleton/core/model.py` 的 stub 仍保留，作為沒有金鑰或
+呼叫失敗時的退路，這本身是 demo 備援的一部分。
+依 `CLAUDE.md`：往後若要安裝任何相依套件，仍須先取得 Tommy 明確核准，列出套件名稱與理由。
 
 ## 12. 工時分配建議
 
