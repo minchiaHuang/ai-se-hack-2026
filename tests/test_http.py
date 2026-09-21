@@ -163,9 +163,14 @@ class HttpRoundTrip(Server):
         person = json.loads(body.split("const MOCK_PERSON = ")[1].split(";\n")[0])
         self.assertEqual(person, {"name": "Li Wei", "phone": "0400 000 000",
                                   "email": "liwei.cook@example.com", "language": "zh"})
+        # The interview does not ask for either any more: /review takes them from
+        # what was typed here, so the mock resume is where they have to show up.
         interview = app.INTERVIEW_PAGE.read_text(encoding="utf-8")
-        self.assertIn(person["phone"], interview)
-        self.assertIn(person["email"], interview)
+        self.assertNotIn(person["phone"], interview)
+        self.assertNotIn(person["email"], interview)
+        review = app.REVIEW_PAGE.read_text(encoding="utf-8")
+        self.assertIn(person["phone"], review)
+        self.assertIn(person["email"], review)
 
     def test_the_choose_path_page_serves(self):
         status, body = self.get("/start/path")

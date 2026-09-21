@@ -1,0 +1,60 @@
+<!-- @dsCard group="Components" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Button</title>
+<link rel="stylesheet" href="../tokens.css">
+<style>
+* { box-sizing: border-box; }
+body { margin: 0; padding: var(--space-6); background: var(--bg); color: var(--fg);
+       font: var(--weight-regular) var(--text-md-size)/var(--text-md-line) var(--font); }
+h1 { margin: 0 0 var(--space-1); font-size: var(--text-lg-size); line-height: var(--text-lg-line);
+     font-weight: var(--weight-semibold); }
+p.note { margin: 0 0 var(--space-6); color: var(--fg-muted);
+         font-size: var(--text-sm-size); line-height: var(--text-sm-line); }
+h2 { margin: var(--space-6) 0 var(--space-3); font-size: var(--text-sm-size);
+     line-height: var(--text-sm-line); font-weight: var(--weight-semibold); color: var(--fg-strong); }
+.card { background: var(--surface); border-radius: var(--radius-card); box-shadow: var(--shadow-xs);
+        padding: var(--space-6); display: flex; flex-wrap: wrap; gap: var(--space-3); }
+
+/* The kit's button: 18px side padding, 10px top and bottom, 8px radius,
+   Text md / Semibold, shadow xs. Every variant below changes only colour. */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2);
+       padding: var(--space-2-5) 18px; border: 1px solid transparent;
+       border-radius: var(--radius-control); box-shadow: var(--shadow-xs); cursor: pointer;
+       font-family: var(--font); font-size: var(--text-md-size); line-height: var(--text-md-line);
+       font-weight: var(--weight-semibold); }
+.btn:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.btn-primary { background: var(--brand); border-color: var(--brand); color: var(--white); }
+.btn-secondary { background: var(--surface); border-color: var(--line); color: var(--fg-strong); }
+.btn-destructive { background: var(--error); border-color: var(--error); color: var(--white); }
+.btn-ghost { background: transparent; border-color: transparent; box-shadow: none; color: var(--fg-strong); }
+.btn[disabled] { opacity: .5; cursor: not-allowed; }
+.pair { display: flex; gap: var(--space-3); width: 100%; }
+.pair .btn { flex: 1 0 0; min-width: 0; }
+</style>
+</head>
+<body>
+<h1>Button</h1>
+<p class="note">18 / 10 padding, 8px radius, Text md / Semibold, shadow xs — the kit's modal actions, node 1328:3858.</p>
+
+<h2>Variants</h2>
+<div class="card">
+  <button class="btn btn-primary">Confirm</button>
+  <button class="btn btn-secondary">Cancel</button>
+  <button class="btn btn-destructive">Delete</button>
+  <button class="btn btn-ghost">Skip</button>
+  <button class="btn btn-primary" disabled>Confirm</button>
+</div>
+
+<h2>Modal actions — the kit pairs them at equal width</h2>
+<div class="card">
+  <div class="pair">
+    <button class="btn btn-secondary">Cancel</button>
+    <button class="btn btn-primary">Confirm</button>
+  </div>
+</div>
+</body>
+</html>

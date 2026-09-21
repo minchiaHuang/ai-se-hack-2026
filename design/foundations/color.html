@@ -1,0 +1,72 @@
+<!-- @dsCard group="Foundations" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Colour</title>
+<link rel="stylesheet" href="../tokens.css">
+<style>
+* { box-sizing: border-box; }
+body { margin: 0; padding: var(--space-6); background: var(--bg); color: var(--fg);
+       font: var(--weight-regular) var(--text-md-size)/var(--text-md-line) var(--font); }
+h1 { margin: 0 0 var(--space-1); font-size: var(--text-lg-size); line-height: var(--text-lg-line);
+     font-weight: var(--weight-semibold); }
+p.note { margin: 0 0 var(--space-6); color: var(--fg-muted);
+         font-size: var(--text-sm-size); line-height: var(--text-sm-line); }
+h2 { margin: var(--space-6) 0 var(--space-3); font-size: var(--text-sm-size);
+     line-height: var(--text-sm-line); font-weight: var(--weight-semibold); color: var(--fg-strong); }
+.row { display: flex; flex-wrap: wrap; gap: var(--space-3); }
+.swatch { width: 148px; background: var(--surface); border: 1px solid var(--line-soft);
+          border-radius: var(--radius-control); box-shadow: var(--shadow-xs); overflow: hidden; }
+.chip { height: 64px; }
+.meta { padding: var(--space-2) var(--space-3); }
+.name { font-size: var(--text-sm-size); line-height: var(--text-sm-line); font-weight: var(--weight-medium); }
+.hex { font-size: var(--text-sm-size); line-height: var(--text-sm-line); color: var(--fg-placeholder);
+       font-variant-numeric: tabular-nums; text-transform: uppercase; }
+.ratio { display: inline-block; margin-top: var(--space-1); padding: 0 var(--space-1-5);
+         border-radius: var(--radius-control); background: var(--success-tint); color: var(--success);
+         font-size: var(--text-sm-size); line-height: var(--text-sm-line); font-weight: var(--weight-medium); }
+</style>
+</head>
+<body>
+<h1>Colour</h1>
+<p class="note">Read out of the Untitled UI kit, file KYWUHL795TJwqHRANibwch. Ratios are measured against white.</p>
+
+<h2>Neutrals</h2>
+<div class="row">
+  <div class="swatch"><div class="chip" style="background:var(--neutral-900)"></div>
+    <div class="meta"><div class="name">Neutral 900</div><div class="hex">#171717</div>
+    <span class="ratio">17.93:1</span></div></div>
+  <div class="swatch"><div class="chip" style="background:var(--neutral-700)"></div>
+    <div class="meta"><div class="name">Neutral 700</div><div class="hex">#404040</div>
+    <span class="ratio">10.37:1</span></div></div>
+  <div class="swatch"><div class="chip" style="background:var(--neutral-600)"></div>
+    <div class="meta"><div class="name">Neutral 600</div><div class="hex">#525252</div>
+    <span class="ratio">7.82:1</span></div></div>
+  <div class="swatch"><div class="chip" style="background:var(--neutral-500)"></div>
+    <div class="meta"><div class="name">Neutral 500</div><div class="hex">#737373</div>
+    <span class="ratio">4.74:1</span></div></div>
+  <div class="swatch"><div class="chip" style="background:var(--neutral-300)"></div>
+    <div class="meta"><div class="name">Neutral 300</div><div class="hex">#D4D4D4</div></div></div>
+  <div class="swatch"><div class="chip" style="background:var(--neutral-200)"></div>
+    <div class="meta"><div class="name">Neutral 200</div><div class="hex">#E5E5E5</div></div></div>
+</div>
+
+<h2>Brand and semantics</h2>
+<div class="row">
+  <div class="swatch"><div class="chip" style="background:var(--brand)"></div>
+    <div class="meta"><div class="name">Brand 600</div><div class="hex">#7F56D9</div>
+    <span class="ratio">4.96:1 on white text</span></div></div>
+  <div class="swatch"><div class="chip" style="background:var(--error)"></div>
+    <div class="meta"><div class="name">Error 600</div><div class="hex">#D92D20</div></div></div>
+  <div class="swatch"><div class="chip" style="background:var(--error-tint)"></div>
+    <div class="meta"><div class="name">Error tint</div><div class="hex">#FEE4E2</div></div></div>
+  <div class="swatch"><div class="chip" style="background:var(--warning-tint)"></div>
+    <div class="meta"><div class="name">Warning tint</div><div class="hex">#FEF0C7</div></div></div>
+  <div class="swatch"><div class="chip" style="background:var(--success)"></div>
+    <div class="meta"><div class="name">Success</div><div class="hex">#2F6B47</div>
+    <span class="ratio">BridgeWork's own</span></div></div>
+</div>
+</body>
+</html>

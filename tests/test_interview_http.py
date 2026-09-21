@@ -14,7 +14,7 @@ class InterviewRoutes(Server):
         status, text = self.get("/api/interview/questions")
         self.assertEqual(status, 200)
         questions = json.loads(text)["questions"]
-        self.assertEqual(len(questions), 7)
+        self.assertEqual(len(questions), 6)
         self.assertEqual(questions[0]["id"], "profile")
         self.assertEqual(set(questions[0]), {"id", "section", "en", "zh"})
 

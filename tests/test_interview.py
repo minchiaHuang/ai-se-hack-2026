@@ -23,10 +23,17 @@ def broken(*args, **kwargs):
 
 
 class Questions(unittest.TestCase):
-    def test_the_seven_fixed_questions_in_file_order(self):
+    def test_the_six_fixed_questions_in_file_order(self):
         ids = [q["id"] for q in interview.questions()["questions"]]
-        self.assertEqual(ids, ["profile", "contacts", "education", "employment",
+        self.assertEqual(ids, ["profile", "education", "employment",
                                "volunteer", "skills", "certificates"])
+
+    def test_no_question_asks_for_a_phone_or_email(self):
+        # /start collects both. Asking again wastes the jobseeker's time, and a
+        # phone number read back from speech is the answer least likely to survive.
+        for q in interview.questions()["questions"]:
+            for phrase in ("phone", "email", "电话", "邮箱"):
+                self.assertNotIn(phrase, q["en"] + q["zh"])
 
     def test_each_question_carries_exactly_the_contract_fields(self):
         for q in interview.questions()["questions"]:

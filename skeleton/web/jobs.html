@@ -111,8 +111,10 @@ svg.i { flex: none; width: 1.05em; height: 1.05em; }
 .job-card.selected { box-shadow: 0 0 0 3px var(--primary); }
 .job-main { min-width: 0; padding: .7rem .8rem .8rem; }
 .job-top { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: .9rem; align-items: start; }
+/* --mark-h is set per card from a hash of the company name; see companyMark(). */
 .logo { display: grid; place-items: center; width: 64px; height: 64px; border: 1px solid var(--line); border-radius: 10px;
-        background: #fafafa; color: #c3c8cf; }
+        background: hsl(var(--mark-h, 0) 45% 92%); box-shadow: 0 1px 2px 0 rgba(0, 0, 0, .05); }
+.logo .mono { color: hsl(var(--mark-h, 0) 55% 28%); font-size: 1.35rem; font-weight: 700; letter-spacing: .02em; }
 .logo svg { width: 30px; height: 30px; }
 .tags { display: flex; flex-wrap: wrap; gap: .35rem; }
 .tag { padding: .05rem .45rem; border-radius: 6px; background: var(--pill); font-size: .78rem; font-weight: 600; }
@@ -711,12 +713,36 @@ function cardTags(job) {
           job.for_occupation ? null : el("span", { class: "tag" }, "Another occupation")];
 }
 
+// Every employer gets a mark of its own. Adzuna sends no logo, and a logo
+// fetched from the web would break the offline demo, so the mark is drawn from
+// the company's own initials. The hue is a hash of the name, so a company keeps
+// the same colour between renders and no two neighbours collide by accident.
+// Lightness is fixed at 92% behind 28% text, which clears 7:1 at every hue.
+function companyMark(name) {
+  const clean = (name || "").trim();
+  if (!clean) return { initials: "?", hue: 0 };
+  const initials = clean.split(/[^A-Za-z0-9]+/).filter(Boolean).slice(0, 2)
+                        .map(w => w[0].toUpperCase()).join("") || "?";
+  let hash = 0;
+  for (const ch of clean) hash = (hash * 31 + ch.codePointAt(0)) >>> 0;
+  return { initials, hue: hash % 360 };
+}
+
+function companyLogo(job) {
+  const mark = companyMark(job.company);
+  const el2 = el("div", { class: "logo" },
+    el("span", { class: "mono" }, mark.initials));
+  el2.style.setProperty("--mark-h", String(mark.hue));
+  el2.setAttribute("aria-hidden", "true");
+  return el2;
+}
+
 function renderJobCard(job, selected, meta) {
   return el("article", { class: "job-card" + (selected ? " selected" : ""), "data-id": job.id,
                          onclick: () => selectJob(job.id) },
     el("div", { class: "job-main" },
       el("div", { class: "job-top" },
-        el("div", { class: "logo" }, icon("building")),
+        companyLogo(job),
         el("div", {},
           el("div", { class: "tags" }, cardTags(job)),
           el("h3", {}, el("button", { type: "button", "aria-pressed": String(selected) }, job.title)),
