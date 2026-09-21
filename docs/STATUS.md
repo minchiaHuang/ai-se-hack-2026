@@ -1,11 +1,12 @@
 # STATUS
 
-單行狀態：2026-09-21 Day 1 傍晚。**題目改為方向 7：難民就業（口述經歷 → 佐證包 ＋ 媒合）。**
+單行狀態：2026-09-21 晚。**方向 7 第一波 4 個 PR 已合入 `docs/direction-7-refugee-employment`（#5 d7-core、#3 d7-match、#2 d7-live、#4 d7-intake-ui，合併點 `718edc6`），下一步開第二波 `d7-wire`。**
+題目為方向 7：難民就業（口述經歷 → 佐證包 ＋ 媒合）。
 方向 6（WISE 就業成效申報）**正式放棄**，研究與證據原封保留為備案。
 方向 7 的一輪研究已完成（三個 agent 平行），框架、交接文件第 8 節、spec 皆已落檔。
 **現場優先原則仍凌駕一切。**
 
-最後驗證：2026-09-21（`bash bin/verify.sh` → GREEN，含 25 個骨架測試）
+最後驗證：2026-09-21（`bash bin/verify.sh` → GREEN，含 91 個骨架測試，於 `718edc6`）
 
 ## 進行中
 
@@ -122,6 +123,7 @@ White Box Enterprises 與 Seedkit 的答案、SEDI 付費論證、Social Traders
    brief 依第一波實際合進來的程式碼再寫；介面契約見任一份 pending brief 的 "API contract"。
 5. **錄影前**：`python3 skeleton/app.py` → `http://127.0.0.1:8000/intake`；斷網再跑一次確認離線可用；
    逐條複驗要念的數字；查 ElevenLabs 音檔保留設定（查清楚前不得宣稱零保留）。
+6. 提交前（Tommy 2026-09-21 決定）：開 submission 分支，git rm AGENTS.md CLAUDE.md，評審看的是這個分支；開發分支照常保留兩檔，worker 流程要靠它們。
 
 **現場優先**：現場出現的真實問題，一律優先於上述任何方向（判準見交接文件第 7 節）。
 現場那張要拿在手上的是 **`docs/frameworks/onsite-matching-sheet.md`**。
