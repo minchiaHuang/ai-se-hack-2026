@@ -1,11 +1,12 @@
 # Render Blueprint: the live site for the hackathon submission.
 #
 # Connect this repo once at https://dashboard.render.com/blueprints and Render
-# reads this file, so there is nothing to fill in by hand in the dashboard.
+# reads this file. Supply the ElevenLabs values in the dashboard.
 #
 # The two ElevenLabs values are declared but not set here: "sync: false" means
-# Render asks for the value in its own dashboard and keeps it there, so no key
-# is ever committed to this public repo.
+# Render asks for values during initial Blueprint creation. Existing services
+# ignore these declarations on update: add both values under Environment and
+# save with a redeploy. No key is committed to this public repo.
 #
 # The trade-off, decided deliberately: /api/speak and the agent's talk link are
 # public endpoints, so anyone who finds them can spend the ElevenLabs

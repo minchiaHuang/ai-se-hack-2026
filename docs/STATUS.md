@@ -20,13 +20,32 @@ bash bin/verify.sh             # the whole check
 ```
 
 Standard library only: no dependency to install and no build step. Without API
-keys every page still runs, and says on screen what it could not do rather than
-filling the gap with invented text. `?mock=1` runs the flow against fixtures
-with no network at all.
+keys every page still runs. `?mock=1` uses fixture answers and transcripts, but
+still requests spoken questions and the phone Agent link from the server.
+Without the ElevenLabs settings, mock mode shows a silent speaking animation
+and omits the phone link.
 
 ## Last verification
 
-2026-09-22: `bash bin/verify.sh` → GREEN, 333 tests.
+2026-09-22: `bash bin/verify.sh` → GREEN, 337 tests.
+
+## Demo deployment in progress
+
+The phone-link fix is committed at `c4b0d18` on `fix/d7-demo-call-link` but has
+not reached `origin/main`. The live site was checked on 2026-09-22: it still
+served the old interview page, `/api/speak` reported no `ELEVENLABS_API_KEY`,
+and `/api/talk/link` reported that the Agent was not configured.
+
+Local browser verification of the fix: mock mode displayed the configured
+ElevenLabs Agent URL, completed 12 fixture turns, and showed Review the answers.
+This verifies link display and the simulated transcript, not a real phone call
+or live Mandarin audio playback.
+
+Next: merge the reviewed fix into `main`, deploy it, and manually add
+`ELEVENLABS_API_KEY` and `ELEVENLABS_AGENT_ID` to the existing Render service's
+Environment settings. Save with a redeploy, then verify both endpoints and tap
+the interview orb on the live site. `sync: false` only prompts during initial
+Blueprint creation; it does not add these values to an existing service.
 
 ## What is built
 
