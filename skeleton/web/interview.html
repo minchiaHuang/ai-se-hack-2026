@@ -69,6 +69,8 @@ button:disabled { background: #d1d5db; border-color: #9ca3af; color: #333; curso
 .start h2 { color: var(--primary); }
 .consent { display: flex; gap: .55rem; align-items: flex-start; margin: 1rem 0; cursor: pointer; }
 .consent input { width: 22px; height: 22px; flex: none; margin-top: .15rem; accent-color: var(--primary); }
+.back { color: var(--muted); font-size: .88rem; font-weight: 600; text-decoration: none; }
+.back:hover { color: var(--primary); text-decoration: underline; }
 .phone { margin-top: 1.5rem; padding-top: 1.2rem; border-top: 1px solid var(--line); }
 .phone h3 { color: var(--primary); margin: 0 0 .3rem; font-size: 1rem; }
 #talk-url { word-break: break-all; font-weight: 600; color: var(--primary); }
@@ -162,7 +164,7 @@ button:disabled { background: #d1d5db; border-color: #9ca3af; color: #333; curso
   <p id="error" class="banner error" role="alert" hidden></p>
 
   <section id="start" class="start" hidden>
-    <h2>Seven questions for the resume</h2>
+    <h2>Questions for the resume</h2>
     <p class="muted">Each question is read aloud in Mandarin. The jobseeker answers in their own words; the answer is
       transcribed and translated into English. You can correct both before moving on, and nothing is final until you
       confirm the resume on the next page.</p>
@@ -177,10 +179,11 @@ button:disabled { background: #d1d5db; border-color: #9ca3af; color: #333; curso
 
     <div class="phone">
       <h3>Or: the jobseeker talks with an AI interviewer on their phone</h3>
-      <p class="muted">It asks the same seven questions in Mandarin. When they hang up, the answers come back here,
+      <p class="muted">It asks the same questions in Mandarin. When they hang up, the answers come back here,
         sorted by question, for you to check on the next page.</p>
       <button id="call" class="secondary" disabled>Start the phone interview</button>
     </div>
+    <p><a class="back" id="back" href="/start/path">&larr; Back</a></p>
   </section>
 
   <section id="call-panel" class="start" hidden>
@@ -711,6 +714,7 @@ $("play").addEventListener("click", speak);
 $("record").addEventListener("click", toggleRecord);
 $("next").addEventListener("click", next);
 $("call").addEventListener("click", startCall);
+$("back").href = (location.protocol === "file:" ? "path.html" : "/start/path") + (FLAGS ? "?" + FLAGS : "");
 $("call-review").addEventListener("click", handOver);
 
 loadQuestions().then(questions => {

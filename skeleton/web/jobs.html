@@ -303,7 +303,8 @@ function el(tag, attrs, ...children) {
   return node;
 }
 
-const firstName = () => state.name.split(/\s+/)[0] || "";
+// The whole name: which word is the given name differs between cultures ("Li Wei").
+const fullName = () => state.name.trim();
 const sourceWord = () => (state.source === "resume" ? "resume" : "interview");
 
 // ---------------------------------------------------------------- evidence
@@ -335,7 +336,7 @@ function citedWhere([label, locator]) {
 
 // Where the evidenced units came from: said in the interview, or written in a resume.
 function evidencedHeading() {
-  const who = firstName();
+  const who = fullName();
   if (state.via === "upload" || (!state.via && state.source === "resume")) {
     return who ? "Evidenced in " + who + "'s resume" : "Evidenced in the resume";
   }
@@ -511,7 +512,7 @@ function renderSummary(job) {
     el("h2", { id: "h-summary" }, "Match summary"),
     note ? el("p", {}, note) : null,
     el("div", { class: "cols" },
-      job.matched.length ? el("div", {}, el("h3", {}, "Why " + (firstName() || "the jobseeker") + " is a match"),
+      job.matched.length ? el("div", {}, el("h3", {}, "Why " + (fullName() || "the jobseeker") + " is a match"),
         el("ul", { class: "skills ok" }, job.matched.map(u => el("li", {}, u.title)))) : null,
       job.missing.length ? el("div", {}, el("h3", {}, "Skills to build"),
         el("ul", { class: "skills miss" }, job.missing.map(u => el("li", {}, u.title)))) : null));

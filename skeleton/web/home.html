@@ -64,7 +64,7 @@ h2 { color: var(--primary); font-size: 40px; font-weight: 700; text-align: cente
 
 .cards { display: grid; grid-template-columns: repeat(2, minmax(0, 479px)); gap: 64px; justify-content: center; margin-top: 160px; }
 .card { background: var(--card); border-radius: 20px; padding: 36px 40px; min-height: 376px; display: flex; flex-direction: column; }
-.icon { width: 63px; height: 54px; border-radius: 5px; background: var(--bg); }
+.icon { width: 63px; height: 54px; border-radius: 5px; background: var(--bg); display: grid; place-items: center; font-size: 30px; }
 .card h3 { font-size: 20px; color: #000; margin: 28px 0 16px; }
 .card p { color: var(--muted); font-weight: 500; margin: 0 0 32px; }
 .button {
@@ -109,18 +109,18 @@ footer { padding: 52px 30px 30px; display: flex; justify-content: flex-end; back
   <ol class="steps">
     <li><span class="num">1</span><h3>Conversation</h3><p>A refugee client speaks in their own language, in a real interview with a caseworker.</p></li>
     <li><span class="num">2</span><h3>Resume</h3><p>AI drafts a resume in Australian English — the caseworker reviews and confirms.</p></li>
-    <li><span class="num">3</span><h3>Match &amp; Apply</h3><p>Matched to real, open roles and submitted — all in one place.</p></li>
+    <li><span class="num">3</span><h3>Match &amp; Apply</h3><p>Matched to real, open roles, with a resume ready to send.</p></li>
   </ol>
 
   <div class="cards">
     <section class="card">
-      <div class="icon" aria-hidden="true"></div>
+      <div class="icon" aria-hidden="true">🤝</div>
       <h3>I’m an NGO caseworker</h3>
       <p>Bring a refugee client's story — spoken in their own language — to a job-ready resume in one session. No typing required on their side.</p>
       <a class="button" href="/start" data-route>Get Started →</a>
     </section>
     <section class="card">
-      <div class="icon" aria-hidden="true"></div>
+      <div class="icon" aria-hidden="true">🏢</div>
       <h3>I’m hiring refugee talent</h3>
       <p>Reach candidates ready to work, with wage-subsidy evidence — hours, tenure, wage records — generated automatically as they work with you.</p>
       <!-- There is no employer side yet, so this card cannot lead anywhere. -->
