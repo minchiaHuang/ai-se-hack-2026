@@ -111,11 +111,26 @@ def render_result(scenario_key):
     return "".join(parts)
 
 
+def resume_lines(payload):
+    """The resume the page sends: numbered lines, checked before anything reads them."""
+    lines = payload.get("resume")
+    if not isinstance(lines, list) or not all(
+            isinstance(line, dict) and type(line.get("line")) is int
+            and isinstance(line.get("text"), str) for line in lines):
+        raise BadRequest("resume must be a list of {line: integer, text: string} objects")
+    return lines
+
+
 def extract(payload):
     """Run the pipeline and return JSON-safe data. Refusals come back as data."""
     occupation_key = payload.get("occupation")
+    from_resume = payload.get("source") == d7_credentials.RESUME
+    if from_resume:
+        model = model_for_resume(occupation_key, resume_lines(payload))
+    else:
+        model = model_for_occupation(occupation_key)
     try:
-        result = run(d7_credentials, payload, model_for_occupation(occupation_key))
+        result = run(d7_credentials, payload, model)
     except REFUSALS as refused:
         return {"refused": str(refused)}
     return {
@@ -138,7 +153,9 @@ def extract(payload):
         # page can show "superseded MEM31922" beside the qualification. Offline
         # on purpose: reachable stays False and never claims currency.
         "qualification_source": registry.source_check(occupation_key),
-        "metric_name": result.metric_name,
+        # The pipeline names the transcript metric; a resume's items cite lines
+        # of the resume, and the label must not claim otherwise.
+        "metric_name": d7_credentials.RESUME_METRIC if from_resume else result.metric_name,
         "metric_value": result.metric_value,
     }
 
@@ -155,6 +172,21 @@ def model_for_occupation(occupation_key):
         stub = model_for(f"d7_{occupation_key}")
     else:
         stub = StubModel({d7_credentials.KEY: []})
+    if os.environ.get("ANTHROPIC_API_KEY"):
+        return live.LiveModel(fallback=stub)
+    return stub
+
+
+def model_for_resume(occupation_key, lines):
+    """Offline, the canned answer is given only for the built-in sample resume,
+    whose lines it cites. Any other resume gets nothing, reported as gaps: the
+    sample's reasons pinned to someone else's line numbers would be evidence
+    in name only. NEEDS DECISION: the interview's offline stub answers any
+    transcript; this path is stricter on purpose."""
+    canned = json.loads((CANNED / "d7_resume.json").read_text(encoding="utf-8"))
+    is_sample = [line["text"] for line in lines] == canned["resume"]
+    answer = canned["answer"] if occupation_key == "cookery" and is_sample else []
+    stub = StubModel({d7_credentials.KEY: answer})
     if os.environ.get("ANTHROPIC_API_KEY"):
         return live.LiveModel(fallback=stub)
     return stub
@@ -177,16 +209,24 @@ def match(payload):
     qualifications are still listed. Lines without an English gloss are left
     out because the resume is written in English. "resume" stays the best-fit
     job's draft so callers written before "resumes" existed keep working.
+
+    With "source": "resume" the lines come from the resume the person brought
+    ("resume": [{line, text, en}]) and the drafts cite resume lines.
     """
     evidenced = payload.get("evidenced_units", [])
     if not isinstance(evidenced, list) or not all(isinstance(u, dict) for u in evidenced):
         raise BadRequest("evidenced_units must be a list of objects")
-    transcript = [line for line in payload.get("transcript") or []
-                  if isinstance(line, dict) and "t" in line and "en" in line]
+    source = "interview"
+    if payload.get("source") == d7_credentials.RESUME:
+        source = "resume"
+        lines = [line for line in resume_lines(payload) if isinstance(line.get("en"), str)]
+    else:
+        lines = [line for line in payload.get("transcript") or []
+                 if isinstance(line, dict) and "t" in line and "en" in line]
     jobs = d7_match.match_jobs(payload.get("occupation"), evidenced)
     resumes = {}
     for job in jobs:
-        sections = d7_match.resume_sections(job, evidenced, transcript)
+        sections = d7_match.resume_sections(job, evidenced, lines, source)
         resumes[job["id"]] = {"job_id": job["id"], "text": d7_match.resume_text(sections),
                               "sections": sections}
     resume = resumes[jobs[0]["id"]] if jobs else None

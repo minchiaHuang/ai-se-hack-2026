@@ -103,6 +103,33 @@ class IntakeEndpoint(unittest.TestCase):
         with mock.patch.dict(os.environ, {"ANTHROPIC_API_KEY": "k"}):
             self.assertIsInstance(model_for_occupation("cookery"), LiveModel)
 
+    def test_offline_the_canned_resume_answer_is_only_for_the_sample(self):
+        """The sample's reasons pinned to another resume's line numbers would be
+        evidence in name only, so any other resume gets nothing."""
+        import json
+        from skeleton.app import model_for_resume
+        from skeleton.core.live import LiveModel
+        from skeleton.core.model import CANNED
+        sample = json.loads((CANNED / "d7_resume.json").read_text(encoding="utf-8"))
+        lines = [{"line": i + 1, "text": t} for i, t in enumerate(sample["resume"])]
+        self.assertEqual(model_for_resume("cookery", lines).suggest("d7", {}), sample["answer"])
+        self.assertEqual(model_for_resume("cookery", lines[:-1]).suggest("d7", {}), [])
+        self.assertEqual(model_for_resume("welding", lines).suggest("d7", {}), [])
+        with mock.patch.dict(os.environ, {"ANTHROPIC_API_KEY": "k"}):
+            self.assertIsInstance(model_for_resume("cookery", lines), LiveModel)
+
+    def test_the_canned_resume_answer_cites_only_lines_of_the_sample(self):
+        import json
+        from skeleton.core.model import CANNED
+        sample = json.loads((CANNED / "d7_resume.json").read_text(encoding="utf-8"))
+        lines = {f"line={i + 1}" for i in range(len(sample["resume"]))}
+        self.assertTrue(sample["resume"][0].startswith("SAMPLE RESUME"))
+        for item in sample["answer"]:
+            for label, locator in item["sources"]:
+                with self.subTest(field=item["field"], locator=locator):
+                    self.assertEqual(label, "resume")
+                    self.assertIn(locator, lines)
+
 
 if __name__ == "__main__":
     unittest.main()

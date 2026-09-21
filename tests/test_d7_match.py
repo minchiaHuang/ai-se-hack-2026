@@ -221,6 +221,65 @@ class TailoredResume(unittest.TestCase):
                                      "Recognition of Prior Learning in progress, not yet assessed")
 
 
+RESUME = [
+    {"line": 1, "text": "Head cook, hotel restaurant", "en": "Head cook, hotel restaurant"},
+    {"line": 2, "text": "Made soups and sauces every day.", "en": "Made soups and sauces every day."},
+    {"line": 9, "text": "Kept raw and cooked food apart.", "en": "Kept raw and cooked food apart."},
+    {"line": 10, "text": "Cooked for 150 guests a day.", "en": "Cooked for 150 guests a day."},
+    {"line": 11, "text": "In 2019 I fled and walked to the border.", "en": "In 2019 I fled and walked to the border."},
+]
+
+RESUME_EVIDENCED = [
+    {"code": "SITXFSA005", "sources": [["resume", "line=9"]]},
+    {"code": "SITHCCC027", "sources": [["resume", "line=10"]]},
+    {"code": "SITHCCC029", "sources": [["resume", "line=2"]]},
+]
+
+
+class ResumeSource(unittest.TestCase):
+    """A draft built from the resume the person brought cites that resume's lines."""
+
+    def setUp(self):
+        self.jobs = d7_match.match_jobs("cookery", RESUME_EVIDENCED)
+        self.sections = {job["id"]: d7_match.resume_sections(job, RESUME_EVIDENCED, RESUME, "resume")
+                         for job in self.jobs}
+        self.texts = {k: d7_match.resume_text(v) for k, v in self.sections.items()}
+
+    def test_every_experience_line_cites_a_resume_line(self):
+        for job_id, text in self.texts.items():
+            section = text.split("WORK EXPERIENCE")[1].split("\n\n")[0]
+            experience = [l for l in section.splitlines() if l.startswith("- ")]
+            with self.subTest(job=job_id):
+                self.assertEqual(len(experience), 3)
+                for line in experience:
+                    self.assertRegex(line, r"\[resume line \d+\]$")
+                self.assertNotIn("transcript", text)
+
+    def test_skills_name_the_resume_lines_they_come_from(self):
+        skills = self.sections["cookery-1"]["skills"]
+        self.assertEqual({s["code"]: s["described_at"] for s in skills},
+                         {"SITXFSA005": ["9"], "SITHCCC027": ["10"], "SITHCCC029": ["2"]})
+        self.assertIn("SITXFSA005 Use hygienic practices for food safety (resume line 9)",
+                      self.texts["cookery-1"])
+
+    def test_lines_sort_by_number_not_as_text(self):
+        """Line 10 comes after line 9, not before line 2."""
+        lines = [e["line"] for e in self.sections["cookery-2"]["experience"]]
+        self.assertEqual(lines, ["2", "10", "9"])
+
+    def test_a_journey_line_no_unit_cites_never_reaches_a_draft(self):
+        for job_id, text in self.texts.items():
+            with self.subTest(job=job_id):
+                self.assertNotIn("border", text)
+                self.assertNotIn("resume line 11", text)
+
+    def test_the_interview_output_carries_no_source_key(self):
+        """The interview's draft is exactly what it was before resumes came in."""
+        sections = d7_match.resume_sections(self.jobs[0], EVIDENCED, TRANSCRIPT)
+        self.assertNotIn("source", sections)
+        self.assertEqual(self.sections[self.jobs[0]["id"]]["source"], "resume")
+
+
 class JobData(unittest.TestCase):
     def test_nine_cookery_four_welding_four_aged_care_all_marked_as_samples(self):
         jobs = d7_match.load_jobs()

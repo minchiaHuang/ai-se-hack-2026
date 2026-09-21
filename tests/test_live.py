@@ -150,6 +150,49 @@ class LiveModelSuggest(unittest.TestCase):
         self.assertIn("营地厨房", sent["payload"]["messages"][0]["content"])
 
 
+RESUME_PREPARED = dict(
+    {k: v for k, v in PREPARED.items() if k != "transcript"},
+    resume=[{"line": 1, "text": "Head cook, hotel restaurant"},
+            {"line": 2, "text": "Kept raw and cooked food apart."}])
+
+FROM_RESUME = dict(GOOD, sources=[["resume", "line=1"]])
+
+
+class LiveModelResume(unittest.TestCase):
+    def test_a_cited_resume_line_is_kept(self):
+        model = live.LiveModel(Fallback(), api_key="k", post=answering([FROM_RESUME]))
+        self.assertEqual(model.suggest("d7", RESUME_PREPARED), [FROM_RESUME])
+
+    def test_a_line_the_resume_does_not_have_is_dropped(self):
+        """A fabricated line number is no source, exactly as a made-up timestamp."""
+        fabricated = dict(FROM_RESUME, field="osca_code", sources=[["resume", "line=99"]])
+        model = live.LiveModel(Fallback(), api_key="k", post=answering([FROM_RESUME, fabricated]))
+        self.assertEqual(model.suggest("d7", RESUME_PREPARED), [FROM_RESUME])
+
+    def test_a_timestamp_cannot_stand_in_for_a_resume_line_or_back(self):
+        on_resume = dict(GOOD, sources=[["transcript", "t=00:12"]])
+        model = live.LiveModel(Fallback(), api_key="k", post=answering([on_resume]))
+        self.assertEqual(model.suggest("d7", RESUME_PREPARED), [])
+        on_transcript = dict(GOOD, sources=[["resume", "line=1"]])
+        model = live.LiveModel(Fallback(), api_key="k", post=answering([on_transcript]))
+        self.assertEqual(model.suggest("d7", PREPARED), [])
+
+    def test_the_request_carries_the_resume_lines_and_how_to_cite_them(self):
+        sent = {}
+
+        def fake_post(url, headers, payload):
+            sent.update(payload=payload)
+            return {"content": [{"type": "text", "text": "[]"}]}
+
+        live.LiveModel(Fallback(), api_key="k", post=fake_post).suggest("d7", RESUME_PREPARED)
+        content = json.loads(sent["payload"]["messages"][0]["content"])
+        self.assertEqual(content["resume"], RESUME_PREPARED["resume"])
+        self.assertNotIn("transcript", content)
+        self.assertNotIn("resume", content["candidates"])
+        self.assertIn('["resume", "line=N"]', sent["payload"]["system"])
+        self.assertIn("If the transcript or resume mentions", sent["payload"]["system"])
+
+
 class Offline(unittest.TestCase):
     def test_with_no_keys_in_the_environment_nothing_raises(self):
         env = {k: v for k, v in os.environ.items()
