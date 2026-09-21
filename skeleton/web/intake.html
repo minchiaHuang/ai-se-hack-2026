@@ -161,7 +161,7 @@ input[type=radio], input[type=checkbox] { width: 26px; height: 26px; accent-colo
       </button>
       <button type="button" class="entry alt" id="enter-resume">
         <span class="entry-title">I have a resume</span>
-        <span>Paste it, or upload a plain-text .txt file. For a partial record, such as an overseas resume, that nobody has mapped to Australian occupations and units.</span>
+        <span>Upload a PDF or .txt file, or paste it. For a partial record, such as an overseas resume, that nobody has mapped to Australian occupations and units.</span>
       </button>
     </div>
     <p class="muted">Both go through the same steps and give the same evidence pack. The only difference is what each item cites: a moment in the interview, or a line of the resume. Nothing is processed until the jobseeker consents.</p>
@@ -221,14 +221,14 @@ input[type=radio], input[type=checkbox] { width: 26px; height: 26px; accent-colo
           </select></label>
       </div>
       <div class="resume-input">
-        <label for="resume-text" class="visually-hidden">Your resume, as plain text</label>
+        <label for="resume-text" class="visually-hidden">Your resume, as text</label>
         <textarea id="resume-text" maxlength="100000" spellcheck="false"
                   placeholder="Paste the resume here, one entry per line."></textarea>
         <div class="controls">
-          <label class="file-pick" id="file-pick">Upload a .txt file
-            <input type="file" id="resume-file" class="visually-hidden" accept=".txt,text/plain"></label>
+          <label class="file-pick" id="file-pick">Upload a PDF or .txt file
+            <input type="file" id="resume-file" class="visually-hidden" accept=".pdf,application/pdf,.txt,text/plain"></label>
           <button type="button" id="sample" class="secondary">Use sample resume</button>
-          <span class="small muted">Plain text, up to 100 KB. The sample is a fictional cook's resume.</span>
+          <span class="small muted">PDF or plain text, up to 2 MB. A PDF needs selectable text; scans and photos cannot be read.</span>
         </div>
       </div>
       <div class="controls">
@@ -271,8 +271,8 @@ const SUPPORTED = ["zh", "ar"];
 // Must match WRITTEN_LANGUAGES there: a resume is read, not heard, so English is added.
 const WRITTEN = ["en", "zh", "ar"];
 const LANGUAGE_NAMES = { en: "English", zh: "Mandarin", ar: "Arabic", ti: "Tigrinya", fa: "Farsi" };
-// A resume larger than this is not a resume; the server's JSON cap is 1 MB.
-const MAX_RESUME_BYTES = 100 * 1024;
+const MAX_TEXT_BYTES = 100 * 1024;
+const MAX_PDF_BYTES = 2 * 1024 * 1024;
 
 // NEEDS DECISION: the contract requires an occupation but the brief gives no
 // selector, so the page is fixed to the demo's frame. Change here if a picker is wanted.
@@ -672,20 +672,25 @@ function resumeChanged() {
   render();
 }
 
-// Read in the browser: a .txt file never leaves the page until the pack is built.
-// Anything else is refused by name, never guessed at.
-function readResumeFile(file) {
+// A .txt file stays in the browser. A PDF is sent only after consent to the
+// local, offline server, which returns text lines and never writes the file.
+async function readResumeFile(file) {
   if (!file || !state.consent) return;
   $("resume-file").value = "";
-  const isText = /\.txt$/i.test(file.name) && (!file.type || file.type === "text/plain");
-  if (!isText) {
-    showError(file.name + ": only plain-text .txt files are read here. For a PDF or Word file, copy the text and paste it above.");
+  // Browser MIME labels vary for files received by email or messaging apps;
+  // the server still checks a PDF's bytes before reading it.
+  const isText = /\.txt$/i.test(file.name);
+  const isPdf = /\.pdf$/i.test(file.name);
+  if (!isText && !isPdf) {
+    showError(file.name + ": upload a PDF with selectable text or a plain-text .txt file.");
     return;
   }
-  if (file.size > MAX_RESUME_BYTES) {
-    showError(file.name + ": larger than 100 KB, so it is not read. Paste the work history part instead.");
+  const limit = isPdf ? MAX_PDF_BYTES : MAX_TEXT_BYTES;
+  if (file.size > limit) {
+    showError(file.name + ": larger than " + (isPdf ? "2 MB" : "100 KB") + ", so it is not read.");
     return;
   }
+  if (isPdf) return readPdfResume(file);
   const reader = new FileReader();
   reader.onload = () => {
     if (String(reader.result).includes("\u0000")) {
@@ -700,6 +705,37 @@ function readResumeFile(file) {
   reader.readAsText(file);
 }
 
+async function readPdfResume(file) {
+  if (MOCK) {
+    showError("PDF upload needs this demo's local offline server; mock mode has no PDF reader.");
+    return;
+  }
+  state.busy = true;
+  render();
+  setStatus("Reading " + file.name + "…");
+  try {
+    const bytes = new Uint8Array(await file.arrayBuffer());
+    let binary = "";
+    for (let start = 0; start < bytes.length; start += 0x8000) {
+      binary += String.fromCharCode(...bytes.subarray(start, start + 0x8000));
+    }
+    const body = await call("/api/resume-text", { json: {
+      source: "resume", consent: state.consent, language: state.language,
+      filename: file.name, pdf_base64: btoa(binary)
+    } });
+    if (refusedBy(body)) return;
+    $("resume-text").value = body.lines.map(line => line.text).join("\n");
+    resumeChanged();
+    setStatus("Read " + file.name + ": " + state.lines.length + " lines.");
+  } catch (err) {
+    showError(file.name + ": could not be read. Nothing was added.");
+    setStatus("");
+  } finally {
+    state.busy = false;
+    render();
+  }
+}
+
 // One click from the start screen's resume card to the Jobs view: fill, build, land.
 async function useSampleResume() {
   if (needConsent("rwhy", "rconsent")) return;
@@ -711,7 +747,7 @@ async function useSampleResume() {
 async function findJobs() {
   if (needConsent("rwhy", "rconsent")) return;
   if (!state.lines.length) {
-    $("rwhy").textContent = "Paste a resume, upload a .txt file, or use the sample first.";
+    $("rwhy").textContent = "Paste a resume, upload a PDF or .txt file, or use the sample first.";
     $("resume-text").focus();
     return;
   }

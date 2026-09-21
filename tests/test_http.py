@@ -3,6 +3,7 @@
 No test here may touch the network: both API keys are cleared for the whole
 class, so transcription and the model run on their offline paths.
 """
+import base64
 import json
 import os
 import threading
@@ -12,6 +13,7 @@ from http.server import ThreadingHTTPServer
 from unittest import mock
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
+from pathlib import Path
 
 from skeleton import app
 from skeleton.app import Handler
@@ -42,6 +44,7 @@ SAMPLE_RESUME = json.loads(
     (app.CANNED / "d7_resume.json").read_text(encoding="utf-8"))["resume"]
 # What the page sends for the sample: numbered lines, English as its own gloss.
 SAMPLE_LINES = [{"line": i + 1, "text": text, "en": text} for i, text in enumerate(SAMPLE_RESUME)]
+PDF_FIXTURES = Path(__file__).parent / "fixtures"
 
 
 def resume(**over):
@@ -54,6 +57,14 @@ def resume(**over):
 def cook(**over):
     body = {"occupation": "cookery", "language": "zh", "consent": True,
             "transcript": COOK_TRANSCRIPT}
+    body.update(over)
+    return body
+
+
+def pdf_resume(name="resume_text.pdf", **over):
+    body = {"source": "resume", "language": "en", "consent": True,
+            "filename": name,
+            "pdf_base64": base64.b64encode((PDF_FIXTURES / name).read_bytes()).decode("ascii")}
     body.update(over)
     return body
 
@@ -199,6 +210,43 @@ class IntakeApi(Server):
     def post_json(self, path, data, content_type="application/json"):
         status, text = self.post(path, data, content_type)
         return status, json.loads(text)
+
+    def test_pdf_resume_text_is_numbered_before_the_evidence_pipeline(self):
+        status, body = self.post_json("/api/resume-text", pdf_resume())
+        self.assertEqual(status, 200)
+        self.assertEqual(body["lines"], [
+            {"line": 1, "text": "Leah Example"},
+            {"line": 2, "text": "Commercial cook"},
+            {"line": 3, "text": "Food safety and kitchen work"},
+        ])
+
+    def test_pdf_resume_needs_consent_before_its_bytes_are_read(self):
+        with mock.patch.object(app.pdf_text, "extract_lines") as extracted:
+            status, body = self.post_json("/api/resume-text", pdf_resume(consent=False))
+        self.assertEqual(status, 200)
+        self.assertIn("consent", body["refused"])
+        extracted.assert_not_called()
+
+    def test_scanned_and_encrypted_pdfs_are_refused_as_non_evidence(self):
+        for name, words in (("scanned.pdf", "scan or a photo"),
+                            ("encrypted.pdf", "encrypted")):
+            with self.subTest(name=name):
+                status, body = self.post_json("/api/resume-text", pdf_resume(name))
+                self.assertEqual(status, 200)
+                self.assertIn(words, body["refused"])
+
+    def test_pdf_upload_body_limit_is_checked_before_reading(self):
+        connection = HTTPConnection("127.0.0.1", self.port, timeout=5)
+        try:
+            connection.putrequest("POST", "/api/resume-text")
+            connection.putheader("Content-Type", "application/json")
+            connection.putheader("Content-Length", str(app.MAX_PDF_JSON_BYTES + 1))
+            connection.endheaders()
+            response = connection.getresponse()
+            self.assertEqual(response.status, 400)
+            self.assertIn("error", json.loads(response.read()))
+        finally:
+            connection.close()
 
     def test_extract_golden_path(self):
         status, body = self.post_json("/api/extract", cook())
