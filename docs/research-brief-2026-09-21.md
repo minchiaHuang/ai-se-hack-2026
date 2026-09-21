@@ -1065,8 +1065,11 @@ DOI https://doi.org/10.1111/bjir.70016
 
 | 數字 | 來源 | 標籤 |
 |---|---|---|
-| 人道簽證領失業給付 **20.1%** vs 技術移民 **1.7%**（約 12 倍） | ABS Migrant Settlement Outcomes, PLIDA 2022–23 | OFFICIAL |
+| 抵澳未滿 5 年者領失業給付：人道移民 **41.7%** vs 技術移民 **0.1%**；所有抵澳年份為 **20.1%** vs **1.7%**。這是給付比例，不是失業率 | ABS Migrant Settlement Outcomes 2025, PLIDA 2022–23 | OFFICIAL |
 | 人道移民中位總所得 **$39,423**；抵澳未滿 5 年 **$25,183** | 同上 | OFFICIAL |
+| 近 **2,200 名**人道移民十年追蹤：抵澳前有大學／技術學歷，與男性第五年轉入有薪工作的機率**降低 14 個百分點**相關；女性結果未達統計顯著 | AIFS, BNLA 2013–14 至 2023；DSS 資助研究，不代表政府政策 | OFFICIAL RESEARCH |
+| Pilot 2 就業障礙：缺澳洲經驗／推薦人 **54%**、語言 **31%**、額外牌照／認證 **25%**；整理申請與完整文件需要大量個案管理工作 | DEWR Skills Assessment Pilot Final Evaluation 2024；混合簽證族群，非難民獨立分項 | OFFICIAL |
+| 2024–25 Humanitarian Program 核發 **20,000** 個簽證，其中 **15,999** 個境外人道簽證、**4,001** 個境內永久 Protection visas | Home Affairs 2024–25 Humanitarian Program Outcomes | OFFICIAL |
 | 抵澳 3–6 個月 **6%** 有支薪工作 → 約 18 個月 **16%** → 約 2.5 年 **23%** | BNLA, AIFS/DSS, n=2,399 | EVIDENCE |
 | BNLA 第 3 波性別差：男 **36%** vs 女 **8%**；第 10 年男 **63%** vs 女 **39%** | 同上 | EVIDENCE |
 | **44%** 移民與難民從事低於技能水準的工作；年損 **90 億澳幣**、約 **44,000** 職位；**62 萬**「隱形勞動力」 | Deloitte Access Economics for SSI, 2024-06 | EVIDENCE |
@@ -1080,9 +1083,20 @@ DOI https://doi.org/10.1111/bjir.70016
 | SSI FY25 營收 **2.1196 億澳幣**，年服務 **67,000+ 人** | SSI FY25 整合報告 | EVIDENCE |
 | Thrive Refugee Enterprise：逾 **1,000 萬澳幣**放款給 550 家企業，年營收 **6,000 萬澳幣**；2017 年起支持 **1,500+** 名難民 | Thrive 影響報告 | EVIDENCE |
 
+本次官方資料補強來源：
+
+- ABS：https://www.abs.gov.au/statistics/people/people-and-communities/migrant-settlement-outcomes/2025
+- AIFS：https://aifs.gov.au/building-new-life-australia/research-findings/income-support-payments-and-employment
+- DEWR：https://www.dewr.gov.au/assessing-authority-policy-and-assurance/resources/skills-assessment-pilot-final-evaluation-report-and-appendices
+- Home Affairs：https://www.homeaffairs.gov.au/research-and-stats/files/aus-offshore-humanitarian-program-2024-25-glance.pdf
+
 **摩擦點（Career Pathways Pilot 評估 §5.5.1，可直接引述原文）**：
 文件拿不到、沒有澳洲推薦人、卡在初篩（雇主覺得 "more risky"）、
 履歷協助為第三高需求（**42%**）、再認證六個月拖成三年、駕照與電腦是具體門檻。
+
+**2026-09-21 澳洲官方資料補強**：AIFS 的十年追蹤直接支持「技能存在，但沒有自然轉成澳洲工作」；
+DEWR 的評估直接支持「把申請整理成 assessment-ready 需要大量個案管理工作」。這兩項比一般移民的技能錯配數字
+更貼近目前產品切口。DEWR 百分比來自混合簽證族群，不得說成難民專屬結果。
 
 **可整段講的案例**：阿富汗牙醫，6 年臨床 ＋ 7 年教學，
 因拿不到母國一份政府文件而無法報考，同時因「沒有澳洲經驗」被牙助職缺拒絕，
@@ -1192,8 +1206,8 @@ NYC LL144、AHRC 技術報告、HRW 羅興亞案）：
    RESP 於 2024-06-30 結束後，NSW 難民在主流系統中的表現公開不可測。
    唯一對照點是已消失的 RESP 近 30% vs 全國 18 個月 17%。
 3. **沒有公開數字說明難民走完海外資歷認證的成本、時間或放棄率。**
-   VETASSESS 有費用（$1,205.60）與名目時程（8–12 週），
-   但沒有人公布有多少人道入境者開始、完成、或在文件拿不到時放棄。
+   VETASSESS 有費用（$1,205.60）與名目時程（8–12 週）；DEWR Pilot 2 有混合簽證族群的
+   申請與完成資料，但沒有人單獨公布有多少人道入境者開始、完成、或在文件拿不到時放棄。
    現有證據全是軼事（阿富汗牙醫；六個月拖成三年的再認證）。
 
 > **INFERENCE，可以上台講**：管不了沒被量的東西。

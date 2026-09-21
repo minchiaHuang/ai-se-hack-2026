@@ -273,23 +273,42 @@ https://immi.homeaffairs.gov.au/settlement-services-subsite/files/career-pathway
 
 ## 可引用的證據（每一條都附 URL，上台前逐條複驗）
 
-### 五個最強的數字
+### Problem Validation：先講這五條
 
-1. **人道簽證持有者領失業給付的比例是技術移民的約 12 倍——20.1% vs 1.7%**
-   （ABS Migrant Settlement Outcomes，PLIDA，參考年 2022–23）
-   https://www.abs.gov.au/statistics/people/people-and-communities/migrant-settlement-outcomes/latest-release
-2. ⭐ **難民抵澳時就業機率低約 88 個百分點，五年後仍低超過 51 個百分點；
+1. **近期抵澳者的落差最大。** ABS 2022–23 資料顯示，抵澳未滿 5 年、15–64 歲的人道移民中，
+   **41.7% 曾領取失業給付**，技術移民為 **0.1%**。若看所有抵澳年份，人道移民為
+   **20.1%**，技術移民為 **1.7%**。這是「領取失業給付比例」，**不是失業率**。
+   https://www.abs.gov.au/statistics/people/people-and-communities/migrant-settlement-outcomes/2025
+2. **既有學歷沒有自然轉換成工作優勢。** AIFS 對近 **2,200 名**人道移民的十年追蹤發現，
+   對男性而言，抵澳前有大學或技術學歷，與第五年從收入支持轉向有薪工作的機率
+   **降低 14 個百分點**相關；女性結果未達統計顯著。AIFS 指出海外資歷認定複雜且昂貴。
+   https://aifs.gov.au/building-new-life-australia/research-findings/income-support-payments-and-employment
+3. **政府試點也卡在證據與制度導航。** DEWR 2024 Skills Assessment Pilot 2 的參與者包括
+   family、partner、humanitarian 與 secondary skilled visa holders。就業障礙包括缺乏澳洲工作經驗
+   或推薦人 **54%**、語言 **31%**、額外牌照或認證 **25%**；評估機構另列出過往學歷或工作證據、
+   費用及不理解評估標準。報告總結，把申請整理到 assessment-ready 並取得完整文件，仍需要
+   大量個案管理工作。這些百分比**不是人道簽證持有人的獨立分項**。
+   https://www.dewr.gov.au/assessing-authority-policy-and-assurance/resources/skills-assessment-pilot-final-evaluation-report-and-appendices
+4. ⭐ **難民抵澳時就業機率低約 88 個百分點，五年後仍低超過 51 個百分點；
    同儕審查結論是主因為雇主在無法驗證海外資歷時的篩選行為**
    （Guo & Tani, BJIR 2026，n=3,757）
    https://www.unsw.edu.au/newsroom/news/2025/11/refugees-Australia-employer-discrimination
-3. **44% 的移民與難民從事低於自身技能水準的工作，一年損失 90 億澳幣、約 44,000 個職位；
-   報告明文指出人道入境者受影響更嚴重**
-   （Deloitte Access Economics for SSI，2024-06）
-   https://www.ssi.org.au/media-centre/media-releases/billion-dollar-benefit-new-report-identifies-five-ways-to-harness-untapped-skilled-workforce/
-4. **政府 450 萬澳幣的 Career Pathways Pilot 只讓 11–17% 的人回到原職業，
-   招募僅達目標 65%，單人成本最高逾 5,000 澳幣**（見上節 URL）
-5. **AMES Australia FY2024-25：17,951 名客戶 → 1,533 個成效，8.5% 媒合率**
-   https://www.ames.net.au/sites/default/files/2025-11/AMES%20Australia%20Annual%20Report%202024-2025.pdf
+5. **需求每年持續進入服務系統。** Home Affairs 2024–25 Humanitarian Program 共核發
+   **20,000 個簽證**，其中 15,999 個為境外人道簽證、4,001 個為境內永久 Protection visas。
+   這是年度流入規模，不是潛在使用者或市場規模。
+   https://www.homeaffairs.gov.au/research-and-stats/files/aus-offshore-humanitarian-program-2024-25-glance.pdf
+
+### 次要佐證
+
+- **44% 的移民與難民從事低於自身技能水準的工作，一年損失 90 億澳幣、約 44,000 個職位；
+  報告明文指出人道入境者受影響更嚴重**（Deloitte Access Economics for SSI，2024-06）。
+  這不是人道入境者的獨立比例。
+  https://www.ssi.org.au/media-centre/media-releases/billion-dollar-benefit-new-report-identifies-five-ways-to-harness-untapped-skilled-workforce/
+- **政府 450 萬澳幣的 Career Pathways Pilot 只讓 11–17% 的人回到原職業，
+  招募僅達目標 65%，單人成本最高逾 5,000 澳幣**（見上節 URL）。
+- **AMES Australia FY2024-25：17,951 名客戶 → 1,533 個成效，8.5% 媒合率**。
+  這是 AMES 全部 Workforce Australia 客戶，不是難民專屬成效。
+  https://www.ames.net.au/sites/default/files/2025-11/AMES%20Australia%20Annual%20Report%202024-2025.pdf
 
 備用第六條：**抵澳 3–6 個月僅 6% 的人道移民有支薪工作，約 18 個月升至 16%，
 約 2.5 年升至 23%**（BNLA，n=2,399）https://aifs.gov.au/building-new-life-australia
@@ -451,8 +470,8 @@ https://www.tisnational.gov.au/en/Our-services/Free-Interpreting-Service/About
 2. **Workforce Australia 不公布依人道簽證身分分項的成效。**
    RESP 於 2024-06-30 結束後，NSW 難民在主流系統中的表現**公開不可測**。
 3. **沒有任何公開數字說明難民走完海外資歷認證的成本、時間或放棄率。**
-   VETASSESS 有費用與名目時程，但沒有人公布有多少人道入境者開始、完成、
-   或在文件拿不到時放棄。
+   VETASSESS 有費用與名目時程；DEWR Pilot 2 有混合簽證族群的申請與完成資料，
+   但沒有單獨公布人道入境者有多少人開始、完成，或在文件拿不到時放棄。
 
 > **INFERENCE，可以上台講**：管不了沒被量的東西。
 > 這三個缺口本身就解釋了為什麼供應商申報的是活動量而不是成效。
