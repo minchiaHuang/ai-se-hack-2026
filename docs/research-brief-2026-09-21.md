@@ -1016,3 +1016,185 @@ Good Cycles 80/20（八成以上交易收入）；Social Traders 認證社企平
 5. 誰付錢、誰維護
 
 填不滿就用本檔的方向。
+
+---
+
+## 8. 方向 7 研究 —— 難民就業（2026-09-21 傍晚，三個 agent 平行）
+
+**背景**：2026-09-21 傍晚，隊伍決定換題到「澳洲難民就業平台」。
+本倉庫在此之前對 refugee／migrant／asylum／CALD **完全沒有任何研究**（grep 為零），
+因此本節是該方向的第一輪、也是唯一一輪研究。
+
+**方法**：三個 `general-purpose` agent 平行跑 WebSearch／WebFetch，
+分為證據線、競品線、語音與評分對位線。
+
+> ### ⚠️ 本節與第 5 節的證據等級不同
+>
+> 第 5 節的六個方向經過二到四輪研究與人工複驗。
+> **本節只有一輪，且未經人工逐條複驗。**
+> 上台前要念的每個數字必須自己打開原始 URL 確認。
+> 「不要引用的數字」見 8.5，那一節比正文重要。
+
+### 8.1 核心發現 —— 三份報告互相打架，而打架處就是答案
+
+- **競品 agent** 的結論：履歷翻譯、jobright 式媒合、模擬面試三條車道全滿，
+  唯一可守的是「無文件經歷 → ANZSCO／VET RPL 對映」。
+- **語音 agent** 的結論：做非評分的語音面試練習室，
+  因為 Usability 15% ＋ Prototype 15% ＋ Effective AI 15% = 45% 最好拿。
+- **證據 agent** 挖到的同儕審查論文判了這場架：斷點在**雇主篩選時缺乏可信資訊**，
+  所以面試練習室打不到斷點，而資歷對映打得到。
+
+**合成結論（本輪最重要的一句）**：
+**語音的正確位置是輸入端（口述採集），不是輸出端（朗讀）、也不是通話端（口譯）。**
+因為求職者沒有文件、也打不出英文，**口述是唯一可能的輸入方式**——
+所以語音是必要的，不是裝飾的。
+
+### 8.2 證據線（agent 1）
+
+⭐ **最強的一張牌 —— Guo & Tani, _British Journal of Industrial Relations_, 2026（UNSW）**
+n=3,757（BNLA + HILDA）。難民抵澳時就業機率比其他移民低約 **88 個百分點**，
+五年後仍低超過 **51 個百分點**。作者原話：
+
+> *"the primary driver is discrimination by employers due to how they screen candidates
+> when they lack reliable information about overseas qualifications or experience."*
+
+https://www.unsw.edu.au/newsroom/news/2025/11/refugees-Australia-employer-discrimination
+DOI https://doi.org/10.1111/bjir.70016
+
+**其餘可引用數字**（完整清單與警語見 `docs/frameworks/direction-7-refugee-employment.md`）：
+
+| 數字 | 來源 | 標籤 |
+|---|---|---|
+| 人道簽證領失業給付 **20.1%** vs 技術移民 **1.7%**（約 12 倍） | ABS Migrant Settlement Outcomes, PLIDA 2022–23 | OFFICIAL |
+| 人道移民中位總所得 **$39,423**；抵澳未滿 5 年 **$25,183** | 同上 | OFFICIAL |
+| 抵澳 3–6 個月 **6%** 有支薪工作 → 約 18 個月 **16%** → 約 2.5 年 **23%** | BNLA, AIFS/DSS, n=2,399 | EVIDENCE |
+| BNLA 第 3 波性別差：男 **36%** vs 女 **8%**；第 10 年男 **63%** vs 女 **39%** | 同上 | EVIDENCE |
+| **44%** 移民與難民從事低於技能水準的工作；年損 **90 億澳幣**、約 **44,000** 職位；**62 萬**「隱形勞動力」 | Deloitte Access Economics for SSI, 2024-06 | EVIDENCE |
+| Career Pathways Pilot：**450 萬澳幣**、**784 人（目標 65%）**、**11–17%** 回到原職業、單人最高逾 **5,000 澳幣** | DSS/Deloitte 期中評估 | OFFICIAL/EVIDENCE |
+| AMES FY2024-25：**17,951 客戶 → 1,533 成效 = 8.5%** | AMES 年報 | EVIDENCE |
+| VETASSESS 完整評估 **$1,205.60 含 GST**，處理 **8–12 週** | VETASSESS 官網，2026-09 生效 | OFFICIAL |
+| HSP：年逾 **1.2 億澳幣**、年逾 **17,000 客戶**、**5 供應商 11 合約區** | ANAO 績效稽核 | OFFICIAL |
+| ⭐ **HISP 招標 2025-03-06 截標，結果預計 2026 年初** | Home Affairs | OFFICIAL |
+| SETS：**205 筆補助**，2024-07-01 – 2027-06-30；**444 萬澳幣**滾存給 42 家供應商 | Home Affairs / ANAO | OFFICIAL |
+| NSW RESP **已於 2024-06-30 結束**：5 年 **3,450 萬澳幣**、逾 **10,000 人**、近 **30%** 持續就業（全國基準 18 個月後 **17%**） | SSI / NSW | OFFICIAL/EVIDENCE |
+| SSI FY25 營收 **2.1196 億澳幣**，年服務 **67,000+ 人** | SSI FY25 整合報告 | EVIDENCE |
+| Thrive Refugee Enterprise：逾 **1,000 萬澳幣**放款給 550 家企業，年營收 **6,000 萬澳幣**；2017 年起支持 **1,500+** 名難民 | Thrive 影響報告 | EVIDENCE |
+
+**摩擦點（Career Pathways Pilot 評估 §5.5.1，可直接引述原文）**：
+文件拿不到、沒有澳洲推薦人、卡在初篩（雇主覺得 "more risky"）、
+履歷協助為第三高需求（**42%**）、再認證六個月拖成三年、駕照與電腦是具體門檻。
+
+**可整段講的案例**：阿富汗牙醫，6 年臨床 ＋ 7 年教學，
+因拿不到母國一份政府文件而無法報考，同時因「沒有澳洲經驗」被牙助職缺拒絕，
+最後只能無薪見習。
+
+**雇主端阻礙**（Career Pathways Pilot ＋ Tent ＋ UNSW 三方交叉）：
+初篩風險趨避、無法驗證海外資歷（Guo & Tani 指為**主因**）、
+從人脈招募（難民沒有本地人脈）、本地經驗要求、小雇主職缺密度不足、
+支援成本無法預估、沒有客製 onboarding 的經費。
+另見 Lee, Szkudlarek, Johnson & Brewster, _Human Relations_, 2026（39 家澳洲雇主質性研究）
+https://journals.sagepub.com/doi/10.1177/00187267251363341
+
+### 8.3 競品線（agent 2）
+
+**車道盤點結論**：
+
+| 車道 | 狀態 | 關鍵佔位者 |
+|---|---|---|
+| A. 難民專用求職平台（境外技術通道） | **佔滿** | Talent Beyond Boundaries（15.5 萬人、開源、政府試辦）、Global Talent Pathway（澳洲自有、13.5 萬人、做資歷驗證）⚠️ 最接近的澳洲對手 |
+| A'. 澳洲境內消費端 | **空著，但養不活** | ⛔ **Refugee Talent 已死** —— agent 直接 fetch `refugeetalent.com`，HTTP 200 但標題是印尼賭博網站，網域過期被接管 |
+| B. AI 履歷翻譯／重排 | **完全佔滿，而且免費** | Kickresume、AIApply **免費**十秒翻譯；⛔ **Home Affairs Free Translating Service 免費翻 10 份官方文件**（含就業與教育文件，簽證後兩年內） |
+| B'. 無文件資歷對映 | ⭐ **唯一薄的一格** | **SkillLab**（ESCO 13,485 技能→2,942 職業，明文處理 informal learning，**不在澳洲**）；**EQPR**（歐洲，靠 45–60 分鐘真人訪談）；**WES Gateway**（只有美加）；**Upwardly Global**（只有美國） |
+| C. jobright 式媒合 | **佔滿且競爭激烈** | Jobright（**美國限定**，US$19.99–39.99/月，被抱怨 resume AI 幻覺）、Simplify、LazyApply、AIApply、Careerflow。**Sonara 已死過一次**（2024-02 倒閉，2026 換東家重開） |
+| C'. 澳紐本地 | **有人佔住** | **JobSparrow**（AU/NZ，AI 履歷＋模擬面試＋媒合分數，**明文鎖定 migrants**，落地才付費） |
+| D. AI 模擬面試／語音 | **佔滿，且地基本身是商品** | Yoodli（$8/月）、Huru（$99/年）、Final Round AI；⛔ **Google Interview Warmup 已於 2026-04 關閉**；**ElevenLabs Agents 本身就賣整套語音堆疊 $0.08–0.12/分鐘** |
+| E. 澳洲安置部門就業媒合服務 | **塞滿了人** | 30+ 家政府資助機構，每州都有；**AMES 官網直接寫「free employment matching service」**；SSI、Brotherhood of St Laurence、CareerSeekers |
+
+**⭐ Upwardly Global 的自我實測（本輪最有用的單一引用）**：
+該組織公布自家 AI 工具對移民與難民申請者的辨識錯誤率——
+**教育資歷 35% 被誤判、工作經歷 20% 被誤判**。其 CEO 原話大意：
+AI 目前無法把一個人在外國取得的技能拆解出來、對映到本地勞動市場。
+https://www.upwardlyglobal.org/news/new-report-examines-impact-of-ai-technologies-on-immigrant-and-refugee-workforce/
+
+**這一條同時證明問題真實、且天真做法會失敗。**
+
+**為什麼澳洲這一格搬不過來（護城河論證）**：
+ANZSCO、VET RPL、ASQA、Country Education Profiles、TRA／VETASSESS／ACS 的分工
+全是澳洲專有制度。SkillLab 的 ESCO 對映不能移植——**這正是 SkillLab 不在澳洲的原因**。
+
+**誠實警語（agent 自陳）**：Workeer、Migracode、Amala、Talent Lift、Hire Immigrants、
+LinkedIn Welcome Talent、Refugee Jobs Marketplace **本輪未取得現行第一手資料**，
+不得宣稱其已死。Divtal 的網域無法解析，狀態未確認。
+
+### 8.4 語音與評分對位線（agent 3）
+
+**ElevenLabs 實際能力（EVIDENCE，官方文件）**：
+
+| 能力 | 覆蓋 |
+|---|---|
+| Eleven v3 / v3 Conversational（約 280ms） | 70+ 語言 |
+| Flash v2.5（約 75ms） | 32 語言 |
+| Agents「All」設定 | **31 語言**；⛔ **語言偵測只在通話開始執行，無法中途切換** |
+| Scribe v2 STT（90+ 語言） | 阿拉伯語 WER **10–20%**「Good」；波斯語／史瓦希里語 **5–10%**「High」；**普什圖語 25–50%**「Moderate」 |
+| ⛔ **不在清單** | **Dari、Tigrinya、Rohingya、Hazaragi** |
+
+https://elevenlabs.io/docs/overview/capabilities/speech-to-text
+https://elevenlabs.io/docs/help-center/product/eleven-agents/which-languages-can-i-use-with-eleven-agents
+
+**⭐ 承重的不對稱（INFERENCE）**：能聽約 90 種，能說約 31 種，
+而**最需要的幾個語言剛好都缺**。任何以「說使用者的語言」為核心價值的功能，
+對最需要它的族群結構性最弱。**自己先講。**
+
+**TIS National 精確結論（OFFICIAL）**：免費口譯只對列舉式機構清單免費
+（Medicare 私人執業醫療、藥局、**無大額政府資助的 NGO 個案／緊急服務**、房仲、
+地方政府、工會、國會議員辦公室、特定 LGA 聯合健康）。
+**雇主、職業介紹所、就業服務供應商與個別求職者不在清單上。**
+https://www.tisnational.gov.au/en/Our-services/Free-Interpreting-Service/About
+
+- **紅線（已確認）**：任何有後果的通話一律導去 TIS 131 450，我們不自稱口譯員。
+- **INFERENCE，未驗證**：HSP 供應商年領 1.2 億澳幣，很可能不符合「無大額政府資助」。
+  ⚠️ **上台前必須打開官網確認，不得直接宣稱。**
+
+**九條倫理紅線**（含 AAAI-AIES 2024 的 85%、ANU 的 35% vs 22%、
+PNAS 2020 的 WER 0.35 vs 0.19、Mobley v. Workday、EU AI Act Annex III、
+NYC LL144、AHRC 技術報告、HRW 羅興亞案）：
+完整表格與 URL 見 `docs/frameworks/direction-7-refugee-employment.md`「九條倫理紅線」一節。
+
+**七項評分逐條對位**：同框架檔「評審七題的答法」一節。
+最危險的一題是 **Problem–Solution Fit 20%**：
+*「澳洲證據說壞的是雇主那端，你為什麼修求職者？」*
+答案是 Guo & Tani 那句話——雇主壞在**缺可信資訊**。
+
+### 8.5 ⛔ 不要引用的數字（本節最重要）
+
+| 不要講 | 為什麼 |
+|---|---|
+| ABS **60.4%** 說成「就業率」 | 那是 PLIDA 的「有個人所得」比例。能講的是 **20.1% vs 1.7%** 的失業給付差距 |
+| **CEDA 25% ／ 12.5 億澳幣** 套在難民身上 | 該報告只涵蓋**永久技術移民**，無難民數字 |
+| **Woolworths 150 名難民** 當現況 | 那是 **2020 年**的數字；2026 年總數 NOT FOUND |
+| **IKEA／Accor／Marriott／Compass** 為澳洲 Tent 成員 | **未驗證**，Tent 澳洲成員名單未公開 |
+| 任何**競品價格** | 多來自 SEO 比較站，不要放簡報 |
+| 人道入境者專屬**技能錯配百分比** | Deloitte 只說「更嚴重」，從未單獨量化。NOT FOUND |
+| 「**沒有人做這件事**」 | 只能講「我們搜尋後沒有找到」 |
+| 澳洲 AI 強制性規範「**是法律**」 | 截至 2026 年中仍未立法 |
+| MDA Ltd／CareSeekers／Jesuit Refugee Service 規模 | 本輪未驗證 |
+| TRA 費用 | 本輪未取得，只有 VETASSESS |
+
+### 8.6 公開資料裡本來就不存在的三個缺口
+
+**這三個是 NOT FOUND，不是沒查到。可以當論據用，不得自己估數字填補。**
+
+1. **澳洲沒有任何官方來源可以說出「難民失業率是 X%」。**
+   ABS Migrant Settlement Outcomes 只有所得與給付代理指標；
+   ABS Characteristics of Recent Migrants 最新版停在 **2019-11** 且不分離人道簽證；
+   BNLA 是唯一真正的就業序列，最後一波 2023。
+2. **Workforce Australia 不公布依人道簽證身分分項的成效。**
+   RESP 於 2024-06-30 結束後，NSW 難民在主流系統中的表現公開不可測。
+   唯一對照點是已消失的 RESP 近 30% vs 全國 18 個月 17%。
+3. **沒有公開數字說明難民走完海外資歷認證的成本、時間或放棄率。**
+   VETASSESS 有費用（$1,205.60）與名目時程（8–12 週），
+   但沒有人公布有多少人道入境者開始、完成、或在文件拿不到時放棄。
+   現有證據全是軼事（阿富汗牙醫；六個月拖成三年的再認證）。
+
+> **INFERENCE，可以上台講**：管不了沒被量的東西。
+> 這三個缺口本身解釋了為什麼供應商申報的是活動量而不是成效。
