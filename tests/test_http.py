@@ -79,6 +79,9 @@ class Server(unittest.TestCase):
         cls.env.start()
         os.environ.pop("ELEVENLABS_API_KEY", None)
         os.environ.pop("ANTHROPIC_API_KEY", None)
+        # PORT decides whether the scenario pages are served, so a laptop that
+        # happens to have one set must not change what these tests see.
+        os.environ.pop("PORT", None)
         cls.server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
         cls.port = cls.server.server_address[1]
         cls.thread = threading.Thread(target=cls.server.serve_forever, daemon=True)
@@ -94,6 +97,13 @@ class Server(unittest.TestCase):
     def get(self, path):
         with urlopen(f"http://127.0.0.1:{self.port}{path}", timeout=5) as response:
             return response.status, response.read().decode("utf-8")
+
+    def get_allowing_error(self, path):
+        """(status, body) where a 4xx is returned rather than raised."""
+        try:
+            return self.get(path)
+        except HTTPError as error:
+            return error.code, error.read().decode("utf-8")
 
     def post(self, path, data, content_type="application/json"):
         """Returns (status, raw text); a 4xx/5xx is returned, not raised."""
@@ -145,10 +155,9 @@ class HttpRoundTrip(Server):
                 self.assertEqual(headers["Content-Type"], "image/jpeg")
 
     def test_the_photo_route_serves_only_the_photo_folder(self):
-        # Anything not in the folder falls through to the developer index page.
-        _, headers = self.raw_get("/img/../app.py")
-        self.assertEqual(headers["Content-Type"], "text/html; charset=utf-8")
-        _, body = self.get("/img/../app.py")
+        # Anything not in the folder is a 404, never a file off the disk.
+        status, body = self.get_allowing_error("/img/../app.py")
+        self.assertEqual(status, 404)
         self.assertNotIn("class Handler", body)
 
     def test_the_homepage_keeps_mock_mode_on_its_own(self):
@@ -246,6 +255,27 @@ class HttpRoundTrip(Server):
         status, body = self.get("/run?s=nope")
         self.assertEqual(status, 200)
         self.assertIn("Direction skeleton", body)
+
+    def test_an_unknown_path_is_a_404_and_not_the_developer_index(self):
+        # It used to fall through to the scenario list, so a typo showed a judge
+        # an unstyled page listing the three directions the team dropped.
+        status, body = self.get_allowing_error("/nope")
+        self.assertEqual(status, 404)
+        self.assertNotIn("Direction skeleton", body)
+        self.assertIn("/", body)
+
+    def test_the_scenario_pages_are_hidden_where_a_host_sets_port(self):
+        with mock.patch.dict(os.environ, {"PORT": "10000"}):
+            for path in ("/scenarios", "/run?s=d2"):
+                status, body = self.get_allowing_error(path)
+                self.assertEqual(status, 404, path)
+                self.assertNotIn("Direction skeleton", body)
+
+    def test_the_product_pages_still_serve_where_a_host_sets_port(self):
+        with mock.patch.dict(os.environ, {"PORT": "10000"}):
+            for path in ("/", "/start", "/interview", "/review", "/jobs", "/upload"):
+                status, _ = self.get_allowing_error(path)
+                self.assertEqual(status, 200, path)
 
 
     def test_the_intake_page_serves(self):
