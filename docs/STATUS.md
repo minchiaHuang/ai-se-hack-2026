@@ -1,12 +1,12 @@
 # STATUS
 
-單行狀態：2026-09-21 晚。**方向 7 共 16 個 PR 已合入 `docs/direction-7-refugee-employment`（第一波 #5 d7-core、#3 d7-match、#2 d7-live、#4 d7-intake-ui；第二波 #6 d7-wire；#7 d7-resume 職缺板與逐職缺履歷；#8 d7-docs 給評審的英文 README；#9 d7-entry 起始畫面：口述或帶履歷兩個入口；#10 d7-docs2 README 補上起始畫面；#11 d7-jobs 職缺頁：全部範例職缺、平台式版面、佐證與逐字稿分頁；#12 d7-adzuna Adzuna 雪梨職缺快照工具（30 筆、25 筆有單元、106 個單元）；#13 d7-validation-docs 問題驗證數字改用官方來源；#14 d7-flow 履歷入口一步完成、職缺板獨立成 `/jobs` 頁；#15 d7-adzuna-quotes 抓取重試與引文要指名單元；#16 d7-real-jobs 職缺板改用真實 Adzuna 廣告並附上每個單元的原文出處；#17 d7-pdf-upload 可讀取文字型 PDF 履歷（純標準函式庫），合併點 `b6076f5`），`/intake` 與三條 API 已接上。**
+單行狀態：2026-09-21 晚。**方向 7 共 17 個 PR 已合入 `docs/direction-7-refugee-employment`（第一波 #5 d7-core、#3 d7-match、#2 d7-live、#4 d7-intake-ui；第二波 #6 d7-wire；#7 d7-resume 職缺板與逐職缺履歷；#8 d7-docs 給評審的英文 README；#9 d7-entry 起始畫面：口述或帶履歷兩個入口；#10 d7-docs2 README 補上起始畫面；#11 d7-jobs 職缺頁：全部範例職缺、平台式版面、佐證與逐字稿分頁；#12 d7-adzuna Adzuna 雪梨職缺快照工具（30 筆、25 筆有單元、106 個單元）；#13 d7-validation-docs 問題驗證數字改用官方來源；#14 d7-flow 履歷入口一步完成、職缺板獨立成 `/jobs` 頁；#15 d7-adzuna-quotes 抓取重試與引文要指名單元；#16 d7-real-jobs 職缺板改用真實 Adzuna 廣告並附上每個單元的原文出處；#17 d7-pdf-upload 可讀取文字型 PDF 履歷（純標準函式庫）；#18 d7-quotes 同一段廣告引文最多對應兩個單元、`?mock=1` 改顯示真實 Adzuna 職缺板，合併點 `0b53ba5`），`/intake` 與三條 API 已接上。**
 題目為方向 7：難民就業（口述經歷 → 佐證包 ＋ 媒合）。
 方向 6（WISE 就業成效申報）**正式放棄**，研究與證據原封保留為備案。
 方向 7 的一輪研究已完成（三個 agent 平行），框架、交接文件第 8 節、spec 皆已落檔。
 **現場優先原則仍凌駕一切。**
 
-最後驗證：2026-09-21（`bash bin/verify.sh` → GREEN，含 197 個骨架測試，於 `b6076f5`）
+最後驗證：2026-09-21（`bash bin/verify.sh` → GREEN，含 202 個骨架測試，於 `0b53ba5`）
 
 ## 進行中
 
