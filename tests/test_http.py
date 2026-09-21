@@ -132,7 +132,8 @@ class HttpRoundTrip(Server):
         # The demo button carries ?mock=1 itself, so it must not be rewritten
         # by the data-route script, which would drop mock mode on a live page.
         _, body = self.get("/")
-        self.assertIn('<a class="btn ghost-light" href="/start?mock=1">Live demo</a>', body)
+        self.assertIn(
+            '<a class="btn ghost-light" href="/start?mock=1&amp;quiet=1">Live demo</a>', body)
 
     def test_every_homepage_photo_serves_as_jpeg(self):
         _, body = self.get("/")
