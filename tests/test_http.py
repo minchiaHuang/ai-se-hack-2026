@@ -135,7 +135,7 @@ class HttpRoundTrip(Server):
         self.assertEqual(status, 200)
         self.assertEqual(headers["Content-Type"], "text/html; charset=utf-8")
         _, body = self.get("/")
-        self.assertIn("Work experience should not be lost in translation.", body)
+        self.assertIn("Turning spoken experience into Australian resumes.", body)
         self.assertIn('href="/start"', body)
 
     def test_the_homepage_offers_the_demo_in_mock_mode(self):
