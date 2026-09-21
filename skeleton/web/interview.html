@@ -625,7 +625,8 @@ function showQuestion() {
   showError("");
   setStatus("");
   render();
-  speak();
+  // Not read aloud on arrival: a voice starting by itself startles the jobseeker.
+  // The caseworker taps the orb when they are both ready.
 }
 
 // What the caseworker left in the boxes is the answer, empty or not: skipping a
