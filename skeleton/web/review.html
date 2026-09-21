@@ -1,0 +1,603 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BridgeWork caseworker review</title>
+<style>
+/* BridgeWork theme from the Figma "Design Theme" frame. Inline and without
+   external fonts: the page must render offline from the stdlib server. */
+:root {
+  --primary: #1B4B5A;
+  --accent: #E8874A;
+  --success: #4C9A6B;
+  --bg: #F7F5F1;
+  --text: #2B2B2B;
+  --muted: #5b6168;
+  --card: #fff;
+  --line: #d9d4cb;
+  --warn: #7a4a00;
+  --warn-bg: #fff3d6;
+  --stop: #9b1111;
+  --stop-bg: #fdecec;
+  --focus: #ffbf00;
+}
+* { box-sizing: border-box; }
+html { font-size: 18px; }
+body {
+  margin: 0; background: var(--bg); color: var(--text);
+  font: 1rem/1.5 system-ui, -apple-system, "Segoe UI", "PingFang SC", "Noto Sans CJK SC", sans-serif;
+}
+header.top { display: flex; align-items: baseline; gap: 1.25rem; padding: 14px 24px;
+             border-bottom: 1px solid var(--line); background: var(--card); }
+.wordmark { font-size: 1.4rem; margin: 0; letter-spacing: -.01em; }
+.wordmark b { color: var(--text); }
+.wordmark span { color: var(--primary); font-weight: 400; }
+.step { color: var(--muted); font-weight: 600; }
+main { max-width: 1280px; margin: 0 auto; padding: 16px 24px 48px; }
+h2 { font-size: 1.2rem; margin: 0 0 .25rem; }
+h3 { font-size: 1rem; margin: 0; }
+p { margin: .3rem 0; }
+.muted { color: var(--muted); }
+.small { font-size: .88rem; }
+button, input, textarea { font: inherit; }
+:focus-visible { outline: 4px solid var(--focus); outline-offset: 2px; }
+button {
+  min-height: 44px; padding: .35rem 1rem; border-radius: 8px; cursor: pointer;
+  border: 2px solid var(--primary); background: var(--primary); color: #fff; font-weight: 600;
+}
+button.secondary { background: var(--card); color: var(--primary); }
+button.small-btn { min-height: 34px; padding: .1rem .7rem; font-size: .88rem; }
+button.go { background: var(--accent); border-color: var(--accent); color: #1f1a15; }
+button:disabled { background: #d1d5db; border-color: #9ca3af; color: #333; cursor: not-allowed; }
+.link { color: var(--primary); font-weight: 600; }
+[hidden] { display: none !important; }
+
+.banner { padding: .5rem .8rem; border-radius: 6px; margin: 0 0 .75rem; font-weight: 600; }
+.banner.mock { background: var(--card); border: 2px dashed var(--line); font-weight: 500; }
+.banner.offline { background: var(--warn-bg); color: var(--warn); border: 2px solid var(--warn); }
+.banner.error { background: var(--stop-bg); color: var(--stop); border: 2px solid var(--stop); }
+
+/* Figma "MacBook Air - 2": the wait while the draft is written. */
+.loading { max-width: 560px; margin: 12vh auto; text-align: center; }
+.loading h2 { font-size: 1.5rem; }
+.spinner { width: 56px; height: 56px; margin: 0 auto 1rem; border-radius: 50%;
+           border: 6px solid #e4ded3; border-top-color: var(--primary); animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .spinner { animation: none; border-top-color: var(--accent); } }
+
+/* Figma "MacBook Air - 5": the resume on the left, the review panel on the right. */
+.review { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 24px; align-items: start; }
+.paper { background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+         padding: 36px 44px; box-shadow: 0 1px 3px rgba(0,0,0,.06); min-height: 70vh; }
+.paper .draft-tag { float: right; font-size: .75rem; font-weight: 800; letter-spacing: .05em; text-transform: uppercase;
+                    color: var(--accent); border: 2px solid var(--accent); border-radius: 999px; padding: 0 .5rem; }
+.paper h1 { font-size: 1.7rem; margin: 0; color: var(--primary); }
+.paper h1.empty { color: var(--muted); font-style: italic; font-weight: 500; }
+.paper .contact { color: var(--muted); margin: .15rem 0 1rem; }
+.paper h4 { margin: 1.1rem 0 .3rem; font-size: .8rem; letter-spacing: .08em; text-transform: uppercase;
+            color: var(--primary); border-bottom: 2px solid var(--primary); padding-bottom: .15rem; }
+.paper .entry { margin: 0 0 .55rem; }
+.paper .entry-head { font-weight: 700; }
+.paper .entry-meta { color: var(--muted); font-size: .9rem; }
+.paper ul { margin: .2rem 0; padding-left: 1.2rem; }
+.paper .none { color: var(--muted); font-style: italic; }
+
+.panel { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 18px; position: sticky; top: 12px; }
+.cards { list-style: none; margin: .75rem 0; padding: 0; display: grid; gap: 10px; }
+.card { border: 2px solid var(--line); border-radius: 10px; padding: .6rem .8rem; }
+.card.selected { border-color: var(--primary); }
+.card-head { display: flex; align-items: center; gap: .6rem; }
+.card-head h3 { flex: 1; }
+.card .summary { color: var(--muted); font-size: .88rem; margin-top: .2rem; overflow-wrap: anywhere; }
+.card .summary.blank { color: var(--warn); font-weight: 600; }
+.form { display: grid; gap: .5rem; margin-top: .5rem; }
+.form label { display: grid; gap: .1rem; font-size: .85rem; font-weight: 600; }
+.form input, .form textarea { width: 100%; padding: .35rem .5rem; border: 2px solid var(--line); border-radius: 6px;
+                              background: #fff; color: var(--text); font-size: .95rem; }
+.form textarea { min-height: 4.5rem; resize: vertical; }
+.form fieldset { border: 1px solid var(--line); border-radius: 8px; padding: .4rem .6rem .6rem; margin: 0; display: grid; gap: .4rem; }
+.form legend { font-size: .85rem; font-weight: 700; padding: 0 .25rem; }
+.row { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; }
+.consent { display: flex; gap: .55rem; align-items: flex-start; margin: .75rem 0; cursor: pointer; }
+.consent input { width: 22px; height: 22px; flex: none; margin-top: .15rem; accent-color: var(--primary); }
+.actions { display: flex; flex-wrap: wrap; gap: .6rem; justify-content: space-between; }
+.status { min-height: 1.4rem; font-weight: 600; margin-top: .5rem; }
+details.said { margin-top: .75rem; font-size: .88rem; }
+details.said summary { cursor: pointer; font-weight: 600; color: var(--primary); }
+details.said dl { margin: .4rem 0 0; }
+details.said dt { font-weight: 700; margin-top: .4rem; }
+details.said dd { margin: 0; }
+
+@media (max-width: 900px) {
+  .review { grid-template-columns: 1fr; }
+  .panel { position: static; }
+  .paper { padding: 20px; min-height: 0; }
+}
+@media print {
+  header.top, .panel, .banner { display: none !important; }
+  body { background: #fff; }
+  .review { display: block; }
+  .paper { border: 0; box-shadow: none; padding: 0; }
+  .paper .draft-tag { display: none; }
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <p class="wordmark"><b>Bridge</b><span>Work</span></p>
+  <span class="step">Caseworker review</span>
+</header>
+<main>
+  <p id="mock-banner" class="banner mock" hidden>Mock mode: fixture data for a fictional cook, no backend. Nothing is recorded or sent.</p>
+  <p id="offline" class="banner offline" role="status" hidden></p>
+  <p id="error" class="banner error" role="alert" hidden></p>
+
+  <section id="loading" class="loading" aria-live="polite">
+    <div class="spinner" aria-hidden="true"></div>
+    <h2>Generating resume from the conversation…</h2>
+    <p class="muted">About 30 seconds. Nothing is final: every section comes back as a draft for you to check.</p>
+  </section>
+
+  <section id="missing" class="loading" hidden>
+    <h2>No interview in this tab</h2>
+    <p class="muted">This page drafts a resume from the answers given on the interview page, and none were found here.
+      Answers stay in the tab they were given in, so start from the interview.</p>
+    <p><a class="link" id="to-interview" href="/interview">Go to the interview &rarr;</a></p>
+  </section>
+
+  <div id="review" class="review" hidden>
+    <article class="paper" id="preview" aria-label="Resume preview"></article>
+
+    <aside class="panel" aria-labelledby="h-panel">
+      <h2 id="h-panel">Caseworker Review</h2>
+      <p class="muted small">Drafted from the interview answers. Check each section with the jobseeker and edit anything that is wrong or missing.</p>
+      <ul class="cards" id="cards"></ul>
+      <label class="consent">
+        <input type="checkbox" id="consent">
+        <span>The jobseeker has checked this resume and agrees it is used to find matching jobs.</span>
+      </label>
+      <div class="actions">
+        <button type="button" class="secondary" id="regenerate"></button>
+        <button type="button" class="go" id="confirm">Confirm and continue &rarr;</button>
+      </div>
+      <p class="status" id="status" role="status"></p>
+      <details class="said">
+        <summary>What was said in the interview</summary>
+        <dl id="answers"></dl>
+      </details>
+    </aside>
+  </div>
+</main>
+
+<script>
+"use strict";
+
+// ?mock=1 runs the whole page against the fixtures below, shaped exactly like the
+// shared API contract, and makes no /api/ request at all: the demo is recorded in it.
+const params = new URLSearchParams(location.search);
+const MOCK = params.get("mock") === "1";
+
+// Handed over by /interview. sessionStorage keeps it to this tab.
+const INTERVIEW_KEY = "d7.interview";
+// Handed on to /jobs: the same key and shape intake.html writes.
+const SESSION_KEY = "d7-session";
+const asRoute = (route, file) => (location.protocol === "file:" ? file : route) + (MOCK ? "?mock=1" : "");
+const JOBS_URL = asRoute("/jobs", "jobs.html");
+
+// NEEDS DECISION: the extract contract requires an occupation and the brief gives
+// no selector, so this page uses the demo's frame, as intake.html does.
+const OCCUPATION = "cookery";
+
+const SECTIONS = [
+  { key: "profile", label: "Profile" },
+  { key: "contacts", label: "Contacts" },
+  { key: "education", label: "Education",
+    fields: [["major", "Course or major"], ["school", "School"], ["location", "Location"], ["dates", "Dates"], ["description", "What was learned"]] },
+  { key: "employment", label: "Employment",
+    fields: [["position", "Position"], ["company", "Company"], ["location", "Location"], ["dates", "Dates"], ["description", "Main tasks"]] },
+  { key: "volunteer", label: "Volunteer Experience",
+    fields: [["role", "Role"], ["location", "Location"], ["dates", "Dates"], ["description", "What was done"]] },
+  { key: "skills", label: "Technical Skills" },
+  { key: "certificates", label: "Certificates" },
+];
+const LABEL = Object.fromEntries(SECTIONS.map(s => [s.key, s.label]));
+
+// ---------------------------------------------------------------- fixtures
+// The mock interviewee's answers: exactly the team's mock_interview_answers.json
+// (fictional cook Li Wei), with the questions from interview_questions.json.
+const MOCK_INTERVIEW = /*MOCK_INTERVIEW*/null;
+// The contract has no name field; the mock fills the page-only name with the
+// fictional interviewee's so the preview reads like a resume.
+const MOCK_NAME = "Li Wei";
+
+// The live /api/resume-sections answer for MOCK_INTERVIEW, drafted by the model on
+// 2026-09-21 and checked against the answers by hand: nothing in it was unsaid.
+const FIXTURE_SECTIONS = /*FIXTURE_SECTIONS*/null;
+
+// The real /api/extract (live model) and /api/match (app.match()) responses for the
+// lines resumeLines() builds from FIXTURE_SECTIONS, generated on 2026-09-21, so /jobs
+// shows the real Adzuna board. FIXTURE_REVIEW_LINES are those lines' texts.
+const FIXTURE_REVIEW_LINES = /*FIXTURE_REVIEW_LINES*/null;
+const FIXTURE_REVIEW_EXTRACT = /*FIXTURE_REVIEW_EXTRACT*/null;
+const FIXTURE_REVIEW_MATCH = /*FIXTURE_REVIEW_MATCH*/null;
+FIXTURE_REVIEW_MATCH.resume = FIXTURE_REVIEW_MATCH.resumes[FIXTURE_REVIEW_MATCH.jobs[0].id];
+
+function mockApi(path, body) {
+  // Long enough on the first draft that the loading state shows in the video.
+  const delay = path === "/api/resume-sections" && !state.sections ? 1600 : 450;
+  return new Promise(resolve => setTimeout(() => {
+    if (path === "/api/resume-sections") return resolve({ sections: clone(FIXTURE_SECTIONS) });
+    if (path === "/api/extract") {
+      if (!body.consent) return resolve({ refused: "consent was not given; nothing may be processed" });
+      return resolve(mockExtract(body.resume));
+    }
+    if (path === "/api/match") return resolve(mockMatch(body.evidenced_units));
+    resolve({ refused: "unknown endpoint " + path });
+  }, delay));
+}
+
+// An edit that changes a line the fixture cites takes that item away, and an
+// edit elsewhere keeps it: the mock never claims evidence the text no longer says.
+function mockExtract(lines) {
+  const intact = sources => sources.every(([label, locator]) => {
+    const n = Number(String(locator).replace("line=", ""));
+    return label === "resume" && lines[n - 1] && lines[n - 1].text === FIXTURE_REVIEW_LINES[n - 1];
+  });
+  const extract = clone(FIXTURE_REVIEW_EXTRACT);
+  extract.suggestions = extract.suggestions.filter(item => intact(item.sources));
+  extract.needs_human = extract.needs_human.filter(item => intact(item.sources));
+  extract.metric_value = extract.suggestions.length + extract.needs_human.length;
+  return extract;
+}
+
+// The fixture board with only the units still evidenced counted as matched.
+// Courses and drafts stay the fixture's: the mock cannot recompute them.
+function mockMatch(evidenced) {
+  const kept = new Set(evidenced.map(unit => unit.code));
+  const match = clone(FIXTURE_REVIEW_MATCH);
+  for (const list of [match.jobs, match.all_jobs]) {
+    for (const job of list) {
+      const dropped = job.matched.filter(unit => !kept.has(unit.code));
+      if (!dropped.length) continue;
+      job.matched = job.matched.filter(unit => kept.has(unit.code));
+      job.missing = job.missing.concat(dropped.map(({ code, title }) => ({ code, title })));
+      job.fit = job.matched.length + " of " + (job.matched.length + job.missing.length) + " required units evidenced";
+    }
+  }
+  return match;
+}
+
+// ---------------------------------------------------------------- state
+const state = {
+  interview: null,  // {language, answers: [{id, section, question_en, question_zh, answer_zh, answer_en}]}
+  sections: null,   // the contract's sections, as edited by the caseworker
+  name: "",         // page-only: the contract carries no name
+  editing: null,    // the key of the card open for editing
+  selected: "profile", // what "Regenerate Section" redrafts
+  consent: false,
+  busy: false,
+  leaving: false,
+};
+
+const $ = id => document.getElementById(id);
+const clone = value => JSON.parse(JSON.stringify(value));
+
+function el(tag, attrs, ...children) {
+  const node = document.createElement(tag);
+  for (const [key, value] of Object.entries(attrs || {})) {
+    if (value === null || value === undefined || value === false) continue;
+    if (key === "class") node.className = value;
+    else if (key.startsWith("on")) node.addEventListener(key.slice(2), value);
+    else node.setAttribute(key, value === true ? "" : value);
+  }
+  for (const child of children.flat(Infinity)) {
+    if (child === null || child === undefined || child === false) continue;
+    node.append(child instanceof Node ? child : document.createTextNode(String(child)));
+  }
+  return node;
+}
+
+// ---------------------------------------------------------------- network
+async function call(path, json) {
+  if (MOCK) return mockApi(path, json);
+  const response = await fetch(path, { method: "POST", headers: { "Content-Type": "application/json" },
+                                       body: JSON.stringify(json) });
+  if (!response.ok) throw new Error(path + " answered HTTP " + response.status);
+  return response.json();
+}
+
+function showError(message) {
+  $("error").textContent = message || "";
+  $("error").hidden = !message;
+}
+
+function showOffline(reason) {
+  $("offline").textContent = reason || "";
+  $("offline").hidden = !reason;
+}
+
+function setStatus(message) { $("status").textContent = message || ""; }
+
+// The contract's empty resume: what the caseworker types into when the model is offline.
+function emptySections() {
+  return { profile: "", contacts: { phone: "", email: "" }, education: [], employment: [],
+           volunteer: [], skills: [], certificates: [] };
+}
+
+// ---------------------------------------------------------------- load
+function readInterview() {
+  let stored = null;
+  try {
+    stored = JSON.parse(sessionStorage.getItem(INTERVIEW_KEY) || "null");
+  } catch (err) {
+    stored = null;
+  }
+  if (stored && Array.isArray(stored.answers)) return stored;
+  // Mock mode can be opened directly, as the demo does, so it brings its own answers.
+  return MOCK ? clone(MOCK_INTERVIEW) : null;
+}
+
+async function draftAll() {
+  const body = await call("/api/resume-sections", { answers: state.interview.answers });
+  if (body && body.offline) return { offline: body.reason || "The resume service is offline." };
+  if (!body || !body.sections) throw new Error("the answer had no sections");
+  return { sections: body.sections };
+}
+
+async function start() {
+  state.interview = readInterview();
+  if (!state.interview) {
+    $("loading").hidden = true;
+    $("missing").hidden = false;
+    return;
+  }
+  if (MOCK && !state.name) state.name = MOCK_NAME;
+  try {
+    const drafted = await draftAll();
+    // Offline, nothing is drafted in the model's place: the caseworker gets empty
+    // sections to type into, and the banner says why.
+    state.sections = drafted.sections || emptySections();
+    showOffline(drafted.offline ? "No draft: " + drafted.offline + " Type the sections in from the answers below." : "");
+  } catch (err) {
+    state.sections = emptySections();
+    showError("Could not draft the resume: " + err.message + ". Type the sections in from the answers below.");
+  }
+  $("loading").hidden = true;
+  $("review").hidden = false;
+  render();
+}
+
+// ---------------------------------------------------------------- actions
+async function regenerate() {
+  const key = state.selected;
+  state.busy = true; render();
+  showError("");
+  setStatus("Redrafting " + LABEL[key] + " from the same answers…");
+  try {
+    // The contract has one endpoint for the whole resume; only this section is taken.
+    const drafted = await draftAll();
+    if (drafted.offline) {
+      setStatus("");
+      showOffline("Not redrafted: " + drafted.offline + " " + LABEL[key] + " was left as it was.");
+      return;
+    }
+    state.sections[key] = drafted.sections[key];
+    showOffline("");
+    setStatus(LABEL[key] + " redrafted. Check it again with the jobseeker.");
+  } catch (err) {
+    setStatus("");
+    showError("Could not redraft " + LABEL[key] + ": " + err.message + ". Nothing was changed.");
+  } finally {
+    state.busy = false; render();
+  }
+}
+
+const joinParts = (...parts) => parts.map(p => String(p || "").trim()).filter(Boolean).join(", ");
+
+// The confirmed resume as the numbered lines the existing resume path reads, one
+// fact per line so a citation points at something short. Name and contacts are left
+// out: matching needs neither, and nothing is sent that the match does not use.
+// FIXTURE_REVIEW_LINES was generated with this same layout; change both together.
+function resumeLines(s) {
+  const out = [];
+  const block = (title, rows) => {
+    rows = rows.map(row => String(row || "").trim()).filter(Boolean);
+    if (rows.length) out.push(title, ...rows);
+  };
+  block("PROFILE", [s.profile]);
+  block("WORK EXPERIENCE", s.employment.flatMap(e => [joinParts(e.position, e.company, e.location, e.dates), e.description]));
+  block("VOLUNTEER EXPERIENCE", s.volunteer.flatMap(e => [joinParts(e.role, e.location, e.dates), e.description]));
+  block("EDUCATION", s.education.flatMap(e => [joinParts(e.major, e.school, e.location, e.dates), e.description]));
+  block("SKILLS", s.skills);
+  block("CERTIFICATES", s.certificates);
+  return out.map((text, i) => ({ line: i + 1, text }));
+}
+
+// Same reading as intake.html: only confirmed, cited units feed the match.
+function evidencedUnits(extract) {
+  const units = [];
+  for (const item of extract.suggestions) {
+    if (item.field !== "units_evidenced") continue;
+    for (const code of String(item.value).split(/[;,\s]+/).filter(Boolean)) {
+      units.push({ code, sources: item.sources });
+    }
+  }
+  return units;
+}
+
+async function confirmAndContinue() {
+  if (!state.consent) {
+    setStatus("Tick the box first: the resume is used only once the jobseeker agrees.");
+    $("consent").focus();
+    return;
+  }
+  const lines = resumeLines(state.sections);
+  if (!lines.length) {
+    setStatus("The resume is empty. Fill in at least one section first.");
+    return;
+  }
+  state.editing = null;
+  state.busy = true; render();
+  showError("");
+  try {
+    // The resume is written in English, so each line is its own English gloss,
+    // exactly as intake.html sends an English resume.
+    const resume = lines.map(({ line, text }) => ({ line, text, en: text }));
+    setStatus("Mapping to Australian units…");
+    const extract = await call("/api/extract", { occupation: OCCUPATION, language: "en", consent: state.consent,
+                                                 source: "resume", resume });
+    if (typeof extract.refused === "string") throw new Error(extract.refused);
+    setStatus("Matching jobs…");
+    const match = await call("/api/match", { occupation: OCCUPATION, evidenced_units: evidencedUnits(extract),
+                                             source: "resume", resume });
+    if (typeof match.refused === "string") throw new Error(match.refused);
+    handOff(lines, extract, match);
+  } catch (err) {
+    setStatus("");
+    showError("Could not match jobs: " + err.message + ". The resume is kept; try again.");
+  } finally {
+    if (!state.leaving) { state.busy = false; render(); }
+  }
+}
+
+// What intake.html carries to /jobs, key for key, so jobs.html needs no change.
+function handOff(lines, extract, match) {
+  const carried = { source: "resume", language: "en", lines, extract, match, mock: MOCK };
+  try {
+    sessionStorage.setItem(SESSION_KEY, JSON.stringify(carried));
+  } catch (err) {
+    showError("Could not open the jobs page: this browser is blocking session storage for this site. " +
+              "Nothing was lost; allow site data and press the button again.");
+    return;
+  }
+  state.leaving = true;
+  setStatus("Opening the jobs…");
+  location.assign(JOBS_URL);
+}
+
+// ---------------------------------------------------------------- render: preview
+function renderPreview() {
+  const s = state.sections;
+  const contact = [s.contacts.phone, s.contacts.email].filter(Boolean).join("  ·  ");
+  const entries = (list, head, meta) => list.map(e => el("div", { class: "entry" },
+    el("div", { class: "entry-head" }, head(e)),
+    meta(e) ? el("div", { class: "entry-meta" }, meta(e)) : null,
+    e.description ? el("p", {}, e.description) : null));
+  const section = (title, body) => [el("h4", {}, title), body];
+  const none = el("p", { class: "none" }, "Nothing recorded.");
+  $("preview").replaceChildren(
+    el("span", { class: "draft-tag" }, "Draft"),
+    el("h1", { class: state.name ? null : "empty" }, state.name || "Name not entered"),
+    el("p", { class: "contact" }, contact || "No phone or email recorded."),
+    section("Summary", s.profile ? el("p", {}, s.profile) : none.cloneNode(true)),
+    section("Skills", s.skills.length ? el("ul", {}, s.skills.map(x => el("li", {}, x))) : none.cloneNode(true)),
+    section("Experience", s.employment.length ? entries(s.employment, e => joinParts(e.position, e.company) || "Untitled role",
+                                                          e => joinParts(e.location, e.dates)) : none.cloneNode(true)),
+    section("Volunteer experience", s.volunteer.length ? entries(s.volunteer, e => e.role || "Volunteer",
+                                                                 e => joinParts(e.location, e.dates)) : none.cloneNode(true)),
+    section("Education", s.education.length ? entries(s.education, e => joinParts(e.major, e.school) || "Study",
+                                                        e => joinParts(e.location, e.dates)) : none.cloneNode(true)),
+    section("Certificates", s.certificates.length ? el("ul", {}, s.certificates.map(x => el("li", {}, x))) : none.cloneNode(true)));
+}
+
+// ---------------------------------------------------------------- render: cards
+function summaryOf(key) {
+  const s = state.sections;
+  if (key === "profile") return s.profile;
+  if (key === "contacts") return [state.name, s.contacts.phone, s.contacts.email].filter(Boolean).join(" · ");
+  if (key === "skills" || key === "certificates") return s[key].join("; ");
+  const head = { education: e => joinParts(e.major, e.school), employment: e => joinParts(e.position, e.company),
+                 volunteer: e => e.role }[key];
+  return s[key].map(e => head(e) || "(untitled)").join("; ");
+}
+
+// Every input writes straight into state and redraws the preview, so the resume
+// on the left is always what would be confirmed.
+function field(label, value, onValue, multiline) {
+  const input = el(multiline ? "textarea" : "input", multiline ? {} : { type: "text" });
+  input.value = value || "";
+  input.addEventListener("input", () => { onValue(input.value); renderPreview(); });
+  return el("label", {}, label, input);
+}
+
+function editor(section) {
+  const s = state.sections;
+  const key = section.key;
+  if (key === "profile") return [field("Profile", s.profile, v => { s.profile = v; }, true)];
+  if (key === "contacts") {
+    return [
+      // NEEDS DECISION: the sections contract has no name, so the caseworker types it here.
+      field("Name (typed by the caseworker)", state.name, v => { state.name = v; }),
+      field("Phone", s.contacts.phone, v => { s.contacts.phone = v; }),
+      field("Email", s.contacts.email, v => { s.contacts.email = v; }),
+    ];
+  }
+  if (key === "skills" || key === "certificates") {
+    return [field("One per line", s[key].join("\n"),
+                  v => { s[key] = v.split("\n").map(x => x.trim()).filter(Boolean); }, true)];
+  }
+  const blank = Object.fromEntries(section.fields.map(([name]) => [name, ""]));
+  return [
+    s[key].map((entry, i) => el("fieldset", {},
+      el("legend", {}, section.label + " " + (i + 1)),
+      section.fields.map(([name, label]) => field(label, entry[name], v => { entry[name] = v; }, name === "description")),
+      el("div", { class: "row" }, el("button", { type: "button", class: "secondary small-btn",
+        onclick: () => { s[key].splice(i, 1); render(); } }, "Remove")))),
+    el("div", { class: "row" }, el("button", { type: "button", class: "secondary small-btn",
+      onclick: () => { s[key].push(Object.assign({}, blank)); render(); } }, "Add " + section.label.toLowerCase())),
+  ];
+}
+
+function renderCards() {
+  $("cards").replaceChildren(...SECTIONS.map(section => {
+    const open = state.editing === section.key;
+    const summary = summaryOf(section.key);
+    return el("li", { class: "card" + (state.selected === section.key ? " selected" : "") },
+      el("div", { class: "card-head" },
+        el("h3", {}, section.label),
+        el("button", { type: "button", class: "secondary small-btn", disabled: state.busy,
+                       "aria-expanded": open ? "true" : "false",
+                       onclick: () => toggleEdit(section.key) }, open ? "Done" : "Edit")),
+      open ? el("div", { class: "form" }, editor(section))
+           : el("p", { class: "summary" + (summary ? "" : " blank") }, summary || "Nothing recorded: check with the jobseeker."));
+  }));
+}
+
+function toggleEdit(key) {
+  state.editing = state.editing === key ? null : key;
+  state.selected = key;
+  render();
+  const card = [...$("cards").children][SECTIONS.findIndex(s => s.key === key)];
+  const first = card && card.querySelector("input, textarea");
+  if (first) first.focus();
+}
+
+function renderAnswers() {
+  $("answers").replaceChildren(...state.interview.answers.flatMap(a => [
+    el("dt", {}, a.section || a.id),
+    el("dd", {}, a.answer_en || "(no English translation)"),
+    a.answer_zh ? el("dd", { class: "muted", lang: "zh" }, a.answer_zh) : null,
+  ]));
+}
+
+function render() {
+  if (!state.sections) return;
+  renderPreview();
+  renderCards();
+  renderAnswers();
+  $("regenerate").textContent = "Regenerate Section: " + LABEL[state.selected];
+  $("regenerate").disabled = state.busy;
+  $("confirm").disabled = state.busy;
+}
+
+// ---------------------------------------------------------------- wiring
+$("mock-banner").hidden = !MOCK;
+$("to-interview").href = asRoute("/interview", "interview.html");
+$("consent").addEventListener("change", event => { state.consent = event.target.checked; setStatus(""); });
+$("regenerate").addEventListener("click", regenerate);
+$("confirm").addEventListener("click", confirmAndContinue);
+start();
+</script>
+</body>
+</html>

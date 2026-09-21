@@ -24,6 +24,7 @@ from skeleton.core.model import CANNED, StubModel
 from skeleton.core.pipeline import run
 from skeleton.core.schema import AggregationError
 from skeleton.directions import d2_triage, d3_evidence, d6_outcomes, d7_credentials, d7_match
+from skeleton.directions import d7_sections
 from skeleton.directions.d7_credentials import RedLineError, UnsupportedLanguageError
 
 DIRECTIONS = {"d2": d2_triage, "d3": d3_evidence,
@@ -37,6 +38,8 @@ WEB = Path(__file__).resolve().parent / "web"
 INTAKE_PAGE = WEB / "intake.html"
 # The board the intake hands over to, carrying the pack in sessionStorage.
 JOBS_PAGE = WEB / "jobs.html"
+# Where the caseworker edits the resume drafted from the interview.
+REVIEW_PAGE = WEB / "review.html"
 
 # A request past these is refused before it is read: a few minutes of webm
 # speech is well under 25 MB, and no JSON the page sends comes near 1 MB.
@@ -286,6 +289,13 @@ def match(payload):
             "jobs_source": d7_match.snapshot_meta()}
 
 
+def resume_sections(payload):
+    try:
+        return d7_sections.draft(payload)
+    except ValueError as bad:
+        raise BadRequest(str(bad)) from None
+
+
 PAGE = """<!doctype html><meta charset=utf-8><title>Direction skeleton</title>
 <style>
 body{{font:15px/1.5 system-ui,sans-serif;max-width:760px;margin:2rem auto;padding:0 1rem}}
@@ -314,6 +324,8 @@ class Handler(BaseHTTPRequestHandler):
             return self._send(200, "text/html; charset=utf-8", INTAKE_PAGE.read_bytes())
         if parsed.path == "/jobs":
             return self._send(200, "text/html; charset=utf-8", JOBS_PAGE.read_bytes())
+        if parsed.path == "/review":
+            return self._send(200, "text/html; charset=utf-8", REVIEW_PAGE.read_bytes())
         scenario = parse_qs(parsed.query).get("s", [None])[0]
         if parsed.path == "/run" and scenario in SCENARIOS:
             body = render_result(scenario)
@@ -335,6 +347,8 @@ class Handler(BaseHTTPRequestHandler):
                 body = extract(self._read_json())
             elif parsed.path == "/api/match":
                 body = match(self._read_json())
+            elif parsed.path == "/api/resume-sections":
+                body = resume_sections(self._read_json())
             else:
                 return self._json(404, {"error": f"{parsed.path}: no such endpoint"})
         except BadRequest as bad:
