@@ -58,7 +58,8 @@ def run(get=None, post=None, env=CLEAR):
             contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
         path = Path(tmp) / "jobs_adzuna.json"
         code = fetch_jobs.main(get=get, post=post, out=path,
-                               now=datetime(2026, 9, 21, tzinfo=timezone.utc))
+                               now=datetime(2026, 9, 21, tzinfo=timezone.utc),
+                               sleep=lambda _seconds: None)
         saved = json.loads(path.read_text()) if path.exists() else None
     return code, saved, out.getvalue(), err.getvalue()
 
@@ -246,6 +247,40 @@ class Main(unittest.TestCase):
         self.assertEqual(code, 0)
         self.assertIsNone(saved["jobs"][0]["required_units"])
         self.assertIn("1 jobs could not be mapped", out)
+
+    def test_a_job_is_tried_again_before_it_is_written_off(self):
+        """A real run lost 8 of 30 ads to rate limits; every one of them
+        mapped on a retry, so a single failure must not decide the snapshot."""
+        calls = []
+
+        def flaky_post(url, headers, payload):
+            calls.append(url)
+            if len(calls) < fetch_jobs.ATTEMPTS:
+                raise OSError("overloaded")
+            return {"content": [{"type": "text", "text": json.dumps(
+                [{"code": "SITHCCC027", "quote": "prepare dishes for a la carte",
+                  "basis": "stated"}])}]}
+
+        env = dict(KEYS, ANTHROPIC_API_KEY="sk-secret")
+        code, saved, out, _ = run(get=searching({"cook": [COOK]}), post=flaky_post, env=env)
+        self.assertEqual(code, 0)
+        self.assertEqual(len(calls), fetch_jobs.ATTEMPTS)
+        self.assertEqual([u["code"] for u in saved["jobs"][0]["required_units"]],
+                         ["SITHCCC027"])
+        self.assertNotIn("could not be mapped", out)
+
+    def test_it_waits_longer_between_tries_and_gives_up(self):
+        waits = []
+
+        def broken_post(*args):
+            raise OSError("overloaded")
+
+        failed = fetch_jobs.map_jobs(
+            [fetch_jobs.keep(COOK, "cookery")],
+            {"cookery": {"units": CANDIDATES}}, "k", "m", broken_post, waits.append)
+        self.assertEqual(failed, 1)
+        self.assertEqual(waits, [fetch_jobs.BACKOFF * 2 ** n
+                                 for n in range(fetch_jobs.ATTEMPTS - 1)])
 
     def test_a_network_failure_is_a_message_without_the_key(self):
         def broken_get(url):

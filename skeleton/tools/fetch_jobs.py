@@ -16,6 +16,7 @@ import json
 import os
 import re
 import sys
+import time
 import urllib.parse
 import urllib.request
 from datetime import datetime, timezone
@@ -67,6 +68,22 @@ Return only a JSON array. Each item is an object:
 - If neither the snippet nor the title supports a unit, leave the unit out.
   An empty array is a correct answer for a vague title and a short snippet.
 
+The quote is what a person will read to check the unit for themselves, so it
+has to be the words that name this unit's work:
+- A phrase that only names the role, the seniority, the employer or the team
+  is not a "stated" quote. "experienced Cook to join their team" says someone
+  cooks; it does not say the job requires food safety. When the snippet only
+  names the role like this, the basis is "title" and the quote comes from the
+  title.
+- Give each unit its own quote. Use one quote for two units only when those
+  words really do name both kinds of work — "safe and hygienic environment"
+  can carry both a food-safety and a food-handling unit. Reaching for the
+  same phrase a third time means the phrase is too general: drop the unit, or
+  cite the title instead.
+- Prefer the most specific words available. If the snippet says both
+  "nutritious meals and snacks" and "prepare dishes to order", the second is
+  the better quote for a cookery method unit.
+
 Never output a score, rating or judgement about any person."""
 
 TAG = re.compile(r"<[^>]+>")
@@ -77,6 +94,11 @@ STATED, FROM_TITLE = "stated", "title"
 # Short enough for a real phrase, long enough that a single word like
 # "welding" cannot stand as the citation for a whole unit.
 MIN_QUOTE = 12
+# Tries per ad, and the first wait in seconds. Three tries over a few seconds
+# is enough for the rate limits and overload replies seen on a real run, and
+# the tool is run by hand the night before, so the wait costs nothing.
+ATTEMPTS = 3
+BACKOFF = 2
 
 
 def _get_json(url):
@@ -178,24 +200,35 @@ def required_units(job, candidates, key, model, post=None):
     return kept
 
 
-def map_jobs(jobs, occupations, key, model, post=None):
+def map_jobs(jobs, occupations, key, model, post=None, sleep=time.sleep):
     """Mutates jobs in place; returns how many could not be mapped.
 
     Needs a decision: an unmapped job (no key, or its call failed) carries
     required_units None, so the page can tell it apart from a mapped ad with
     [] that was too short to name any unit.
+
+    A run that is rate limited or hits an overloaded API leaves that job
+    unmapped for good, because the snapshot is what the demo reads and the
+    tool is not run again per job. One ad failing is not evidence the ad is
+    unmappable, so each one is tried a few times with a growing wait before
+    it is written off.
     """
     failed = 0
     for job in jobs:
         job["required_units"], job["mapped_by"] = None, None
         if not key:
             continue
-        try:
-            job["required_units"] = required_units(
-                job, occupations[job["occupation"]]["units"], key, model, post)
-            job["mapped_by"] = model
-        except Exception:
-            failed += 1
+        for attempt in range(ATTEMPTS):
+            try:
+                job["required_units"] = required_units(
+                    job, occupations[job["occupation"]]["units"], key, model, post)
+                job["mapped_by"] = model
+                break
+            except Exception:
+                if attempt == ATTEMPTS - 1:
+                    failed += 1
+                else:
+                    sleep(BACKOFF * 2 ** attempt)
     return failed
 
 
@@ -208,7 +241,7 @@ def snapshot(jobs, now=None):
     }
 
 
-def main(get=None, post=None, out=SNAPSHOT, now=None):
+def main(get=None, post=None, out=SNAPSHOT, now=None, sleep=time.sleep):
     """Exit status, never a traceback: this is run by hand the night before."""
     app_id = os.environ.get("ADZUNA_APP_ID", "")
     app_key = os.environ.get("ADZUNA_APP_KEY", "")
@@ -229,7 +262,7 @@ def main(get=None, post=None, out=SNAPSHOT, now=None):
     anthropic_key = os.environ.get("ANTHROPIC_API_KEY", "")
     model = os.environ.get("ANTHROPIC_MODEL") or DEFAULT_MODEL
     occupations = json.loads(OCCUPATIONS.read_text(encoding="utf-8"))
-    failed = map_jobs(jobs, occupations, anthropic_key, model, post)
+    failed = map_jobs(jobs, occupations, anthropic_key, model, post, sleep)
 
     text = json.dumps(snapshot(jobs, now), ensure_ascii=False, indent=2) + "\n"
     # A key in the snapshot would be committed to a public repo. The app id
