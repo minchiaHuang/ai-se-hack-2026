@@ -1,0 +1,109 @@
+{
+  "resume": [
+    "SAMPLE RESUME (fictional, for demonstration only)",
+    "Cook",
+    "WORK EXPERIENCE",
+    "2016-2022  Head cook, hotel restaurant (overseas)",
+    "Cooked breakfast, lunch and dinner for up to 150 guests a day.",
+    "Prepared stocks, soups and sauces from scratch every morning.",
+    "Prepared lamb, beef and chicken dishes for the daily menu.",
+    "Kept raw and cooked food apart, with separate boards and knives.",
+    "Checked and recorded cool-room temperatures at the start and end of each shift.",
+    "Trained and supervised three kitchen hands.",
+    "2013-2016  Assistant cook, family restaurant (overseas)",
+    "Prepared rice, vegetables and bread for the lunch service.",
+    "EDUCATION AND CERTIFICATES",
+    "Secondary school certificate (overseas)",
+    "Food hygiene certificate (overseas), not recognised in Australia"
+  ],
+  "answer": [
+    {
+      "field": "anzsco_code",
+      "value": "351411 Cook",
+      "reason": "Six years as head cook, cooking for up to 150 guests a day.",
+      "confidence": 0.86,
+      "sources": [
+        [
+          "resume",
+          "line=4"
+        ],
+        [
+          "resume",
+          "line=5"
+        ]
+      ]
+    },
+    {
+      "field": "osca_code",
+      "value": "322331 Cook",
+      "reason": "Same record; OSCA 2024 code for the same occupation.",
+      "confidence": 0.84,
+      "sources": [
+        [
+          "resume",
+          "line=4"
+        ]
+      ]
+    },
+    {
+      "field": "units_evidenced",
+      "value": "SITXFSA005; SITXFSA006",
+      "reason": "Kept raw and cooked food apart and recorded cool-room temperatures every shift.",
+      "confidence": 0.8,
+      "sources": [
+        [
+          "resume",
+          "line=8"
+        ],
+        [
+          "resume",
+          "line=9"
+        ]
+      ]
+    },
+    {
+      "field": "units_evidenced",
+      "value": "SITHCCC029",
+      "reason": "Prepared stocks, soups and sauces from scratch every morning.",
+      "confidence": 0.76,
+      "sources": [
+        [
+          "resume",
+          "line=6"
+        ]
+      ]
+    },
+    {
+      "field": "units_evidenced",
+      "value": "SITHCCC036",
+      "reason": "Prepared lamb, beef and chicken dishes for the daily menu.",
+      "confidence": 0.72,
+      "sources": [
+        [
+          "resume",
+          "line=7"
+        ]
+      ]
+    },
+    {
+      "field": "qualification",
+      "value": "SIT30821 Certificate III in Commercial Cookery",
+      "reason": "Several core units of this qualification are described, but no Australian certificate is held.",
+      "confidence": 0.44,
+      "sources": [
+        [
+          "resume",
+          "line=6"
+        ],
+        [
+          "resume",
+          "line=8"
+        ],
+        [
+          "resume",
+          "line=15"
+        ]
+      ]
+    }
+  ]
+}

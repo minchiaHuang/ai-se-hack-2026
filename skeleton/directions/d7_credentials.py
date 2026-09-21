@@ -19,6 +19,15 @@ METRIC = "evidence items mapped to a transcript line"
 # have no ElevenLabs voice at all. We refuse rather than silently use English.
 SUPPORTED_LANGUAGES = ("zh", "ar")
 
+# A resume the person brings is read, not heard, so English is added: the team
+# can read it word for word, and a partial record such as an overseas resume
+# is often in English. Spoken input keeps SUPPORTED_LANGUAGES unchanged.
+WRITTEN_LANGUAGES = ("en", "zh", "ar")
+
+# The interview is the primary path, so a payload without a source is one.
+RESUME = "resume"
+RESUME_METRIC = "evidence items mapped to a resume line"
+
 # Fields that identify a refugee, or expose a protection claim. A database row
 # holding these is a route back to the people they fled.
 FORBIDDEN_FIELDS = (
@@ -54,6 +63,15 @@ def guard(payload):
         raise RedLineError("consent was not given; nothing may be processed")
 
     language = payload.get("language")
+    if payload.get("source") == RESUME:
+        if language not in WRITTEN_LANGUAGES:
+            raise UnsupportedLanguageError(
+                f"{language}: not supported for a written resume. This demo reads "
+                "resumes in English (en) and Mandarin (zh), and Arabic (ar) is "
+                "configured but not yet validated by a native speaker. We will "
+                "not fake a language we cannot verify."
+            )
+        return
     if language not in SUPPORTED_LANGUAGES:
         raise UnsupportedLanguageError(
             f"{language}: not supported. This demo runs in Mandarin (zh), and "
@@ -63,12 +81,16 @@ def guard(payload):
 
 
 def prepare(payload):
-    """What the model sees: the transcript and the occupational frame, nothing else."""
+    """What the model sees: the transcript, or the numbered resume lines, and
+    the occupational frame, nothing else."""
     occupation_key = payload["occupation"]
+    # Kept under its own key so the live model cites resume lines as resume
+    # lines, never as transcript timestamps the person did not speak at.
+    lines_key = RESUME if payload.get("source") == RESUME else "transcript"
     anzsco, osca = registry.classifications(occupation_key)
     qualification = registry.occupation(occupation_key)["qualification"]
     return {
-        "transcript": payload["transcript"],
+        lines_key: payload[lines_key],
         "candidate_units": registry.all_units(occupation_key),
         "anzsco": anzsco,
         "osca": osca,

@@ -94,7 +94,11 @@ RPL_STATUS = "Recognition of Prior Learning in progress, not yet assessed"
 TO_ADD = "Name, contact details, employers and dates are for the jobseeker to add."
 
 
-def resume_sections(job, evidenced_units, transcript):
+def _line_number(locator):
+    return locator[5:] if locator.startswith("line=") else locator
+
+
+def resume_sections(job, evidenced_units, transcript, source="interview"):
     """The resume as data, tailored to one job by ordering alone.
 
     Only what the person said and what they evidenced goes in. No name,
@@ -102,10 +106,21 @@ def resume_sections(job, evidenced_units, transcript):
     a guessed one on a resume is a false claim made in the person's name.
     Tailoring never adds anything: the units this job requires, and the lines
     that evidence them, move to the top; everything else keeps its place.
+
+    With source="resume", transcript holds the resume the person brought, as
+    {"line", "en"} rows, and every reference is a resume line number instead
+    of a timestamp. Only then do the sections carry "source", so the
+    interview's output is unchanged.
     """
     units = _units_by_code()
     evidence = _evidenced(evidenced_units)
-    lines = {line["t"]: line["en"] for line in transcript}
+    resume = source == "resume"
+    if resume:
+        label, where, order = "resume", _line_number, int
+        lines = {str(line["line"]): line["en"] for line in transcript}
+    else:
+        label, where, order = "transcript", _timestamp, str
+        lines = {line["t"]: line["en"] for line in transcript}
     # What match_jobs() matched is exactly required-and-evidenced.
     required = {u["code"] for u in job["matched"]}
 
@@ -114,7 +129,7 @@ def resume_sections(job, evidenced_units, transcript):
     for code, sources in evidence.items():
         if code not in units:
             continue
-        stamps = [_timestamp(loc) for label, loc in sources if label == "transcript"]
+        stamps = [where(loc) for cited, loc in sources if cited == label]
         skills.append({"code": code, "title": units[code]["title"], "described_at": stamps,
                        "for_this_job": code in required})
         if units[code]["qualification"] not in qualifications:
@@ -126,23 +141,37 @@ def resume_sections(job, evidenced_units, transcript):
     # journey, which no unit cites, cannot reach the resume.
     for_job = {t for s in skills if s["for_this_job"] for t in s["described_at"]}
     cited = {t for s in skills for t in s["described_at"] if t in lines}
-    experience = [{"t": t, "en": lines[t], "for_this_job": t in for_job}
-                  for t in sorted(cited, key=lambda t: (t not in for_job, t))]
+    key = "line" if resume else "t"
+    experience = [{key: t, "en": lines[t], "for_this_job": t in for_job}
+                  for t in sorted(cited, key=lambda t: (t not in for_job, order(t)))]
 
-    return {"job": {"id": job["id"], "title": job["title"], "setting": job["setting"],
-                    "location": job["location"]},
-            "experience": experience, "skills": skills,
-            "qualifications": [{"title": q, "status": RPL_STATUS} for q in qualifications],
-            "to_add": TO_ADD}
+    sections = {"job": {"id": job["id"], "title": job["title"], "setting": job["setting"],
+                        "location": job["location"]},
+                "experience": experience, "skills": skills,
+                "qualifications": [{"title": q, "status": RPL_STATUS} for q in qualifications],
+                "to_add": TO_ADD}
+    if resume:
+        sections["source"] = "resume"
+    return sections
 
 
 def resume_text(sections):
     job = sections["job"]
+    if sections.get("source") == "resume":
+        account = "WORK EXPERIENCE (from the jobseeker's own resume)"
+        experience = [f"- {line['en']} [resume line {line['line']}]"
+                      for line in sections["experience"]]
+        described = "resume line"
+    else:
+        account = "WORK EXPERIENCE (the jobseeker's own account, translated)"
+        experience = [f"- {line['en']} [transcript {line['t']}]"
+                      for line in sections["experience"]]
+        described = "described at"
     out = [f"DRAFT RESUME - for: {job['title']}, {job['setting']}, {job['location']}",
-           "", "WORK EXPERIENCE (the jobseeker's own account, translated)"]
-    out += [f"- {line['en']} [transcript {line['t']}]" for line in sections["experience"]]
+           "", account]
+    out += experience
     out += ["", "SKILLS MAPPED TO AUSTRALIAN UNITS OF COMPETENCY"]
-    out += [f"- {s['code']} {s['title']} (described at {', '.join(s['described_at'])})"
+    out += [f"- {s['code']} {s['title']} ({described} {', '.join(s['described_at'])})"
             for s in sections["skills"]]
     out += ["", "QUALIFICATIONS"]
     out += [f"- {q['title']}: {q['status']}" for q in sections["qualifications"]]

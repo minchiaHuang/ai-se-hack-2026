@@ -26,13 +26,17 @@ OFFLINE_TEXT = "I cooked for two hundred people a day in the camp kitchen."
 MESSAGES_URL = "https://api.anthropic.com/v1/messages"
 DEFAULT_MODEL = "claude-sonnet-5"
 FIELDS = ("anzsco_code", "osca_code", "qualification", "units_evidenced")
+# The labels a source may carry: what was said, or what was written down.
+CITED = ("transcript", "resume")
 CODE = re.compile(r"\b(?:[A-Z]{3,7}\d{3,6}|\d{6})\b")
 
 INSTRUCTIONS = """You extract and map evidence. You do nothing else.
 
 Input: transcript lines from a refugee jobseeker describing their work history,
-each with a timestamp t, the words said (text) and an English gloss (en), plus
-the candidate ANZSCO and OSCA codes and the candidate units of competency.
+each with a timestamp t, the words said (text) and an English gloss (en), or
+instead the lines of a resume they brought, each with a line number (line)
+and the words written (text). Plus the candidate ANZSCO and OSCA codes and the
+candidate units of competency.
 
 Return only a JSON array. Each item is an object:
 {"field": ..., "value": ..., "reason": ..., "confidence": ..., "sources": ...}
@@ -43,11 +47,12 @@ Return only a JSON array. Each item is an object:
 - reason is one short English sentence naming what the person said.
 - confidence is a number from 0 to 1.
 - Every item must cite a transcript timestamp as ["transcript", "t=MM:SS"]
-  in sources. If there is no supporting line, omit the item.
+  in sources, or for resume lines a line number as ["resume", "line=N"].
+  If there is no supporting line, omit the item.
 
 Never output a score, rating or judgement about the person.
 
-Extract work and learning only. If the transcript mentions the person's
+Extract work and learning only. If the transcript or resume mentions the person's
 journey, how they came to Australia, detention, persecution or why they fled,
 ignore it: never put it in any field, reason or value."""
 
@@ -135,9 +140,11 @@ def _keep(item, allowed, locators):
     if not all(isinstance(s, list) and len(s) == 2
                and all(isinstance(p, str) for p in s) for s in sources):
         return False
-    # A locator the transcript does not have is a source in name only.
-    cited = [locator for label, locator in sources if label == "transcript"]
-    if not cited or not set(cited) <= locators:
+    # A locator the transcript or resume does not have is a source in name
+    # only. Pairs, not bare locators, so a resume line cannot stand in for a
+    # timestamp or the other way round.
+    cited = {(label, locator) for label, locator in sources if label in CITED}
+    if not cited or not cited <= locators:
         return False
     if not isinstance(item.get("value"), str) or not isinstance(item.get("reason"), str):
         return False
@@ -170,13 +177,14 @@ class LiveModel:
         if not key:
             return self._fallback.suggest(direction_key, prepared)
         model = self._model or os.environ.get("ANTHROPIC_MODEL") or DEFAULT_MODEL
+        lines_key = "resume" if "resume" in prepared else "transcript"
         payload = {
             "model": model,
             "max_tokens": 2048,
             "system": INSTRUCTIONS,
             "messages": [{"role": "user", "content": json.dumps(
-                {"transcript": prepared.get("transcript", []),
-                 "candidates": {k: v for k, v in prepared.items() if k != "transcript"}},
+                {lines_key: prepared.get(lines_key, []),
+                 "candidates": {k: v for k, v in prepared.items() if k != lines_key}},
                 ensure_ascii=False)}],
         }
         headers = {
@@ -189,7 +197,11 @@ class LiveModel:
             if not isinstance(items, list):
                 raise ValueError("model output is not a JSON array")
             allowed = _allowed_codes(prepared)
-            locators = {"t=" + line["t"] for line in prepared.get("transcript", [])}
+            if lines_key == "resume":
+                locators = {("resume", f"line={line['line']}") for line in prepared["resume"]}
+            else:
+                locators = {("transcript", "t=" + line["t"])
+                            for line in prepared.get("transcript", [])}
         except Exception:
             return self._fallback.suggest(direction_key, prepared)
         return [item for item in items if _keep(item, allowed, locators)]

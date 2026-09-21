@@ -49,6 +49,52 @@ class RedLines(unittest.TestCase):
     def test_supported_languages_are_only_the_ones_we_can_actually_do(self):
         self.assertEqual(set(d7.SUPPORTED_LANGUAGES), {"zh", "ar"})
 
+    def test_english_is_still_refused_for_the_interview(self):
+        """Only a written resume gains English; spoken input is not loosened."""
+        for over in ({}, {"source": "interview"}, {"source": "something else"}):
+            with self.subTest(**over):
+                with self.assertRaises(d7.UnsupportedLanguageError):
+                    d7.guard(payload(language="en", **over))
+
+
+def resume_payload(**over):
+    base = {"source": "resume", "occupation": "cookery", "language": "en", "consent": True,
+            "resume": [{"line": 1, "text": "Head cook, hotel restaurant"}]}
+    base.update(over)
+    return base
+
+
+class ResumeRedLines(unittest.TestCase):
+    """The resume path: the language rule widens to what can be read; nothing else moves."""
+
+    def test_a_written_resume_may_be_english_mandarin_or_arabic(self):
+        for code in ("en", "zh", "ar"):
+            with self.subTest(code=code):
+                d7.guard(resume_payload(language=code))
+
+    def test_any_other_written_language_is_refused(self):
+        for code in ("ti", "fa", "sw", "fr", None):
+            with self.subTest(code=code):
+                with self.assertRaises(d7.UnsupportedLanguageError) as caught:
+                    d7.guard(resume_payload(language=code))
+                self.assertIn("written resume", str(caught.exception))
+
+    def test_consent_is_still_required(self):
+        with self.assertRaises(d7.RedLineError):
+            d7.guard(resume_payload(consent=False))
+
+    def test_identifying_fields_and_person_scores_are_still_refused(self):
+        for field in ("visa_status", "country_of_origin", "employability_score"):
+            with self.subTest(field=field):
+                with self.assertRaises(d7.RedLineError):
+                    d7.guard(resume_payload(**{field: "x"}))
+
+    def test_prepare_sends_the_resume_lines_not_a_transcript(self):
+        prepared = d7.prepare(resume_payload())
+        self.assertEqual(set(prepared),
+                         {"resume", "candidate_units", "anzsco", "osca", "qualification"})
+        self.assertEqual(prepared["resume"], [{"line": 1, "text": "Head cook, hotel restaurant"}])
+
 
 class Shape(unittest.TestCase):
     def test_target_fields_cover_both_classifications(self):

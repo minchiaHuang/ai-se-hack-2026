@@ -38,6 +38,19 @@ DEMO_TRANSCRIPT = [
 ]
 
 
+SAMPLE_RESUME = json.loads(
+    (app.CANNED / "d7_resume.json").read_text(encoding="utf-8"))["resume"]
+# What the page sends for the sample: numbered lines, English as its own gloss.
+SAMPLE_LINES = [{"line": i + 1, "text": text, "en": text} for i, text in enumerate(SAMPLE_RESUME)]
+
+
+def resume(**over):
+    body = {"source": "resume", "occupation": "cookery", "language": "en", "consent": True,
+            "resume": SAMPLE_LINES}
+    body.update(over)
+    return body
+
+
 def cook(**over):
     body = {"occupation": "cookery", "language": "zh", "consent": True,
             "transcript": COOK_TRANSCRIPT}
@@ -232,6 +245,110 @@ class IntakeApi(Server):
         for key in ("jobs", "courses", "resumes"):
             with self.subTest(key=key):
                 self.assertEqual(fixture[key], body[key])
+
+    def units_of(self, pack):
+        return [{"code": code, "sources": item["sources"]}
+                for item in pack["suggestions"] if item["field"] == "units_evidenced"
+                for code in item["value"].split("; ")]
+
+    def test_resume_golden_path(self):
+        """Same pipeline, same pack; every item cites a line of the sample resume."""
+        status, pack = self.post_json("/api/extract", resume())
+        self.assertEqual(status, 200)
+        values = {s["field"]: s["value"] for s in pack["suggestions"]}
+        self.assertEqual(values["anzsco_code"], "351411 Cook")
+        self.assertIn("Food Safety Supervisor", pack["gate"]["text"])
+        self.assertEqual(pack["metric_name"], "evidence items mapped to a resume line")
+        written = {f"line={line['line']}" for line in SAMPLE_LINES}
+        for item in pack["suggestions"] + pack["needs_human"]:
+            for label, locator in item["sources"]:
+                with self.subTest(field=item["field"], locator=locator):
+                    self.assertEqual(label, "resume")
+                    self.assertIn(locator, written)
+
+        status, body = self.post_json("/api/match", {
+            "source": "resume", "occupation": "cookery",
+            "evidenced_units": self.units_of(pack), "resume": SAMPLE_LINES})
+        self.assertEqual(status, 200)
+        self.assertEqual(set(body["resumes"]), {job["id"] for job in body["jobs"]})
+        for job_id, draft in body["resumes"].items():
+            with self.subTest(job=job_id):
+                self.assertRegex(draft["text"], r"(?m)^- .+ \[resume line \d+\]$")
+                self.assertNotIn("transcript", draft["text"])
+                self.assertNotIn("%", draft["text"])
+
+    def test_an_unsupported_written_language_is_a_200_refusal(self):
+        status, body = self.post_json("/api/extract", resume(language="ti"))
+        self.assertEqual(status, 200)
+        self.assertIn("ti: not supported for a written resume", body["refused"])
+
+    def test_the_resume_path_still_needs_consent(self):
+        status, body = self.post_json("/api/extract", resume(consent=False))
+        self.assertEqual(status, 200)
+        self.assertIn("consent", body["refused"])
+
+    def test_offline_another_resume_gets_gaps_not_the_samples_evidence(self):
+        mine = [{"line": 1, "text": "Welder, seven years", "en": "Welder, seven years"}]
+        status, body = self.post_json("/api/extract", resume(resume=mine))
+        self.assertEqual(status, 200)
+        self.assertEqual(body["suggestions"], [])
+        self.assertIn("units_evidenced", body["gaps"])
+
+    def test_malformed_resume_lines_are_a_400(self):
+        for lines in ("a resume", [{"t": "00:12", "text": "x"}], [{"line": "1", "text": "x"}]):
+            with self.subTest(lines=lines):
+                status, text = self.post("/api/extract", resume(resume=lines))
+                self.assertEqual(status, 400)
+                self.assertIn("resume", json.loads(text)["error"])
+
+    def test_a_journey_line_is_never_extracted_or_in_any_tailored_resume(self):
+        """Live path: the resume sent to the model holds a line about the
+        journey, the model answers from the work lines, and neither the pack nor
+        any draft carries the journey line."""
+        journey = "2019  Fled with my family and crossed the border on foot"
+        lines = SAMPLE_LINES + [{"line": len(SAMPLE_LINES) + 1, "text": journey, "en": journey}]
+        canned = json.loads((app.CANNED / "d7_resume.json").read_text(encoding="utf-8"))["answer"]
+        sent = {}
+
+        def model(url, headers, payload):
+            sent.update(payload)
+            return {"content": [{"type": "text", "text": json.dumps(canned)}]}
+
+        with mock.patch.dict(os.environ, {"ANTHROPIC_API_KEY": "k"}), \
+                mock.patch.object(app.live, "_post_json", model):
+            status, pack = self.post_json("/api/extract", resume(resume=lines))
+        self.assertEqual(status, 200)
+        self.assertIn("border", sent["messages"][0]["content"])
+        journey_locator = f"line={len(lines)}"
+        for item in pack["suggestions"] + pack["needs_human"]:
+            self.assertNotIn(["resume", journey_locator], item["sources"])
+            self.assertNotIn("border", item["reason"])
+        status, body = self.post_json("/api/match", {
+            "source": "resume", "occupation": "cookery",
+            "evidenced_units": self.units_of(pack), "resume": lines})
+        self.assertEqual(status, 200)
+        for job_id, draft in body["resumes"].items():
+            with self.subTest(job=job_id):
+                self.assertNotIn("border", draft["text"])
+                self.assertNotIn(f"resume line {len(lines)}", draft["text"])
+
+    def test_the_resume_mock_fixtures_are_what_the_server_returns(self):
+        """?mock=1 on the resume path must show the same pack and board as the server."""
+        page = app.INTAKE_PAGE.read_text(encoding="utf-8")
+
+        def constant(name):
+            return json.loads(page.split(f"const {name} = ")[1].split(";\n")[0])
+
+        self.assertEqual(constant("SAMPLE_RESUME"), SAMPLE_RESUME)
+        status, pack = self.post_json("/api/extract", resume())
+        self.assertEqual(status, 200)
+        self.assertEqual(constant("FIXTURE_RESUME_EXTRACT"), pack)
+        status, body = self.post_json("/api/match", {
+            "source": "resume", "occupation": "cookery",
+            "evidenced_units": self.units_of(pack), "resume": SAMPLE_LINES})
+        self.assertEqual(status, 200)
+        body.pop("resume")
+        self.assertEqual(constant("FIXTURE_RESUME_MATCH"), body)
 
     def test_an_unknown_occupation_is_a_400_without_a_traceback(self):
         for path, data in (("/api/extract", cook(occupation="astronaut")),

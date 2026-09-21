@@ -153,7 +153,8 @@ input[type=radio], input[type=checkbox] { width: 26px; height: 26px; accent-colo
 .resume-panel { position: sticky; top: 12px; border: 2px solid var(--accent); border-radius: 10px;
                 padding: .7rem .9rem; min-width: 0; max-height: calc(100vh - 24px); overflow: auto; }
 .resume-actions { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; }
-.resume-actions h3 { margin: 0 auto 0 0; }
+/* The heading takes its own row so Copy and Print stay together beneath it. */
+.resume-actions h3 { margin: 0; flex: 1 0 100%; }
 .resume-doc { margin-top: .6rem; padding: .8rem 1rem; background: var(--paper); border: 1px solid var(--line);
               border-radius: 6px; font-size: .95rem; overflow-wrap: anywhere; }
 .resume-doc .kicker { font-size: .8rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin: 0; }
@@ -167,6 +168,27 @@ input[type=radio], input[type=checkbox] { width: 26px; height: 26px; accent-colo
 .offscreen { position: fixed; left: -9999px; top: 0; }
 .resume-doc .to-add { margin-top: .9rem; font-style: italic; }
 
+/* The start screen: two ways in, the interview first and larger because most
+   people this serves have no documents to bring. */
+.entries { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 20px; margin: .75rem 0; }
+.entry { display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start; gap: .5rem;
+         min-height: 13rem; padding: 1.1rem 1.3rem; border-radius: 12px; text-align: left; font-weight: 400; }
+.entry .entry-title { font-size: 1.5rem; font-weight: 800; line-height: 1.2; }
+.entry .tag { font-size: .8rem; font-weight: 800; text-transform: uppercase; letter-spacing: .04em;
+              padding: 0 .5rem; border: 2px solid currentColor; border-radius: 999px; }
+.entry.alt { background: var(--paper); color: var(--ink); border-color: var(--line); }
+.path-bar { display: flex; flex-wrap: wrap; gap: .4rem 1rem; align-items: baseline; margin: .25rem 0 0; }
+.resume-input { margin-top: 1rem; }
+.resume-input > label { display: block; font-weight: 700; margin-bottom: .25rem; }
+.resume-input textarea { display: block; width: 100%; min-height: 7.5rem; padding: .5rem .6rem; font: inherit; font-size: .95rem;
+                         border: 2px solid var(--line); border-radius: 8px; background: var(--paper); color: var(--ink); resize: vertical; }
+.resume-input textarea:disabled { background: var(--panel); }
+.resume-input .controls { margin-top: .5rem; }
+.file-pick { display: inline-flex; align-items: center; min-height: 48px; padding: .4rem 1rem; border-radius: 8px; cursor: pointer;
+             border: 2px solid var(--accent); color: var(--accent); font-weight: 600; }
+.file-pick:focus-within { outline: 4px solid var(--focus); outline-offset: 2px; }
+.file-pick.disabled { border-color: #9ca3af; color: #333; background: #d1d5db; cursor: not-allowed; }
+
 .refusal { margin: 2rem auto; max-width: 900px; border: 4px solid var(--stop); background: var(--stop-bg);
            border-radius: 10px; padding: 1rem 1.25rem; }
 .refusal h2 { color: var(--stop); margin-top: 0; font-size: 1.5rem; }
@@ -176,7 +198,7 @@ input[type=radio], input[type=checkbox] { width: 26px; height: 26px; accent-colo
 .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
 @media (max-width: 900px) {
-  .setup, .columns, .match-layout { grid-template-columns: 1fr; }
+  .setup, .columns, .match-layout, .entries { grid-template-columns: 1fr; }
   .resume-panel { position: static; max-height: none; }
   .jobs { max-height: none; overflow: visible; }
   .job-card { grid-template-columns: minmax(0, 1fr) 7rem; }
@@ -190,7 +212,7 @@ input[type=radio], input[type=checkbox] { width: 26px; height: 26px; accent-colo
   html { font-size: 11pt; }
   body { background: #fff; color: #000; }
   main { max-width: none; padding: 0; }
-  main > header, #refusal, #session > :not(#matches), #matches > :not(.match-layout),
+  main > header, #refusal, #start, #session > :not(#matches), #matches > :not(.match-layout),
   .match-layout > :not(.resume-panel), .resume-panel > :not(.resume-doc) { display: none !important; }
   .match-layout { display: block; }
   .resume-panel { position: static; max-height: none; overflow: visible; border: 0; padding: 0; }
@@ -206,7 +228,7 @@ input[type=radio], input[type=checkbox] { width: 26px; height: 26px; accent-colo
 <main>
   <header>
     <h1>Work history intake</h1>
-    <p class="muted">A consultant and a jobseeker, one screen. The jobseeker describes their work in their own language; every item below points back to the line it came from.</p>
+    <p class="muted">A consultant and a jobseeker, one screen. Work experience nobody can verify, whether spoken or written down, mapped to Australian occupations and units; every item points back to the line it came from.</p>
     <p id="mock-banner" class="banner mock" hidden>Mock mode: fixture data, no backend. Nothing is recorded or sent.</p>
   </header>
 
@@ -217,9 +239,27 @@ input[type=radio], input[type=checkbox] { width: 26px; height: 26px; accent-colo
     <p><button type="button" id="restart">Start again</button></p>
   </section>
 
-  <div id="session">
+  <section id="start" aria-labelledby="h-start">
+    <h2 id="h-start">How would you like to start?</h2>
+    <div class="entries">
+      <button type="button" class="entry" id="enter-interview">
+        <span class="tag">Main way in</span>
+        <span class="entry-title">Tell us about your work</span>
+        <span>Describe your work history out loud, in Mandarin or Arabic. No papers needed: most people this is for have none.</span>
+      </button>
+      <button type="button" class="entry alt" id="enter-resume">
+        <span class="entry-title">I have a resume</span>
+        <span>Paste it, or upload a plain-text .txt file. For a partial record, such as an overseas resume, that nobody has mapped to Australian occupations and units.</span>
+      </button>
+    </div>
+    <p class="muted">Both go through the same steps and give the same evidence pack. The only difference is what each item cites: a moment in the interview, or a line of the resume. Nothing is processed until the jobseeker consents.</p>
+  </section>
+
+  <div id="session" hidden>
+    <p class="path-bar"><button type="button" class="link" id="back">&larr; Back to start</button>
+      <span class="muted" id="path-label"></span></p>
     <div class="setup">
-      <fieldset>
+      <fieldset id="lang-interview">
         <legend>1. Jobseeker's language</legend>
         <div class="langs" id="langs">
           <label><input type="radio" name="lang" value="zh" checked> <span lang="zh">中文</span> (Mandarin)</label>
@@ -229,16 +269,40 @@ input[type=radio], input[type=checkbox] { width: 26px; height: 26px; accent-colo
         </div>
         <p class="small muted" id="lang-note">Changing language clears the session.</p>
       </fieldset>
+      <fieldset id="lang-resume" hidden>
+        <legend>1. Language the resume is written in</legend>
+        <div class="langs" id="rlangs">
+          <label><input type="radio" name="rlang" value="en" checked> English</label>
+          <label><input type="radio" name="rlang" value="zh"> <span lang="zh">中文</span> (Chinese)</label>
+          <label><input type="radio" name="rlang" value="ar"> <span lang="ar" dir="rtl">العربية</span> (Arabic)</label>
+          <label><input type="radio" name="rlang" value="fa"> <span lang="fa" dir="rtl">فارسی</span> (Farsi)</label>
+        </div>
+        <p class="small muted">Changing language clears the evidence pack.</p>
+      </fieldset>
       <fieldset class="consent">
         <legend>2. Consent</legend>
         <label>
           <input type="checkbox" id="consent">
-          <span>The jobseeker agrees that what they say is recorded, transcribed by a speech service, and turned into the evidence pack below.</span>
+          <span id="consent-interview">The jobseeker agrees that what they say is recorded, transcribed by a speech service, and turned into the evidence pack below.</span>
+          <span id="consent-resume" hidden>The jobseeker agrees that the resume they bring is read and turned into the evidence pack below.</span>
         </label>
       </fieldset>
     </div>
 
-    <p class="prompt"><b>Consultant:</b> Ask about work and study. Do not ask how they came to Australia.</p>
+    <p class="prompt" id="prompt-interview"><b>Consultant:</b> Ask about work and study. Do not ask how they came to Australia.</p>
+    <p class="prompt" id="prompt-resume" hidden><b>Consultant:</b> Only work and study are read from the resume. Anything about how the person came to Australia is never extracted.</p>
+
+    <div class="resume-input" id="resume-input" hidden>
+      <label for="resume-text">Your resume, as plain text</label>
+      <textarea id="resume-text" maxlength="100000" spellcheck="false"
+                placeholder="Paste the resume here, one entry per line."></textarea>
+      <div class="controls">
+        <label class="file-pick" id="file-pick">Upload a .txt file
+          <input type="file" id="resume-file" class="visually-hidden" accept=".txt,text/plain"></label>
+        <button type="button" id="sample" class="secondary"></button>
+        <span class="small muted">Plain text only, up to 100 KB. The sample is a fictional cook's resume.</span>
+      </div>
+    </div>
 
     <div class="controls">
       <button type="button" id="record"></button>
@@ -265,7 +329,7 @@ input[type=radio], input[type=checkbox] { width: 26px; height: 26px; accent-colo
 
     <section id="matches" hidden aria-labelledby="h-jobs">
       <h2 id="h-jobs">5. Job matches and a tailored resume</h2>
-      <p class="small muted">Fit counts units evidenced in this interview against the units a job requires. It describes the job, not the person, and is not shown to employers. Select a job to see the resume tailored to it.</p>
+      <p class="small muted" id="jobs-hint">Fit counts units evidenced in this interview against the units a job requires. It describes the job, not the person, and is not shown to employers. Select a job to see the resume tailored to it.</p>
       <div class="board-filters" id="board-filters">
         <label>Location <select id="filter-location"></select></label>
         <label>Employment type <select id="filter-type"></select></label>
@@ -295,7 +359,11 @@ const MOCK_OFFLINE = MOCK && params.get("offline") === "1";
 // server refuses the rest anyway; this copy only lets the refusal show the moment
 // an unsupported language is picked instead of after consent and a first call.
 const SUPPORTED = ["zh", "ar"];
-const LANGUAGE_NAMES = { zh: "Mandarin", ar: "Arabic", ti: "Tigrinya", fa: "Farsi" };
+// Must match WRITTEN_LANGUAGES there: a resume is read, not heard, so English is added.
+const WRITTEN = ["en", "zh", "ar"];
+const LANGUAGE_NAMES = { en: "English", zh: "Mandarin", ar: "Arabic", ti: "Tigrinya", fa: "Farsi" };
+// A resume larger than this is not a resume; the server's JSON cap is 1 MB.
+const MAX_RESUME_BYTES = 100 * 1024;
 
 // NEEDS DECISION: the contract requires an occupation but the brief gives no
 // selector, so the page is fixed to the demo's frame. Change here if a picker is wanted.
@@ -405,10 +473,26 @@ const FIXTURE_MATCH = {
 // The best-fit job's draft, as the server also returns it for older callers.
 FIXTURE_MATCH.resume = FIXTURE_MATCH.resumes[FIXTURE_MATCH.jobs[0].id];
 
+// The built-in sample the "Use sample resume" button loads: fictional, in English,
+// labelled as a sample on its first line. Must equal "resume" in
+// skeleton/demo_data/canned/d7_resume.json, the only resume the offline stub answers for.
+const SAMPLE_RESUME = ["SAMPLE RESUME (fictional, for demonstration only)", "Cook", "WORK EXPERIENCE", "2016-2022  Head cook, hotel restaurant (overseas)", "Cooked breakfast, lunch and dinner for up to 150 guests a day.", "Prepared stocks, soups and sauces from scratch every morning.", "Prepared lamb, beef and chicken dishes for the daily menu.", "Kept raw and cooked food apart, with separate boards and knives.", "Checked and recorded cool-room temperatures at the start and end of each shift.", "Trained and supervised three kitchen hands.", "2013-2016  Assistant cook, family restaurant (overseas)", "Prepared rice, vegetables and bread for the lunch service.", "EDUCATION AND CERTIFICATES", "Secondary school certificate (overseas)", "Food hygiene certificate (overseas), not recognised in Australia"];
+
+// The real /api/extract and /api/match responses for SAMPLE_RESUME, generated from
+// app.extract() and app.match() without a key, so mock and server render the same.
+const FIXTURE_RESUME_EXTRACT = {"suggestions": [{"field": "anzsco_code", "value": "351411 Cook", "reason": "Six years as head cook, cooking for up to 150 guests a day.", "confidence": 0.86, "sources": [["resume", "line=4"], ["resume", "line=5"]]}, {"field": "osca_code", "value": "322331 Cook", "reason": "Same record; OSCA 2024 code for the same occupation.", "confidence": 0.84, "sources": [["resume", "line=4"]]}, {"field": "units_evidenced", "value": "SITXFSA005; SITXFSA006", "reason": "Kept raw and cooked food apart and recorded cool-room temperatures every shift.", "confidence": 0.8, "sources": [["resume", "line=8"], ["resume", "line=9"]]}, {"field": "units_evidenced", "value": "SITHCCC029", "reason": "Prepared stocks, soups and sauces from scratch every morning.", "confidence": 0.76, "sources": [["resume", "line=6"]]}, {"field": "units_evidenced", "value": "SITHCCC036", "reason": "Prepared lamb, beef and chicken dishes for the daily menu.", "confidence": 0.72, "sources": [["resume", "line=7"]]}], "needs_human": [{"field": "qualification", "reason": "Several core units of this qualification are described, but no Australian certificate is held.", "confidence": 0.44, "sources": [["resume", "line=6"], ["resume", "line=8"], ["resume", "line=15"]]}], "gaps": [], "gate": {"kind": "statutory_opportunity", "text": "A NSW business serving ready-to-eat potentially hazardous food must appoint a certified Food Safety Supervisor within 30 days. The FSS certificate requires exactly SITXFSA006 plus its prerequisite SITXFSA005, valid 5 years. From 1 September 2025 both units must be completed with the same RTO.", "source": "https://www.foodauthority.nsw.gov.au/sites/default/files/2023-07/FSS_Guidelines.pdf", "refugee_note": "SITXFSA005 and SITXFSA006 together are the Food Safety Supervisor certificate a NSW food business must have on staff, so these two units have value in a job now, not years away."}, "qualification_source": {"code": "SIT30821", "status": "Current", "superseded_code": null, "reachable": false, "source": "https://training.gov.au/assets/SIT/SIT30821_R1.pdf"}, "metric_name": "evidence items mapped to a resume line", "metric_value": 5};
+const FIXTURE_RESUME_MATCH = {"jobs": [{"id": "cookery-5", "title": "Catering cook", "setting": "Contract catering kitchen", "location": "Auburn NSW", "employment_type": "Full-time", "level": "Experienced", "shift": "Weekdays", "note": "Representative sample, not a real listing", "matched": [{"code": "SITHCCC029", "title": "Prepare stocks, sauces and soups", "sources": [["resume", "line=6"]]}, {"code": "SITXFSA005", "title": "Use hygienic practices for food safety", "sources": [["resume", "line=8"], ["resume", "line=9"]]}, {"code": "SITXFSA006", "title": "Participate in safe food handling practices", "sources": [["resume", "line=8"], ["resume", "line=9"]]}], "missing": [{"code": "SITHCCC027", "title": "Prepare dishes using basic methods of cookery"}], "fit": "3 of 4 required units evidenced"}, {"id": "cookery-7", "title": "Banquet cook", "setting": "Hotel function kitchen", "location": "Sydney CBD NSW", "employment_type": "Casual", "level": "Experienced", "shift": "Evenings and weekends", "note": "Representative sample, not a real listing", "matched": [{"code": "SITHCCC029", "title": "Prepare stocks, sauces and soups", "sources": [["resume", "line=6"]]}, {"code": "SITHCCC036", "title": "Prepare meat dishes", "sources": [["resume", "line=7"]]}, {"code": "SITXFSA005", "title": "Use hygienic practices for food safety", "sources": [["resume", "line=8"], ["resume", "line=9"]]}], "missing": [{"code": "SITHCCC027", "title": "Prepare dishes using basic methods of cookery"}, {"code": "SITHCCC043", "title": "Work effectively as a cook"}], "fit": "3 of 5 required units evidenced"}, {"id": "cookery-8", "title": "Production cook", "setting": "Central production kitchen", "location": "Wetherill Park NSW", "employment_type": "Full-time", "level": "Experienced", "shift": "Early starts", "note": "Representative sample, not a real listing", "matched": [{"code": "SITHCCC029", "title": "Prepare stocks, sauces and soups", "sources": [["resume", "line=6"]]}, {"code": "SITHCCC036", "title": "Prepare meat dishes", "sources": [["resume", "line=7"]]}, {"code": "SITXFSA005", "title": "Use hygienic practices for food safety", "sources": [["resume", "line=8"], ["resume", "line=9"]]}], "missing": [{"code": "SITHCCC027", "title": "Prepare dishes using basic methods of cookery"}], "fit": "3 of 4 required units evidenced"}, {"id": "cookery-1", "title": "Cook and Food Safety Supervisor", "setting": "Independent cafe kitchen", "location": "Parramatta NSW", "employment_type": "Full-time", "level": "Experienced", "shift": "Early starts", "note": "Representative sample, not a real listing", "matched": [{"code": "SITXFSA005", "title": "Use hygienic practices for food safety", "sources": [["resume", "line=8"], ["resume", "line=9"]]}, {"code": "SITXFSA006", "title": "Participate in safe food handling practices", "sources": [["resume", "line=8"], ["resume", "line=9"]]}], "missing": [{"code": "SITHCCC027", "title": "Prepare dishes using basic methods of cookery"}, {"code": "SITHCCC043", "title": "Work effectively as a cook"}], "fit": "2 of 4 required units evidenced"}, {"id": "cookery-2", "title": "Commercial cook", "setting": "Public hospital kitchen", "location": "Westmead NSW", "employment_type": "Full-time", "level": "Entry level", "shift": "Rotating roster", "note": "Representative sample, not a real listing", "matched": [{"code": "SITHCCC029", "title": "Prepare stocks, sauces and soups", "sources": [["resume", "line=6"]]}, {"code": "SITHCCC036", "title": "Prepare meat dishes", "sources": [["resume", "line=7"]]}], "missing": [{"code": "SITHCCC027", "title": "Prepare dishes using basic methods of cookery"}, {"code": "SITHCCC043", "title": "Work effectively as a cook"}], "fit": "2 of 4 required units evidenced"}, {"id": "cookery-3", "title": "Kitchen hand and food preparation", "setting": "Aged care home kitchen", "location": "Blacktown NSW", "employment_type": "Part-time", "level": "Entry level", "shift": "Day shifts", "note": "Representative sample, not a real listing", "matched": [{"code": "SITXFSA005", "title": "Use hygienic practices for food safety", "sources": [["resume", "line=8"], ["resume", "line=9"]]}, {"code": "SITXFSA006", "title": "Participate in safe food handling practices", "sources": [["resume", "line=8"], ["resume", "line=9"]]}], "missing": [{"code": "SITHCCC027", "title": "Prepare dishes using basic methods of cookery"}], "fit": "2 of 3 required units evidenced"}, {"id": "cookery-6", "title": "Canteen cook", "setting": "School canteen", "location": "Liverpool NSW", "employment_type": "Part-time", "level": "Entry level", "shift": "School hours", "note": "Representative sample, not a real listing", "matched": [{"code": "SITXFSA005", "title": "Use hygienic practices for food safety", "sources": [["resume", "line=8"], ["resume", "line=9"]]}, {"code": "SITXFSA006", "title": "Participate in safe food handling practices", "sources": [["resume", "line=8"], ["resume", "line=9"]]}], "missing": [{"code": "SITHCCC027", "title": "Prepare dishes using basic methods of cookery"}], "fit": "2 of 3 required units evidenced"}, {"id": "cookery-4", "title": "Breakfast cook", "setting": "Club bistro", "location": "Bankstown NSW", "employment_type": "Casual", "level": "Entry level", "shift": "Early starts, weekends", "note": "Representative sample, not a real listing", "matched": [{"code": "SITXFSA005", "title": "Use hygienic practices for food safety", "sources": [["resume", "line=8"], ["resume", "line=9"]]}], "missing": [{"code": "SITHCCC027", "title": "Prepare dishes using basic methods of cookery"}], "fit": "1 of 2 required units evidenced"}, {"id": "cookery-9", "title": "Grill cook", "setting": "Pub bistro", "location": "Penrith NSW", "employment_type": "Casual", "level": "Experienced", "shift": "Evenings", "note": "Representative sample, not a real listing", "matched": [{"code": "SITHCCC036", "title": "Prepare meat dishes", "sources": [["resume", "line=7"]]}], "missing": [{"code": "SITHCCC027", "title": "Prepare dishes using basic methods of cookery"}, {"code": "SITHCCC043", "title": "Work effectively as a cook"}], "fit": "1 of 3 required units evidenced"}], "courses": [{"code": "SITHCCC027", "title": "Prepare dishes using basic methods of cookery", "qualification": "SIT30821 Certificate III in Commercial Cookery", "for_jobs": ["cookery-5", "cookery-7", "cookery-8", "cookery-1", "cookery-2", "cookery-3", "cookery-6", "cookery-4", "cookery-9"], "note": "Gap training through a Registered Training Organisation"}, {"code": "SITHCCC043", "title": "Work effectively as a cook", "qualification": "SIT30821 Certificate III in Commercial Cookery", "for_jobs": ["cookery-7", "cookery-1", "cookery-2", "cookery-9"], "note": "Gap training through a Registered Training Organisation"}], "resumes": {"cookery-5": {"job_id": "cookery-5", "text": "DRAFT RESUME - for: Catering cook, Contract catering kitchen, Auburn NSW\n\nWORK EXPERIENCE (from the jobseeker's own resume)\n- Prepared stocks, soups and sauces from scratch every morning. [resume line 6]\n- Kept raw and cooked food apart, with separate boards and knives. [resume line 8]\n- Checked and recorded cool-room temperatures at the start and end of each shift. [resume line 9]\n- Prepared lamb, beef and chicken dishes for the daily menu. [resume line 7]\n\nSKILLS MAPPED TO AUSTRALIAN UNITS OF COMPETENCY\n- SITXFSA005 Use hygienic practices for food safety (resume line 8, 9)\n- SITXFSA006 Participate in safe food handling practices (resume line 8, 9)\n- SITHCCC029 Prepare stocks, sauces and soups (resume line 6)\n- SITHCCC036 Prepare meat dishes (resume line 7)\n\nQUALIFICATIONS\n- SIT30821 Certificate III in Commercial Cookery: Recognition of Prior Learning in progress, not yet assessed\n\nName, contact details, employers and dates are for the jobseeker to add.", "sections": {"job": {"id": "cookery-5", "title": "Catering cook", "setting": "Contract catering kitchen", "location": "Auburn NSW"}, "experience": [{"line": "6", "en": "Prepared stocks, soups and sauces from scratch every morning.", "for_this_job": true}, {"line": "8", "en": "Kept raw and cooked food apart, with separate boards and knives.", "for_this_job": true}, {"line": "9", "en": "Checked and recorded cool-room temperatures at the start and end of each shift.", "for_this_job": true}, {"line": "7", "en": "Prepared lamb, beef and chicken dishes for the daily menu.", "for_this_job": false}], "skills": [{"code": "SITXFSA005", "title": "Use hygienic practices for food safety", "described_at": ["8", "9"], "for_this_job": true}, {"code": "SITXFSA006", "title": "Participate in safe food handling practices", "described_at": ["8", "9"], "for_this_job": true}, {"code": "SITHCCC029", "title": "Prepare stocks, sauces and soups", "described_at": ["6"], "for_this_job": true}, {"code": "SITHCCC036", "title": "Prepare meat dishes", "described_at": ["7"], "for_this_job": false}], "qualifications": [{"title": "SIT30821 Certificate III in Commercial Cookery", "status": "Recognition of Prior Learning in progress, not yet assessed"}], "to_add": "Name, contact details, employers and dates are for the jobseeker to add.", "source": "resume"}}, "cookery-7": {"job_id": "cookery-7", "text": "DRAFT RESUME - for: Banquet cook, Hotel function kitchen, Sydney CBD NSW\n\nWORK EXPERIENCE (from the jobseeker's own resume)\n- Prepared stocks, soups and sauces from scratch every morning. [resume line 6]\n- Prepared lamb, beef and chicken dishes for the daily menu. [resume line 7]\n- Kept raw and cooked food apart, with separate boards and knives. [resume line 8]\n- Checked and recorded cool-room temperatures at the start and end of each shift. [resume line 9]\n\nSKILLS MAPPED TO AUSTRALIAN UNITS OF COMPETENCY\n- SITXFSA005 Use hygienic practices for food safety (resume line 8, 9)\n- SITHCCC029 Prepare stocks, sauces and soups (resume line 6)\n- SITHCCC036 Prepare meat dishes (resume line 7)\n- SITXFSA006 Participate in safe food handling practices (resume line 8, 9)\n\nQUALIFICATIONS\n- SIT30821 Certificate III in Commercial Cookery: Recognition of Prior Learning in progress, not yet assessed\n\nName, contact details, employers and dates are for the jobseeker to add.", "sections": {"job": {"id": "cookery-7", "title": "Banquet cook", "setting": "Hotel function kitchen", "location": "Sydney CBD NSW"}, "experience": [{"line": "6", "en": "Prepared stocks, soups and sauces from scratch every morning.", "for_this_job": true}, {"line": "7", "en": "Prepared lamb, beef and chicken dishes for the daily menu.", "for_this_job": true}, {"line": "8", "en": "Kept raw and cooked food apart, with separate boards and knives.", "for_this_job": true}, {"line": "9", "en": "Checked and recorded cool-room temperatures at the start and end of each shift.", "for_this_job": true}], "skills": [{"code": "SITXFSA005", "title": "Use hygienic practices for food safety", "described_at": ["8", "9"], "for_this_job": true}, {"code": "SITHCCC029", "title": "Prepare stocks, sauces and soups", "described_at": ["6"], "for_this_job": true}, {"code": "SITHCCC036", "title": "Prepare meat dishes", "described_at": ["7"], "for_this_job": true}, {"code": "SITXFSA006", "title": "Participate in safe food handling practices", "described_at": ["8", "9"], "for_this_job": false}], "qualifications": [{"title": "SIT30821 Certificate III in Commercial Cookery", "status": "Recognition of Prior Learning in progress, not yet assessed"}], "to_add": "Name, contact details, employers and dates are for the jobseeker to add.", "source": "resume"}}, "cookery-8": {"job_id": "cookery-8", "text": "DRAFT RESUME - for: Production cook, Central production kitchen, Wetherill Park NSW\n\nWORK EXPERIENCE (from the jobseeker's own resume)\n- Prepared stocks, soups and sauces from scratch every morning. [resume line 6]\n- Prepared lamb, beef and chicken dishes for the daily menu. [resume line 7]\n- Kept raw and cooked food apart, with separate boards and knives. [resume line 8]\n- Checked and recorded cool-room temperatures at the start and end of each shift. [resume line 9]\n\nSKILLS MAPPED TO AUSTRALIAN UNITS OF COMPETENCY\n- SITXFSA005 Use hygienic practices for food safety (resume line 8, 9)\n- SITHCCC029 Prepare stocks, sauces and soups (resume line 6)\n- SITHCCC036 Prepare meat dishes (resume line 7)\n- SITXFSA006 Participate in safe food handling practices (resume line 8, 9)\n\nQUALIFICATIONS\n- SIT30821 Certificate III in Commercial Cookery: Recognition of Prior Learning in progress, not yet assessed\n\nName, contact details, employers and dates are for the jobseeker to add.", "sections": {"job": {"id": "cookery-8", "title": "Production cook", "setting": "Central production kitchen", "location": "Wetherill Park NSW"}, "experience": [{"line": "6", "en": "Prepared stocks, soups and sauces from scratch every morning.", "for_this_job": true}, {"line": "7", "en": "Prepared lamb, beef and chicken dishes for the daily menu.", "for_this_job": true}, {"line": "8", "en": "Kept raw and cooked food apart, with separate boards and knives.", "for_this_job": true}, {"line": "9", "en": "Checked and recorded cool-room temperatures at the start and end of each shift.", "for_this_job": true}], "skills": [{"code": "SITXFSA005", "title": "Use hygienic practices for food safety", "described_at": ["8", "9"], "for_this_job": true}, {"code": "SITHCCC029", "title": "Prepare stocks, sauces and soups", "described_at": ["6"], "for_this_job": true}, {"code": "SITHCCC036", "title": "Prepare meat dishes", "described_at": ["7"], "for_this_job": true}, {"code": "SITXFSA006", "title": "Participate in safe food handling practices", "described_at": ["8", "9"], "for_this_job": false}], "qualifications": [{"title": "SIT30821 Certificate III in Commercial Cookery", "status": "Recognition of Prior Learning in progress, not yet assessed"}], "to_add": "Name, contact details, employers and dates are for the jobseeker to add.", "source": "resume"}}, "cookery-1": {"job_id": "cookery-1", "text": "DRAFT RESUME - for: Cook and Food Safety Supervisor, Independent cafe kitchen, Parramatta NSW\n\nWORK EXPERIENCE (from the jobseeker's own resume)\n- Kept raw and cooked food apart, with separate boards and knives. [resume line 8]\n- Checked and recorded cool-room temperatures at the start and end of each shift. [resume line 9]\n- Prepared stocks, soups and sauces from scratch every morning. [resume line 6]\n- Prepared lamb, beef and chicken dishes for the daily menu. [resume line 7]\n\nSKILLS MAPPED TO AUSTRALIAN UNITS OF COMPETENCY\n- SITXFSA005 Use hygienic practices for food safety (resume line 8, 9)\n- SITXFSA006 Participate in safe food handling practices (resume line 8, 9)\n- SITHCCC029 Prepare stocks, sauces and soups (resume line 6)\n- SITHCCC036 Prepare meat dishes (resume line 7)\n\nQUALIFICATIONS\n- SIT30821 Certificate III in Commercial Cookery: Recognition of Prior Learning in progress, not yet assessed\n\nName, contact details, employers and dates are for the jobseeker to add.", "sections": {"job": {"id": "cookery-1", "title": "Cook and Food Safety Supervisor", "setting": "Independent cafe kitchen", "location": "Parramatta NSW"}, "experience": [{"line": "8", "en": "Kept raw and cooked food apart, with separate boards and knives.", "for_this_job": true}, {"line": "9", "en": "Checked and recorded cool-room temperatures at the start and end of each shift.", "for_this_job": true}, {"line": "6", "en": "Prepared stocks, soups and sauces from scratch every morning.", "for_this_job": false}, {"line": "7", "en": "Prepared lamb, beef and chicken dishes for the daily menu.", "for_this_job": false}], "skills": [{"code": "SITXFSA005", "title": "Use hygienic practices for food safety", "described_at": ["8", "9"], "for_this_job": true}, {"code": "SITXFSA006", "title": "Participate in safe food handling practices", "described_at": ["8", "9"], "for_this_job": true}, {"code": "SITHCCC029", "title": "Prepare stocks, sauces and soups", "described_at": ["6"], "for_this_job": false}, {"code": "SITHCCC036", "title": "Prepare meat dishes", "described_at": ["7"], "for_this_job": false}], "qualifications": [{"title": "SIT30821 Certificate III in Commercial Cookery", "status": "Recognition of Prior Learning in progress, not yet assessed"}], "to_add": "Name, contact details, employers and dates are for the jobseeker to add.", "source": "resume"}}, "cookery-2": {"job_id": "cookery-2", "text": "DRAFT RESUME - for: Commercial cook, Public hospital kitchen, Westmead NSW\n\nWORK EXPERIENCE (from the jobseeker's own resume)\n- Prepared stocks, soups and sauces from scratch every morning. [resume line 6]\n- Prepared lamb, beef and chicken dishes for the daily menu. [resume line 7]\n- Kept raw and cooked food apart, with separate boards and knives. [resume line 8]\n- Checked and recorded cool-room temperatures at the start and end of each shift. [resume line 9]\n\nSKILLS MAPPED TO AUSTRALIAN UNITS OF COMPETENCY\n- SITHCCC029 Prepare stocks, sauces and soups (resume line 6)\n- SITHCCC036 Prepare meat dishes (resume line 7)\n- SITXFSA005 Use hygienic practices for food safety (resume line 8, 9)\n- SITXFSA006 Participate in safe food handling practices (resume line 8, 9)\n\nQUALIFICATIONS\n- SIT30821 Certificate III in Commercial Cookery: Recognition of Prior Learning in progress, not yet assessed\n\nName, contact details, employers and dates are for the jobseeker to add.", "sections": {"job": {"id": "cookery-2", "title": "Commercial cook", "setting": "Public hospital kitchen", "location": "Westmead NSW"}, "experience": [{"line": "6", "en": "Prepared stocks, soups and sauces from scratch every morning.", "for_this_job": true}, {"line": "7", "en": "Prepared lamb, beef and chicken dishes for the daily menu.", "for_this_job": true}, {"line": "8", "en": "Kept raw and cooked food apart, with separate boards and knives.", "for_this_job": false}, {"line": "9", "en": "Checked and recorded cool-room temperatures at the start and end of each shift.", "for_this_job": false}], "skills": [{"code": "SITHCCC029", "title": "Prepare stocks, sauces and soups", "described_at": ["6"], "for_this_job": true}, {"code": "SITHCCC036", "title": "Prepare meat dishes", "described_at": ["7"], "for_this_job": true}, {"code": "SITXFSA005", "title": "Use hygienic practices for food safety", "described_at": ["8", "9"], "for_this_job": false}, {"code": "SITXFSA006", "title": "Participate in safe food handling practices", "described_at": ["8", "9"], "for_this_job": false}], "qualifications": [{"title": "SIT30821 Certificate III in Commercial Cookery", "status": "Recognition of Prior Learning in progress, not yet assessed"}], "to_add": "Name, contact details, employers and dates are for the jobseeker to add.", "source": "resume"}}, "cookery-3": {"job_id": "cookery-3", "text": "DRAFT RESUME - for: Kitchen hand and food preparation, Aged care home kitchen, Blacktown NSW\n\nWORK EXPERIENCE (from the jobseeker's own resume)\n- Kept raw and cooked food apart, with separate boards and knives. [resume line 8]\n- Checked and recorded cool-room temperatures at the start and end of each shift. [resume line 9]\n- Prepared stocks, soups and sauces from scratch every morning. [resume line 6]\n- Prepared lamb, beef and chicken dishes for the daily menu. [resume line 7]\n\nSKILLS MAPPED TO AUSTRALIAN UNITS OF COMPETENCY\n- SITXFSA005 Use hygienic practices for food safety (resume line 8, 9)\n- SITXFSA006 Participate in safe food handling practices (resume line 8, 9)\n- SITHCCC029 Prepare stocks, sauces and soups (resume line 6)\n- SITHCCC036 Prepare meat dishes (resume line 7)\n\nQUALIFICATIONS\n- SIT30821 Certificate III in Commercial Cookery: Recognition of Prior Learning in progress, not yet assessed\n\nName, contact details, employers and dates are for the jobseeker to add.", "sections": {"job": {"id": "cookery-3", "title": "Kitchen hand and food preparation", "setting": "Aged care home kitchen", "location": "Blacktown NSW"}, "experience": [{"line": "8", "en": "Kept raw and cooked food apart, with separate boards and knives.", "for_this_job": true}, {"line": "9", "en": "Checked and recorded cool-room temperatures at the start and end of each shift.", "for_this_job": true}, {"line": "6", "en": "Prepared stocks, soups and sauces from scratch every morning.", "for_this_job": false}, {"line": "7", "en": "Prepared lamb, beef and chicken dishes for the daily menu.", "for_this_job": false}], "skills": [{"code": "SITXFSA005", "title": "Use hygienic practices for food safety", "described_at": ["8", "9"], "for_this_job": true}, {"code": "SITXFSA006", "title": "Participate in safe food handling practices", "described_at": ["8", "9"], "for_this_job": true}, {"code": "SITHCCC029", "title": "Prepare stocks, sauces and soups", "described_at": ["6"], "for_this_job": false}, {"code": "SITHCCC036", "title": "Prepare meat dishes", "described_at": ["7"], "for_this_job": false}], "qualifications": [{"title": "SIT30821 Certificate III in Commercial Cookery", "status": "Recognition of Prior Learning in progress, not yet assessed"}], "to_add": "Name, contact details, employers and dates are for the jobseeker to add.", "source": "resume"}}, "cookery-6": {"job_id": "cookery-6", "text": "DRAFT RESUME - for: Canteen cook, School canteen, Liverpool NSW\n\nWORK EXPERIENCE (from the jobseeker's own resume)\n- Kept raw and cooked food apart, with separate boards and knives. [resume line 8]\n- Checked and recorded cool-room temperatures at the start and end of each shift. [resume line 9]\n- Prepared stocks, soups and sauces from scratch every morning. [resume line 6]\n- Prepared lamb, beef and chicken dishes for the daily menu. [resume line 7]\n\nSKILLS MAPPED TO AUSTRALIAN UNITS OF COMPETENCY\n- SITXFSA005 Use hygienic practices for food safety (resume line 8, 9)\n- SITXFSA006 Participate in safe food handling practices (resume line 8, 9)\n- SITHCCC029 Prepare stocks, sauces and soups (resume line 6)\n- SITHCCC036 Prepare meat dishes (resume line 7)\n\nQUALIFICATIONS\n- SIT30821 Certificate III in Commercial Cookery: Recognition of Prior Learning in progress, not yet assessed\n\nName, contact details, employers and dates are for the jobseeker to add.", "sections": {"job": {"id": "cookery-6", "title": "Canteen cook", "setting": "School canteen", "location": "Liverpool NSW"}, "experience": [{"line": "8", "en": "Kept raw and cooked food apart, with separate boards and knives.", "for_this_job": true}, {"line": "9", "en": "Checked and recorded cool-room temperatures at the start and end of each shift.", "for_this_job": true}, {"line": "6", "en": "Prepared stocks, soups and sauces from scratch every morning.", "for_this_job": false}, {"line": "7", "en": "Prepared lamb, beef and chicken dishes for the daily menu.", "for_this_job": false}], "skills": [{"code": "SITXFSA005", "title": "Use hygienic practices for food safety", "described_at": ["8", "9"], "for_this_job": true}, {"code": "SITXFSA006", "title": "Participate in safe food handling practices", "described_at": ["8", "9"], "for_this_job": true}, {"code": "SITHCCC029", "title": "Prepare stocks, sauces and soups", "described_at": ["6"], "for_this_job": false}, {"code": "SITHCCC036", "title": "Prepare meat dishes", "described_at": ["7"], "for_this_job": false}], "qualifications": [{"title": "SIT30821 Certificate III in Commercial Cookery", "status": "Recognition of Prior Learning in progress, not yet assessed"}], "to_add": "Name, contact details, employers and dates are for the jobseeker to add.", "source": "resume"}}, "cookery-4": {"job_id": "cookery-4", "text": "DRAFT RESUME - for: Breakfast cook, Club bistro, Bankstown NSW\n\nWORK EXPERIENCE (from the jobseeker's own resume)\n- Kept raw and cooked food apart, with separate boards and knives. [resume line 8]\n- Checked and recorded cool-room temperatures at the start and end of each shift. [resume line 9]\n- Prepared stocks, soups and sauces from scratch every morning. [resume line 6]\n- Prepared lamb, beef and chicken dishes for the daily menu. [resume line 7]\n\nSKILLS MAPPED TO AUSTRALIAN UNITS OF COMPETENCY\n- SITXFSA005 Use hygienic practices for food safety (resume line 8, 9)\n- SITXFSA006 Participate in safe food handling practices (resume line 8, 9)\n- SITHCCC029 Prepare stocks, sauces and soups (resume line 6)\n- SITHCCC036 Prepare meat dishes (resume line 7)\n\nQUALIFICATIONS\n- SIT30821 Certificate III in Commercial Cookery: Recognition of Prior Learning in progress, not yet assessed\n\nName, contact details, employers and dates are for the jobseeker to add.", "sections": {"job": {"id": "cookery-4", "title": "Breakfast cook", "setting": "Club bistro", "location": "Bankstown NSW"}, "experience": [{"line": "8", "en": "Kept raw and cooked food apart, with separate boards and knives.", "for_this_job": true}, {"line": "9", "en": "Checked and recorded cool-room temperatures at the start and end of each shift.", "for_this_job": true}, {"line": "6", "en": "Prepared stocks, soups and sauces from scratch every morning.", "for_this_job": false}, {"line": "7", "en": "Prepared lamb, beef and chicken dishes for the daily menu.", "for_this_job": false}], "skills": [{"code": "SITXFSA005", "title": "Use hygienic practices for food safety", "described_at": ["8", "9"], "for_this_job": true}, {"code": "SITXFSA006", "title": "Participate in safe food handling practices", "described_at": ["8", "9"], "for_this_job": false}, {"code": "SITHCCC029", "title": "Prepare stocks, sauces and soups", "described_at": ["6"], "for_this_job": false}, {"code": "SITHCCC036", "title": "Prepare meat dishes", "described_at": ["7"], "for_this_job": false}], "qualifications": [{"title": "SIT30821 Certificate III in Commercial Cookery", "status": "Recognition of Prior Learning in progress, not yet assessed"}], "to_add": "Name, contact details, employers and dates are for the jobseeker to add.", "source": "resume"}}, "cookery-9": {"job_id": "cookery-9", "text": "DRAFT RESUME - for: Grill cook, Pub bistro, Penrith NSW\n\nWORK EXPERIENCE (from the jobseeker's own resume)\n- Prepared lamb, beef and chicken dishes for the daily menu. [resume line 7]\n- Prepared stocks, soups and sauces from scratch every morning. [resume line 6]\n- Kept raw and cooked food apart, with separate boards and knives. [resume line 8]\n- Checked and recorded cool-room temperatures at the start and end of each shift. [resume line 9]\n\nSKILLS MAPPED TO AUSTRALIAN UNITS OF COMPETENCY\n- SITHCCC036 Prepare meat dishes (resume line 7)\n- SITXFSA005 Use hygienic practices for food safety (resume line 8, 9)\n- SITXFSA006 Participate in safe food handling practices (resume line 8, 9)\n- SITHCCC029 Prepare stocks, sauces and soups (resume line 6)\n\nQUALIFICATIONS\n- SIT30821 Certificate III in Commercial Cookery: Recognition of Prior Learning in progress, not yet assessed\n\nName, contact details, employers and dates are for the jobseeker to add.", "sections": {"job": {"id": "cookery-9", "title": "Grill cook", "setting": "Pub bistro", "location": "Penrith NSW"}, "experience": [{"line": "7", "en": "Prepared lamb, beef and chicken dishes for the daily menu.", "for_this_job": true}, {"line": "6", "en": "Prepared stocks, soups and sauces from scratch every morning.", "for_this_job": false}, {"line": "8", "en": "Kept raw and cooked food apart, with separate boards and knives.", "for_this_job": false}, {"line": "9", "en": "Checked and recorded cool-room temperatures at the start and end of each shift.", "for_this_job": false}], "skills": [{"code": "SITHCCC036", "title": "Prepare meat dishes", "described_at": ["7"], "for_this_job": true}, {"code": "SITXFSA005", "title": "Use hygienic practices for food safety", "described_at": ["8", "9"], "for_this_job": false}, {"code": "SITXFSA006", "title": "Participate in safe food handling practices", "described_at": ["8", "9"], "for_this_job": false}, {"code": "SITHCCC029", "title": "Prepare stocks, sauces and soups", "described_at": ["6"], "for_this_job": false}], "qualifications": [{"title": "SIT30821 Certificate III in Commercial Cookery", "status": "Recognition of Prior Learning in progress, not yet assessed"}], "to_add": "Name, contact details, employers and dates are for the jobseeker to add.", "source": "resume"}}}};
+FIXTURE_RESUME_MATCH.resume = FIXTURE_RESUME_MATCH.resumes[FIXTURE_RESUME_MATCH.jobs[0].id];
+
 // Mirrors the server's guard order (consent before language) and message shape,
 // so a refusal looks the same in mock mode as it will against the real API.
 function mockGuard(payload) {
   if (!payload.consent) return { refused: "consent was not given; nothing may be processed" };
+  if (payload.source === "resume") {
+    return WRITTEN.includes(payload.language) ? null : { refused: payload.language +
+      ": not supported for a written resume. This demo reads resumes in " + WRITTEN.join(", ") +
+      ". We will not fake a language we cannot verify." };
+  }
   if (!SUPPORTED.includes(payload.language)) {
     return { refused: payload.language + ": not supported. This demo runs in " + SUPPORTED.join(", ") +
                       ". We will not fake a language we cannot pronounce." };
@@ -429,17 +513,35 @@ function mockApi(path, body) {
       // timestamp and gloss so recorded lines line up with the canned citations.
       return resolve(Object.assign({ offline: MOCK_OFFLINE }, line));
     }
+    if (path === "/api/extract" && body.source === "resume") return resolve(mockGuard(body) || mockResumeExtract(body));
     if (path === "/api/extract") return resolve(mockGuard(body) || FIXTURE_EXTRACT);
+    if (path === "/api/match" && body.source === "resume") {
+      // Only the sample has a match fixture. Any other resume evidences nothing
+      // offline, so the mock answers with an empty board rather than the sample's.
+      return resolve(body.evidenced_units.length ? FIXTURE_RESUME_MATCH
+                                                 : { jobs: [], courses: [], resume: null, resumes: {} });
+    }
     if (path === "/api/match") return resolve(FIXTURE_MATCH);
     resolve({ refused: "unknown endpoint " + path });
   }, 350));
 }
 
+// As the server answers offline: the canned pack for the sample, nothing for any
+// other resume, because the sample's citations would point at someone else's lines.
+function mockResumeExtract(body) {
+  const isSample = body.resume.length === SAMPLE_RESUME.length &&
+                   body.resume.every((line, i) => line.text === SAMPLE_RESUME[i]);
+  if (isSample) return FIXTURE_RESUME_EXTRACT;
+  return Object.assign({}, FIXTURE_RESUME_EXTRACT, { suggestions: [], needs_human: [], metric_value: 0,
+    gaps: ["anzsco_code", "osca_code", "qualification", "units_evidenced"] });
+}
+
 // ---------------------------------------------------------------- state
 const state = {
+  source: null,    // null on the start screen, then "interview" or "resume"
   language: "zh",
   consent: false,
-  lines: [],       // {t, text, en, placeholder}
+  lines: [],       // interview: {t, text, en, placeholder}; resume: {line, text}
   extract: null,
   match: null,
   busy: false,
@@ -519,6 +621,8 @@ function resetSession() {
   state.selectedJob = null;
   state.filters = { location: "", type: "" };
   mockNext.zh = 0; mockNext.ar = 0;
+  // The resume's text stays in its box; only what was built from it is dropped.
+  if (state.source === "resume") state.lines = resumeLines($("resume-text").value);
   $("offline").hidden = true;
   showError("");
   setStatus("");
@@ -527,7 +631,12 @@ function resetSession() {
 function chooseLanguage(code) {
   state.language = code;
   resetSession();
-  if (!SUPPORTED.includes(code)) {
+  if (state.source === "resume" && !WRITTEN.includes(code)) {
+    showRefusal(code + " (" + LANGUAGE_NAMES[code] + "): not supported for a written resume. This demo reads resumes in " +
+                WRITTEN.join(", ") + ". We will not fake a language we cannot verify.");
+    return;
+  }
+  if (state.source !== "resume" && !SUPPORTED.includes(code)) {
     showRefusal(code + " (" + LANGUAGE_NAMES[code] + "): not supported. This demo runs in " +
                 SUPPORTED.join(", ") + ". We will not fake a language we cannot pronounce.");
     return;
@@ -535,16 +644,102 @@ function chooseLanguage(code) {
   render();
 }
 
-function restart() {
+// Both paths start clean: default language, no consent, nothing typed or built.
+function enterPath(source) {
+  state.source = source;
+  $("resume-text").value = "";
+  $("resume-file").value = "";
   resetSession();
-  state.language = "zh";
   state.consent = false;
-  document.querySelector('input[name=lang][value=zh]').checked = true;
   $("consent").checked = false;
+  const resume = source === "resume";
+  const first = resume ? 'input[name=rlang][value=en]' : 'input[name=lang][value=zh]';
+  state.language = resume ? "en" : "zh";
+  document.querySelector(first).checked = true;
+  $("lang-interview").hidden = resume;
+  $("lang-resume").hidden = !resume;
+  $("consent-interview").hidden = resume;
+  $("consent-resume").hidden = !resume;
+  $("prompt-interview").hidden = resume;
+  $("prompt-resume").hidden = !resume;
+  $("resume-input").hidden = !resume;
+  $("record").hidden = resume;
+  $("demo").hidden = resume;
+  $("path-label").textContent = resume ? "I have a resume" : "Tell us about your work (interview)";
+  $("h-transcript").textContent = resume ? "3. Your resume" : "3. What was said";
+  $("jobs-hint").textContent = "Fit counts units evidenced in this " + (resume ? "resume" : "interview") +
+    " against the units a job requires. It describes the job, not the person, and is not shown to employers. Select a job to see the resume tailored to it.";
+  $("start").hidden = true;
   $("refusal").hidden = true;
   $("session").hidden = false;
   render();
-  document.querySelector('input[name=lang][value=zh]').focus();
+  document.querySelector(first).focus();
+}
+
+function showStart() {
+  state.source = null;
+  resetSession();
+  state.consent = false;
+  $("consent").checked = false;
+  $("refusal").hidden = true;
+  $("session").hidden = true;
+  $("start").hidden = false;
+  $("enter-interview").focus();
+}
+
+// A refusal ends the session; starting again goes back to the choice of path.
+function restart() {
+  showStart();
+}
+
+// Numbered by non-blank line, so "resume line 8" is the eighth line shown on
+// screen, which is also what the model is asked to cite.
+function resumeLines(text) {
+  return String(text).split(/\r?\n/).map(line => line.trim()).filter(Boolean)
+                     .map((text, i) => ({ line: i + 1, text }));
+}
+
+function resumeChanged() {
+  state.lines = resumeLines($("resume-text").value);
+  state.extract = null;
+  state.match = null;
+  showError("");
+  render();
+}
+
+// Read in the browser: a .txt file never leaves the page until the pack is built.
+// Anything else is refused by name, never guessed at.
+function readResumeFile(file) {
+  if (!file || !state.consent) return;
+  $("resume-file").value = "";
+  const isText = /\.txt$/i.test(file.name) && (!file.type || file.type === "text/plain");
+  if (!isText) {
+    showError(file.name + ": only plain-text .txt files are read here. For a PDF or Word file, copy the text and paste it above.");
+    return;
+  }
+  if (file.size > MAX_RESUME_BYTES) {
+    showError(file.name + ": larger than 100 KB, so it is not read. Paste the work history part instead.");
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = () => {
+    if (String(reader.result).includes("\u0000")) {
+      showError(file.name + ": this does not look like plain text, so it is not read.");
+      return;
+    }
+    $("resume-text").value = reader.result;
+    resumeChanged();
+    setStatus("Read " + file.name + ": " + state.lines.length + " lines.");
+  };
+  reader.onerror = () => showError(file.name + ": could not be read. Nothing was added.");
+  reader.readAsText(file);
+}
+
+async function useSampleResume() {
+  if (!state.consent) return;
+  $("resume-text").value = SAMPLE_RESUME.join("\n");
+  resumeChanged();
+  await buildPack();
 }
 
 function elapsed() {
@@ -647,15 +842,20 @@ async function buildPack() {
   showError("");
   setStatus("Building the evidence pack…");
   try {
-    const transcript = state.lines.map(({ t, text, en }) => (en ? { t, text, en } : { t, text }));
-    const extract = await call("/api/extract", { json: {
-      occupation: OCCUPATION, language: state.language, consent: state.consent, transcript } });
+    // The resume goes through the same two calls, marked as a resume so every item
+    // cites a resume line. An English resume is its own English gloss.
+    const lines = state.source === "resume"
+      ? { source: "resume", resume: state.lines.map(({ line, text }) =>
+            (state.language === "en" ? { line, text, en: text } : { line, text })) }
+      : { transcript: state.lines.map(({ t, text, en }) => (en ? { t, text, en } : { t, text })) };
+    const extract = await call("/api/extract", { json: Object.assign({
+      occupation: OCCUPATION, language: state.language, consent: state.consent }, lines) });
     if (refusedBy(extract)) return;
     state.extract = extract;
     setStatus("Matching against sample jobs…");
     render();
-    const match = await call("/api/match", { json: {
-      occupation: OCCUPATION, evidenced_units: evidencedUnits(extract), transcript } });
+    const match = await call("/api/match", { json: Object.assign({
+      occupation: OCCUPATION, evidenced_units: evidencedUnits(extract) }, lines) });
     if (refusedBy(match)) return;
     state.match = match;
     state.selectedJob = null;
@@ -668,12 +868,14 @@ async function buildPack() {
   }
 }
 
+// "t=02:41" (or a bare "02:41") lights a transcript line; "line=8" a resume line.
 function highlight(locator) {
-  const t = String(locator).replace(/^t=/, "");
+  const resumeLine = String(locator).startsWith("line=");
+  const t = String(locator).replace(/^(t|line)=/, "");
   document.querySelectorAll(".transcript li.hit").forEach(li => li.classList.remove("hit"));
-  const line = document.querySelector('.transcript li[data-t="' + CSS.escape(t) + '"]');
+  const line = document.querySelector('.transcript li[' + (resumeLine ? "data-line" : "data-t") + '="' + CSS.escape(t) + '"]');
   if (!line) {
-    setStatus("No transcript line at " + t + ".");
+    setStatus(resumeLine ? "No resume line " + t + "." : "No transcript line at " + t + ".");
     return;
   }
   line.classList.add("hit");
@@ -690,6 +892,11 @@ function sourceLinks(sources) {
       return [sep, el("button", { type: "button", class: "link", onclick: () => highlight(locator),
                                    "aria-label": "Show transcript line at " + t }, t)];
     }
+    if (label === "resume") {
+      const n = String(locator).replace(/^line=/, "");
+      return [sep, el("button", { type: "button", class: "link", onclick: () => highlight(locator),
+                                   "aria-label": "Show resume line " + n }, "resume line " + n)];
+    }
     return [sep, label + " " + locator];
   });
 }
@@ -699,10 +906,25 @@ function chip(confidence, withheld) {
             "confidence " + Number(confidence).toFixed(2));
 }
 
+function citedAt() {
+  return state.source === "resume" ? "Written at: " : "Said at: ";
+}
+
 function renderTranscript() {
   const list = $("transcript");
   list.replaceChildren();
   const rtl = state.language === "ar";
+  if (state.source === "resume") {
+    for (const line of state.lines) {
+      list.append(el("li", { "data-line": String(line.line), tabindex: "-1" },
+        el("span", { class: "ts" }, String(line.line)),
+        el("div", { class: "said", lang: state.language, dir: rtl ? "rtl" : "ltr" }, line.text)));
+    }
+    $("transcript-empty").textContent = "No resume yet. Paste one, upload a .txt file, or use the sample.";
+    $("transcript-empty").hidden = state.lines.length > 0;
+    return;
+  }
+  $("transcript-empty").textContent = "No lines yet.";
   for (const line of state.lines) {
     list.append(el("li", { "data-t": line.t, tabindex: "-1" },
       el("span", { class: "ts" }, line.t),
@@ -725,7 +947,7 @@ function renderGate(gate, extract) {
     el("h2", { id: "h-gate" }, "Gate: what the law requires" + (kind ? " (" + kind + ")" : "")),
     el("p", { class: "text" }, gate.text),
     evidenced.length ? el("p", { class: "hit-units" },
-      el("b", {}, "Already evidenced in this interview: "),
+      el("b", {}, "Already evidenced in this " + (state.source === "resume" ? "resume" : "interview") + ": "),
       evidenced.map((unit, i) => [i ? "; " : "", el("span", { class: "code" }, unit.code), " (", sourceLinks(unit.sources), ")"])) : null,
     gate.refugee_note ? el("p", {}, el("b", {}, "Why it matters here: "), gate.refugee_note) : null,
     gate.source ? el("p", { class: "small" }, "Source: ", el("a", { href: gate.source, target: "_blank", rel: "noopener" }, gate.source)) : null);
@@ -736,7 +958,8 @@ function renderPack() {
   const extract = state.extract;
   if (!extract) {
     pack.replaceChildren(el("p", { class: "empty" },
-      state.lines.length ? "Press “Build evidence pack” to map what was said." :
+      state.lines.length ? (state.source === "resume" ? "Press “Build evidence pack” to map the resume." :
+                                                        "Press “Build evidence pack” to map what was said.") :
                            "Build the evidence pack once there is something to work from."));
     return;
   }
@@ -746,14 +969,14 @@ function renderPack() {
       el("p", { class: "value" }, item.value),
       el("p", {}, chip(item.confidence, false)),
       el("p", {}, item.reason),
-      el("p", { class: "cites" }, "Said at: ", sourceLinks(item.sources))));
+      el("p", { class: "cites" }, citedAt(), sourceLinks(item.sources))));
   const withheld = extract.needs_human.map(item =>
     el("div", { class: "card withheld" },
       el("h3", {}, FIELD_LABELS[item.field] || item.field),
       el("p", { class: "value" }, "Withheld: a person decides"),
       el("p", {}, chip(item.confidence, true), " too low to show a value"),
       el("p", {}, item.reason),
-      el("p", { class: "cites" }, "Said at: ", sourceLinks(item.sources))));
+      el("p", { class: "cites" }, citedAt(), sourceLinks(item.sources))));
   const gaps = (extract.gaps || []).length ? el("div", { class: "card withheld" },
       el("h3", {}, "Not answered yet: ask about these"),
       el("ul", {}, extract.gaps.map(field => el("li", {}, FIELD_LABELS[field] || field)))) : null;
@@ -796,9 +1019,12 @@ function selectedJobId(match, visible) {
   return ids.includes(state.selectedJob) ? state.selectedJob : (ids[0] || null);
 }
 
-function transcriptStamps(sources) {
-  return (sources || []).filter(([label]) => label === "transcript")
-                        .map(([, locator]) => String(locator).replace(/^t=/, ""));
+// What a unit cites, as {locator, short}: "t=02:41" shows as "02:41", "line=8" as "line 8".
+function citedRefs(sources) {
+  return (sources || []).filter(([label]) => label === "transcript" || label === "resume")
+    .map(([label, locator]) => ({ locator,
+      short: label === "resume" ? "line " + String(locator).replace(/^line=/, "")
+                                : String(locator).replace(/^t=/, "") }));
 }
 
 const ICONS = {
@@ -836,14 +1062,16 @@ function renderJobCard(job, selected) {
       el("div", { class: "facts" },
         fact("pin", job.location, "Location"), fact("clock", job.employment_type, "Employment type"),
         fact("shift", job.shift, "Hours"), fact("level", job.level, "Level")),
-      el("p", { class: "label" }, "Evidenced in this interview"),
+      el("p", { class: "label" }, "Evidenced in this " + (state.source === "resume" ? "resume" : "interview")),
       job.matched.length ? el("div", { class: "chips" }, job.matched.map(unit => {
-        const stamps = transcriptStamps(unit.sources);
+        const refs = citedRefs(unit.sources);
+        const stamps = refs.map(ref => ref.short).join(", ");
         return el("button", { type: "button", class: "unit-chip have",
-                              onclick: () => stamps.length && highlight(stamps[0]),
-                              "aria-label": unit.code + " " + unit.title + ", show transcript line at " + stamps.join(", ") },
+                              onclick: () => refs.length && highlight(refs[0].locator),
+                              "aria-label": unit.code + " " + unit.title + (state.source === "resume"
+                                ? ", show resume " + stamps : ", show transcript line at " + stamps) },
           el("span", { class: "code" }, unit.code), unit.title,
-          stamps.length ? el("span", { class: "when" }, "· " + stamps.join(", ")) : null);
+          refs.length ? el("span", { class: "when" }, "· " + stamps) : null);
       })) : el("p", { class: "muted small" }, "None yet"),
       el("p", { class: "label" }, "Still to evidence"),
       job.missing.length ? el("div", { class: "chips" }, job.missing.map(unit =>
@@ -869,6 +1097,11 @@ function transcriptRef(t) {
                         "aria-label": "Show transcript line at " + t }, "[transcript " + t + "]");
 }
 
+function resumeRef(n, text) {
+  return el("button", { type: "button", class: "link", onclick: () => highlight("line=" + n),
+                        "aria-label": "Show resume line " + n }, text);
+}
+
 async function copyResume(text) {
   try {
     await navigator.clipboard.writeText(text);
@@ -889,14 +1122,16 @@ function renderResume(match, jobId) {
   const panel = $("resume-panel");
   const resume = jobId && match.resumes ? match.resumes[jobId] : null;
   if (!resume) {
-    panel.replaceChildren(el("h3", { id: "h-resume" }, "Draft resume"),
+    panel.replaceChildren(el("h3", { id: "h-resume" }, "Draft resume for this job"),
                           el("p", { class: "empty" }, "No sample job selected, so no resume yet."));
     return;
   }
   const doc = resume.sections;
+  // Drafted from the resume the person brought: it cites that resume's lines.
+  const fromResume = doc.source === "resume";
   panel.replaceChildren(
     el("div", { class: "resume-actions" },
-      el("h3", { id: "h-resume" }, "Draft resume"),
+      el("h3", { id: "h-resume" }, "Draft resume for this job"),
       el("button", { type: "button", class: "secondary", onclick: () => copyResume(resume.text) }, "Copy"),
       el("button", { type: "button", class: "secondary", onclick: () => window.print() }, "Print")),
     el("p", { class: "status small", id: "resume-status", role: "status", "aria-live": "polite" }),
@@ -906,15 +1141,20 @@ function renderResume(match, jobId) {
       el("p", { class: "kicker" }, "Draft resume"),
       el("h3", {}, "For: " + doc.job.title + ", " + doc.job.setting + (doc.job.location ? ", " + doc.job.location : "")),
       el("h4", {}, "Work experience"),
-      el("p", { class: "small muted" }, "The jobseeker's own account, translated"),
+      el("p", { class: "small muted" }, fromResume ? "From the jobseeker's own resume" : "The jobseeker's own account, translated"),
       doc.experience.length ? el("ul", {}, doc.experience.map(line =>
-        el("li", { class: line.for_this_job ? "req" : null }, line.en, " ", transcriptRef(line.t))))
-        : el("p", { class: "muted" }, "No transcript line is cited yet."),
+        el("li", { class: line.for_this_job ? "req" : null }, line.en, " ",
+           fromResume ? resumeRef(line.line, "[resume line " + line.line + "]") : transcriptRef(line.t))))
+        : el("p", { class: "muted" }, fromResume
+            ? "No resume line is quoted: only English lines are quoted in this English draft."
+            : "No transcript line is cited yet."),
       el("h4", {}, "Skills mapped to Australian units of competency"),
       el("ul", {}, doc.skills.map(skill =>
         el("li", { class: skill.for_this_job ? "req" : null },
           el("span", { class: "code" }, skill.code), " ", skill.title,
-          skill.described_at.length ? [" (described at ", skill.described_at.map((t, i) => [i ? ", " : "", transcriptRef(t)]), ")"] : null))),
+          !skill.described_at.length ? null : fromResume
+            ? [" (resume ", skill.described_at.map((n, i) => [i ? ", " : "", resumeRef(n, "line " + n)]), ")"]
+            : [" (described at ", skill.described_at.map((t, i) => [i ? ", " : "", transcriptRef(t)]), ")"]))),
       el("h4", {}, "Qualifications"),
       el("ul", {}, doc.qualifications.map(q => el("li", {}, el("b", {}, q.title), ": " + q.status))),
       el("p", { class: "to-add" }, doc.to_add)));
@@ -942,9 +1182,30 @@ function renderMatches() {
       course.note ? el("p", { class: "small muted" }, course.note) : null)));
 }
 
+function renderResumeInput() {
+  const blocked = !state.consent || state.busy;
+  $("sample").textContent = state.consent ? "Use sample resume" : "Use sample resume (needs consent)";
+  $("sample").disabled = blocked;
+  $("resume-text").disabled = blocked;
+  $("resume-file").disabled = blocked;
+  $("file-pick").classList.toggle("disabled", blocked);
+  const build = $("build");
+  build.textContent = !state.consent ? "Build evidence pack (needs consent)" :
+                      state.lines.length ? "Build evidence pack" : "Build evidence pack (no resume yet)";
+  build.disabled = blocked || !state.lines.length;
+  $("why").textContent = state.consent ? "" : "Tick consent first: nothing is read or sent until the jobseeker agrees.";
+}
+
 function render() {
   const recording = !!state.recorder;
   const record = $("record"), demo = $("demo"), build = $("build");
+  if (state.source === "resume") {
+    renderResumeInput();
+    renderTranscript();
+    renderPack();
+    renderMatches();
+    return;
+  }
   // Disabled buttons say why in their own label, not only in a tooltip.
   if (!state.consent) {
     record.textContent = "Record (needs consent)";
@@ -970,6 +1231,13 @@ function render() {
 $("mock-banner").hidden = !MOCK;
 $("occupation-label").textContent = OCCUPATION_LABEL;
 $("langs").addEventListener("change", event => chooseLanguage(event.target.value));
+$("rlangs").addEventListener("change", event => chooseLanguage(event.target.value));
+$("enter-interview").addEventListener("click", () => enterPath("interview"));
+$("enter-resume").addEventListener("click", () => enterPath("resume"));
+$("back").addEventListener("click", showStart);
+$("resume-text").addEventListener("input", resumeChanged);
+$("resume-file").addEventListener("change", event => readResumeFile(event.target.files[0]));
+$("sample").addEventListener("click", useSampleResume);
 $("consent").addEventListener("change", event => {
   state.consent = event.target.checked;
   // Withdrawing consent stops a live segment without sending it.
@@ -982,7 +1250,6 @@ $("build").addEventListener("click", buildPack);
 $("restart").addEventListener("click", restart);
 $("filter-location").addEventListener("change", event => { state.filters.location = event.target.value; renderMatches(); });
 $("filter-type").addEventListener("change", event => { state.filters.type = event.target.value; renderMatches(); });
-render();
 </script>
 </body>
 </html>
