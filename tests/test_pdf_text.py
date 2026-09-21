@@ -22,6 +22,18 @@ class PdfText(unittest.TestCase):
             "Jos Resume", "Cooked meals", "Food safety"
         ])
 
+    def test_years_and_numbers_survive_a_kerned_tj_array(self):
+        """Quartz splits a line into one string per glyph, and a resume's dates
+        and quantities read as numbers. Dropping them would delete the evidence."""
+        self.assertEqual(self.read("resume_kerned.pdf"),
+                         ["2016-2022 Head cook", "Cooked for 150 guests"])
+
+    def test_a_font_this_reader_cannot_decode_is_not_called_a_scan(self):
+        """Chrome and Google Docs write CID fonts. Refusing is right; telling the
+        person their text PDF is a photo is a wrong reason, and reasons matter here."""
+        with self.assertRaisesRegex(PdfTextError, "cannot decode"):
+            self.read("cid_font.pdf")
+
     def test_scanned_and_malformed_files_are_not_evidence(self):
         for name in ("scanned.pdf", "malformed.pdf"):
             with self.subTest(name=name), self.assertRaisesRegex(PdfTextError, "scan or a photo"):

@@ -44,6 +44,15 @@ def main():
     (HERE / "resume_hex.pdf").write_bytes(page(
         b"BT\n/F1 12 Tf\n72 720 Td\n<4A6F7320526573756D65> Tj\n0 -18 Td\n"
         b"[(Cooked ) -120 (meals)] TJ\n(Food safety) '\nET\n"))
+    # What Quartz writes (Pages, Word for Mac, Preview): one tiny string per
+    # glyph, the kerning between them, and a word gap carried by the gap alone.
+    (HERE / "resume_kerned.pdf").write_bytes(page(
+        b"BT\n/F1 11 Tf\n11 0 0 11 72 720 Tm\n"
+        b"[ (2) -0.2 (0) -0.2 (1) -0.2 (6) -0.2 (-2) -0.2 (0) -0.2 (2) -0.2 (2) -0.2 ( )"
+        b" 0.2 (H) -0.2 (e) -0.2 (a) -0.2 (d) -0.2 ( ) 0.2 (co) -0.2 (o) -0.2 (k) ] TJ\n"
+        b"11 0 0 11 72 704 Tm\n[ (Cooked) -300 (for) -300 (150) -300 (guests) ] TJ\nET\n"))
+    (HERE / "cid_font.pdf").write_bytes(page(
+        b"BT\n/F2 12 Tf\n72 720 Td\n<00240050004C0051004400032B0044> Tj\nET\n"))
     (HERE / "scanned.pdf").write_bytes(page(b"q\n100 0 0 100 0 0 cm\n/Im0 Do\nQ\n"))
     (HERE / "malformed.pdf").write_bytes(b"%PDF-1.4\n<< /Filter /FlateDecode >>\nstream\nnot-zlib\nendstream\n")
     (HERE / "encrypted.pdf").write_bytes(b"%PDF-1.4\n<< /Encrypt 4 0 R >>\n%%EOF\n")
