@@ -40,5 +40,38 @@ class ReferenceData(unittest.TestCase):
         self.assertIn("SITXFSA006", codes)
 
 
+class SourceCheck(unittest.TestCase):
+    def test_offline_reports_the_seeded_record_unchecked(self):
+        checked = registry.source_check("cookery")
+        self.assertEqual(checked["code"], "SIT30821")
+        self.assertEqual(checked["status"], "Current")
+        self.assertFalse(checked["reachable"])
+
+    def test_the_seeded_record_names_what_was_superseded(self):
+        checked = registry.source_check("welding")
+        self.assertEqual(checked["code"], "MEM31925")
+        self.assertEqual(checked["superseded_code"], "MEM31922")
+
+    def test_a_pdf_response_marks_the_source_reachable(self):
+        def fake_fetch(url):
+            self.assertTrue(url.endswith("MEM31925_R1.pdf"))
+            return b"%PDF-1.4"
+
+        self.assertTrue(registry.source_check("welding", fetch=fake_fetch)["reachable"])
+
+    def test_a_non_pdf_response_is_not_reachable(self):
+        """An error page served with 200 must not count."""
+        checked = registry.source_check("welding", fetch=lambda url: b"<html>")
+        self.assertFalse(checked["reachable"])
+
+    def test_a_failed_fetch_degrades_instead_of_raising(self):
+        def broken_fetch(url):
+            raise OSError("no network at the venue")
+
+        checked = registry.source_check("welding", fetch=broken_fetch)
+        self.assertFalse(checked["reachable"])
+        self.assertEqual(checked["code"], "MEM31925")
+
+
 if __name__ == "__main__":
     unittest.main()
