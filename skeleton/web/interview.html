@@ -5,18 +5,23 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>BridgeWork interview</title>
 <style>
-/* BridgeWork theme from the Figma "Design Theme" frame, the same tokens as
-   review.html. Inline and without external fonts: the page must render
-   offline from the stdlib server. */
+/* BridgeWork theme and layout from the Figma "BridgeWork" file, interview frame
+   10:83, the same tokens as review.html. Inline and without a web-font download:
+   the page must render offline from the stdlib server, so Inter is used only
+   when the machine already has it. */
 :root {
   --primary: #1B4B5A;
+  --primary-light: #2E7D96;
   --accent: #E8874A;
   --success: #4C9A6B;
   --bg: #F7F5F1;
   --text: #2B2B2B;
   --muted: #5b6168;
+  --soft: #868686;
   --card: #fff;
+  --panel: #e4e6e4;
   --line: #d9d4cb;
+  --shadow: 0 12px 16px rgba(0, 0, 0, .14);
   --warn: #7a4a00;
   --warn-bg: #fff3d6;
   --stop: #9b1111;
@@ -27,16 +32,18 @@
 html { font-size: 18px; }
 body {
   margin: 0; background: var(--bg); color: var(--text);
-  font: 1rem/1.5 system-ui, -apple-system, "Segoe UI", "PingFang SC", "Noto Sans CJK SC", sans-serif;
+  font: 1rem/1.5 Inter, system-ui, -apple-system, "Segoe UI", "PingFang SC", "Noto Sans CJK SC", sans-serif;
 }
-header.top { display: flex; align-items: baseline; gap: 1.25rem; padding: 14px 24px;
-             border-bottom: 1px solid var(--line); background: var(--card); }
-.wordmark { font-size: 1.4rem; margin: 0; letter-spacing: -.01em; }
-.wordmark b { color: var(--text); }
-.wordmark span { color: var(--primary); font-weight: 400; }
-.step { color: var(--muted); font-weight: 600; }
-.progress { margin-left: auto; color: var(--primary); font-weight: 700; }
-main { max-width: 1280px; margin: 0 auto; padding: 16px 24px 48px; }
+header.top { display: flex; align-items: center; gap: 1.25rem; padding: 12px 24px;
+             background: var(--card); box-shadow: 0 2px 8px rgba(0, 0, 0, .06); }
+.brand { display: flex; align-items: center; gap: 10px; }
+.brand img { width: 40px; height: 40px; }
+.wordmark { font-size: 1.5rem; margin: 0; letter-spacing: -.01em; line-height: 1; }
+.wordmark b { color: #111; font-weight: 700; }
+.wordmark span { color: var(--primary-light); font-weight: 400; }
+.step { color: var(--muted); font-weight: 500; font-size: .85rem; }
+.progress { margin-left: auto; color: var(--muted); font-weight: 500; font-size: .85rem; white-space: nowrap; }
+main { max-width: 1280px; margin: 0 auto; padding: 16px 0 48px; }
 h2 { font-size: 1.2rem; margin: 0 0 .25rem; }
 p { margin: .3rem 0; }
 .muted { color: var(--muted); }
@@ -44,72 +51,101 @@ p { margin: .3rem 0; }
 button, textarea { font: inherit; }
 :focus-visible { outline: 4px solid var(--focus); outline-offset: 2px; }
 button {
-  min-height: 44px; padding: .35rem 1rem; border-radius: 8px; cursor: pointer;
-  border: 2px solid var(--primary); background: var(--primary); color: #fff; font-weight: 600;
+  min-height: 44px; padding: .35rem 1rem; border-radius: 5px; cursor: pointer;
+  border: 2px solid var(--primary); background: var(--primary); color: #fff; font-weight: 500;
 }
 button.secondary { background: var(--card); color: var(--primary); }
 button.go { background: var(--accent); border-color: var(--accent); color: #1f1a15; }
 button:disabled { background: #d1d5db; border-color: #9ca3af; color: #333; cursor: not-allowed; }
 [hidden] { display: none !important; }
 
-.banner { padding: .5rem .8rem; border-radius: 6px; margin: 0 0 .75rem; font-weight: 600; }
+.banner { padding: .5rem .8rem; border-radius: 6px; margin: 0 24px .75rem; font-weight: 600; }
 .banner.mock { background: var(--card); border: 2px dashed var(--line); font-weight: 500; }
 .banner.offline { background: var(--warn-bg); color: var(--warn); border: 2px solid var(--warn); }
 .banner.error { background: var(--stop-bg); color: var(--stop); border: 2px solid var(--stop); }
 
-.start { max-width: 640px; margin: 8vh auto; background: var(--card); border: 1px solid var(--line);
-         border-radius: 10px; padding: 24px 28px; }
+.start { max-width: 640px; margin: 8vh auto; background: var(--card); border-radius: 12px;
+         box-shadow: var(--shadow); padding: 28px 32px; }
+.start h2 { color: var(--primary); }
 .consent { display: flex; gap: .55rem; align-items: flex-start; margin: 1rem 0; cursor: pointer; }
 .consent input { width: 22px; height: 22px; flex: none; margin-top: .15rem; accent-color: var(--primary); }
 
-/* Figma frame "2": the question across the top, English left and Mandarin right. */
-.question { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px; margin: 8px 0 20px; }
-.label { color: var(--accent); font-weight: 800; font-size: .85rem; letter-spacing: .06em; text-transform: uppercase; margin: 0; }
-.q-en { font-size: 1.35rem; font-weight: 700; line-height: 1.35; margin: .25rem 0 0; }
-.q-zh { font-size: 1.25rem; line-height: 1.5; margin: 1.35rem 0 0; }
+/* Figma: "Current Question" in accent, then the question in primary, English on
+   the left and Mandarin right-aligned on the right, both the same size and weight. */
+.question { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 48px; align-items: start;
+            padding: 20px 47px 0 60px; margin-bottom: 36px; }
+.label { color: var(--accent); font-weight: 700; font-size: 20px; line-height: 1.2; margin: 0 0 14px; }
+.q-en, .q-zh { color: var(--primary); font-size: 30px; font-weight: 700; line-height: 1.25; margin: 0; }
+.q-zh { text-align: right; margin-top: 38px; } /* level with the English, under the label */
+/* Most of the team's questions are far longer than the Figma sample; at 30px they
+   would push the cards below the fold. */
+.question.long .q-en, .question.long .q-zh { font-size: 22px; line-height: 1.35; }
 
-/* The two transcript cards with the voice controls between them. */
-.stage { display: grid; grid-template-columns: minmax(0, 1fr) 220px minmax(0, 1fr); gap: 24px; align-items: stretch; }
-.card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px;
-        display: flex; flex-direction: column; gap: .4rem; }
-.card label { font-weight: 700; color: var(--primary); }
-.card textarea { flex: 1; min-height: 280px; width: 100%; padding: .5rem .6rem; border: 2px solid var(--line);
-                 border-radius: 6px; background: #fff; color: var(--text); resize: vertical; }
-.card .hint { color: var(--muted); font-size: .8rem; }
-.centre { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; }
-.voice { width: 170px; height: 170px; border-radius: 50%; display: grid; place-items: center; position: relative;
-         background: #e4ded3; transition: background .2s; }
-.voice::before, .voice::after { content: ""; position: absolute; inset: 0; border-radius: 50%; opacity: 0; }
-.voice .core { width: 96px; height: 96px; border-radius: 50%; background: var(--card); display: grid; place-items: center;
-               font-size: .8rem; font-weight: 700; color: var(--muted); text-align: center; z-index: 1; }
-.voice.speaking { background: var(--primary); }
-.voice.recording { background: var(--accent); }
-.voice.speaking .core { color: var(--primary); }
-.voice.recording .core { color: #8a4515; }
-.voice.speaking::before, .voice.recording::before { animation: ring 1.4s ease-out infinite; }
-.voice.speaking::after, .voice.recording::after { animation: ring 1.4s ease-out .7s infinite; }
-.voice.speaking::before, .voice.speaking::after { border: 4px solid var(--primary); }
-.voice.recording::before, .voice.recording::after { border: 4px solid var(--accent); }
-@keyframes ring { from { transform: scale(1); opacity: .7; } to { transform: scale(1.35); opacity: 0; } }
-@media (prefers-reduced-motion: reduce) { .voice::before, .voice::after { animation: none !important; } }
-.buttons { display: flex; gap: 12px; }
-.round { width: 60px; height: 60px; padding: 0; border-radius: 50%; font-size: 1.3rem; line-height: 1; }
-.round.rec { background: var(--accent); border-color: var(--accent); color: #1f1a15; }
-.round.rec.on { background: var(--stop); border-color: var(--stop); color: #fff; }
-.status { min-height: 2.8rem; font-weight: 600; text-align: center; font-size: .9rem; }
-.next { min-width: 160px; }
+/* The two transcript cards run to the page edges, as in Figma, with the voice
+   controls between them. */
+.stage { display: grid; grid-template-columns: minmax(0, 467fr) minmax(220px, 346fr) minmax(0, 467fr);
+         align-items: stretch; }
+.card { border-radius: 12px; box-shadow: var(--shadow); min-height: 597px;
+        display: flex; flex-direction: column; gap: 28px; padding: 110px 44px 28px; }
+.card.en { background: var(--panel); }
+.card.zh { background: var(--card); padding: 110px 48px 28px 62px; }
+.card label { font-weight: 700; font-size: 20px; line-height: 1.2; color: #000; }
+.card.zh label { text-align: right; }
+/* Editable, but reads as flowing text: no box until the caseworker is in it. */
+.card textarea { flex: 1; min-height: 240px; width: 100%; padding: 4px 6px; margin: 0 -6px;
+                 border: 0; border-radius: 6px; background: transparent; resize: none;
+                 color: var(--soft); font-size: 20px; font-weight: 600; line-height: 1.5; }
+.card.zh textarea { line-height: 2; }
+.card textarea:focus { outline: 2px solid rgba(27, 75, 90, .3); outline-offset: 2px; color: var(--text); }
+.card .hint { color: var(--soft); font-size: .75rem; }
+.centre { display: flex; flex-direction: column; align-items: center; padding: 46px 16px 0; }
+
+/* The voice orb: Figma's gradient ellipse, still when idle, breathing and glowing
+   while the question plays (teal) or while recording (accent). */
+.voice { width: 240px; height: 240px; border-radius: 50%; display: grid; place-items: center; position: relative;
+         background: linear-gradient(210deg, var(--primary) 13%, #2BCDFF 95%);
+         box-shadow: 0 4px 4px rgba(0, 0, 0, .25); }
+.voice .core { color: rgba(255, 255, 255, .85); font-size: .8rem; font-weight: 600; letter-spacing: .08em;
+               text-transform: uppercase; margin-top: 150px; }
+.voice.speaking { animation: breathe 1.6s ease-in-out infinite, glow-teal 1.6s ease-in-out infinite; }
+.voice.recording { animation: breathe 1.2s ease-in-out infinite, glow-accent 1.2s ease-in-out infinite; }
+@keyframes breathe { 50% { transform: scale(1.05); } }
+@keyframes glow-teal {
+  0%, 100% { box-shadow: 0 4px 4px rgba(0, 0, 0, .25), 0 0 0 0 rgba(43, 205, 255, .45); }
+  50% { box-shadow: 0 4px 4px rgba(0, 0, 0, .25), 0 0 0 22px rgba(43, 205, 255, 0); }
+}
+@keyframes glow-accent {
+  0%, 100% { box-shadow: 0 4px 4px rgba(0, 0, 0, .25), 0 0 0 0 rgba(232, 135, 74, .6); }
+  50% { box-shadow: 0 4px 4px rgba(0, 0, 0, .25), 0 0 0 22px rgba(232, 135, 74, 0); }
+}
+@media (prefers-reduced-motion: reduce) { .voice { animation: none !important; } }
+.buttons { display: flex; gap: 60px; margin-top: 52px; }
+.round { width: 67px; height: 67px; min-height: 0; padding: 0; border-radius: 50%; border: 0;
+         background: var(--card); box-shadow: 0 4px 15px rgba(0, 0, 0, .25); display: grid; place-items: center; }
+.round svg { width: 29.4px; height: 29.4px; display: block; }
+.round.on { box-shadow: 0 4px 15px rgba(0, 0, 0, .25), 0 0 0 3px var(--accent); }
+.round:disabled { background: var(--card); border: 0; opacity: .45; }
+.status { min-height: 2.6rem; margin: 10px 0 0; font-weight: 600; text-align: center; font-size: .85rem; color: var(--muted); }
+.next { min-width: 129px; height: 50px; margin-top: 42px; font-size: 20px; padding: 0 22px; }
+.next:disabled { background: var(--primary); border-color: var(--primary); color: #fff; opacity: .45; }
 
 @media (max-width: 900px) {
   .question, .stage { grid-template-columns: 1fr; gap: 16px; }
-  .q-zh { margin-top: 0; }
-  .centre { order: -1; }
+  .question { padding: 12px 16px 0; }
+  .q-zh { text-align: left; margin-top: 0; }
+  .centre { order: -1; padding-top: 0; }
+  .card, .card.zh { min-height: 0; padding: 24px; }
   .card textarea { min-height: 140px; }
 }
 </style>
 </head>
 <body>
 <header class="top">
-  <p class="wordmark"><b>Bridge</b><span>Work</span></p>
+  <!-- /logo.svg comes with the entry pages; until it is served the wordmark stands alone. -->
+  <div class="brand">
+    <img src="/logo.svg" alt="" onerror="this.hidden = true">
+    <p class="wordmark"><b>Bridge</b><span>Work</span></p>
+  </div>
   <span class="step">Interview</span>
   <span id="progress" class="progress" aria-live="polite"></span>
 </header>
@@ -134,7 +170,7 @@ button:disabled { background: #d1d5db; border-color: #9ca3af; color: #333; curso
   </section>
 
   <section id="interview" hidden>
-    <div class="question">
+    <div id="question" class="question">
       <div>
         <p class="label">Current Question · <span id="section"></span></p>
         <p id="q-en" class="q-en"></p>
@@ -143,7 +179,7 @@ button:disabled { background: #d1d5db; border-color: #9ca3af; color: #333; curso
     </div>
 
     <div class="stage">
-      <div class="card">
+      <div class="card en">
         <label for="answer-en">Translated contents</label>
         <textarea id="answer-en" lang="en"></textarea>
         <span class="hint">English draft. Correct it with the jobseeker before moving on.</span>
@@ -152,14 +188,14 @@ button:disabled { background: #d1d5db; border-color: #9ca3af; color: #333; curso
       <div class="centre">
         <div id="voice" class="voice" aria-hidden="true"><div class="core" id="voice-label">Ready</div></div>
         <div class="buttons">
-          <button id="play" class="round secondary" title="Play the question again" aria-label="Play the question again">&#9654;</button>
-          <button id="record" class="round rec" title="Record the answer" aria-label="Record the answer">&#9679;</button>
+          <button id="play" class="round" title="Play the question again" aria-label="Play the question again"></button>
+          <button id="record" class="round" title="Record the answer" aria-label="Record the answer"></button>
         </div>
-        <p id="status" class="status" aria-live="polite"></p>
         <button id="next" class="next">Next &rarr;</button>
+        <p id="status" class="status" aria-live="polite"></p>
       </div>
 
-      <div class="card">
+      <div class="card zh">
         <label for="answer-zh" lang="zh-Hans">原文</label>
         <textarea id="answer-zh" lang="zh-Hans"></textarea>
         <span class="hint">What was said, as transcribed. Several recordings are added one after another.</span>
@@ -175,9 +211,16 @@ button:disabled { background: #d1d5db; border-color: #9ca3af; color: #333; curso
 // request at all: the demo video is recorded in it.
 const params = new URLSearchParams(location.search);
 const MOCK = params.get("mock") === "1";
+// ?quiet=1 hides the mock banner for the demo video; nothing else changes with it.
+const QUIET = params.get("quiet") === "1";
 
 // Read by /review. sessionStorage keeps the answers to this tab.
 const INTERVIEW_KEY = "d7.interview";
+// Written by /start; handed to /review untouched as "person".
+const PERSON_KEY = "d7.person";
+// Written by /upload. /review prefers it over d7.interview, so an upload earlier in
+// this tab would otherwise show the uploaded resume instead of this interview.
+const SECTIONS_KEY = "d7.sections";
 const LANGUAGE = "zh";
 const REVIEW_URL = (location.protocol === "file:" ? "review.html" : "/review") + (MOCK ? "?mock=1" : "");
 
@@ -187,6 +230,14 @@ const FIXTURE_QUESTIONS = {"questions": [{"id": "profile", "section": "Profile",
 // The mock interviewee's answers: exactly the team's mock_interview_answers.json
 // (fictional cook Li Wei), the same answers review.html's MOCK_INTERVIEW carries.
 const MOCK_ANSWERS = [{"id": "profile", "answer_zh": "我叫李伟，做了六年厨师，一直是餐厅的主厨。我最自豪的是每天能给一百五十个客人做饭，从来没有出过食品安全问题。我希望在这里继续在厨房工作。", "answer_en": "My name is Li Wei. I have worked as a cook for six years, always as the head cook of a restaurant. What I am most proud of is cooking for 150 guests a day without ever having a food safety problem. I hope to keep working in a kitchen here."}, {"id": "contacts", "answer_zh": "我的电话是 0400 000 000，邮箱是 liwei.cook@example.com。", "answer_en": "My phone number is 0400 000 000, and my email is liwei.cook@example.com."}, {"id": "education", "answer_zh": "我在成都的一所职业技术学校学烹饪，二零一二年到二零一四年读了两年。在那里学了中餐的基本功，还有厨房卫生。", "answer_en": "I studied cooking at a vocational school in Chengdu, for two years from 2012 to 2014. There I learned the basics of Chinese cooking, and kitchen hygiene."}, {"id": "employment", "answer_zh": "我最近的工作是在成都一家叫蓉香楼的餐厅当主厨，从二零一六年做到二零二二年，一共六年。每天早上从头熬高汤、做汤和酱汁，准备羊肉、牛肉和鸡肉的菜。生的和熟的食物分开放，每个班次都记录冷库的温度。", "answer_en": "My most recent job was head cook at a restaurant called Rongxiang Lou in Chengdu, from 2016 to 2022, six years in total. Every morning I made stocks, soups and sauces from scratch, and prepared lamb, beef and chicken dishes. I kept raw and cooked food apart, and recorded the cool-room temperature every shift."}, {"id": "volunteer", "answer_zh": "有。去年开始每个星期六在社区中心的食物分发站帮忙，大概做了一年。我负责整理捐来的食物，检查保质期，然后帮忙给大家做热饭。", "answer_en": "Yes. Since last year I have helped every Saturday at the food distribution point at the community centre, for about a year. I sort donated food, check the use-by dates, and help cook hot meals for people."}, {"id": "skills", "answer_zh": "我会用商用厨房的设备，像蒸烤箱、大炒锅和切片机。会说普通话和四川话，英语还在学。", "answer_en": "I can use commercial kitchen equipment, such as combi ovens, large woks and slicers. I speak Mandarin and Sichuanese, and I am still learning English."}, {"id": "certificates", "answer_zh": "我有中国的中式烹调师证书。在澳大利亚还没有考任何证书。", "answer_en": "I have a Chinese cook certificate for Chinese cuisine from China. I have not taken any certificate in Australia yet."}];
+
+// Figma's play and stop glyphs (frame 10:83, nodes 38:5 and 38:15). Figma has no
+// record glyph; the dot is drawn in the same grey so the pair reads as one set.
+const ICONS = {
+  play: '<svg viewBox="0 0 29.4 29.4" aria-hidden="true"><path d="M27.5625 14.7C27.5633 15.0119 27.4833 15.3188 27.3303 15.5906C27.1774 15.8625 26.9567 16.0902 26.6897 16.2515L10.143 26.3738C9.86403 26.5447 9.54451 26.6379 9.21745 26.644C8.89039 26.65 8.56764 26.5687 8.28253 26.4083C8.00014 26.2504 7.7649 26.0201 7.60101 25.7412C7.43711 25.4623 7.35047 25.1447 7.35 24.8212V4.5788C7.35047 4.25526 7.43711 3.9377 7.60101 3.65875C7.7649 3.3798 8.00014 3.14954 8.28253 2.99165C8.56764 2.83127 8.89039 2.74991 9.21745 2.75597C9.54451 2.76202 9.86403 2.85528 10.143 3.02611L26.6897 13.1484C26.9567 13.3098 27.1774 13.5374 27.3303 13.8093C27.4833 14.0812 27.5633 14.388 27.5625 14.7Z" fill="black" fill-opacity="0.5"/></svg>',
+  stop: '<svg viewBox="0 0 29.4 29.4" aria-hidden="true"><path d="M24.8062 6.34741V23.0526C24.8056 23.5175 24.6207 23.9632 24.2919 24.2919C23.9632 24.6207 23.5175 24.8056 23.0526 24.8062H6.34741C5.8825 24.8056 5.4368 24.6207 5.10806 24.2919C4.77931 23.9632 4.59436 23.5175 4.59375 23.0526V6.34741C4.59436 5.8825 4.77931 5.4368 5.10806 5.10806C5.4368 4.77931 5.8825 4.59436 6.34741 4.59375H23.0526C23.5175 4.59436 23.9632 4.77931 24.2919 5.10806C24.6207 5.4368 24.8056 5.8825 24.8062 6.34741Z" fill="black" fill-opacity="0.5"/></svg>',
+  record: '<svg viewBox="0 0 29.4 29.4" aria-hidden="true"><circle cx="14.7" cy="14.7" r="10.5" fill="black" fill-opacity="0.5"/></svg>',
+};
 
 // ---------------------------------------------------------------- state
 const state = {
@@ -421,6 +472,7 @@ function showQuestion() {
   $("section").textContent = question.section;
   $("q-en").textContent = question.en;
   $("q-zh").textContent = question.zh;
+  $("question").classList.toggle("long", question.en.length > 60);
   $("answer-en").value = "";
   $("answer-zh").value = "";
   clearOffline();
@@ -445,12 +497,26 @@ function next() {
     return showQuestion();
   }
   try {
-    sessionStorage.setItem(INTERVIEW_KEY, JSON.stringify({ language: LANGUAGE, answers: state.answers }));
+    const handed = { language: LANGUAGE, answers: state.answers };
+    const person = readPerson();
+    if (person) handed.person = person;
+    sessionStorage.setItem(INTERVIEW_KEY, JSON.stringify(handed));
+    sessionStorage.removeItem(SECTIONS_KEY);
   } catch (err) {
     showError("The answers could not be handed to the review page: " + err.message);
     return;
   }
   location.href = REVIEW_URL;
+}
+
+// A missing or unreadable d7.person only means /start was skipped; the interview
+// still hands over.
+function readPerson() {
+  try {
+    return JSON.parse(sessionStorage.getItem(PERSON_KEY) || "null");
+  } catch (err) {
+    return null;
+  }
 }
 
 // ---------------------------------------------------------------- render
@@ -468,7 +534,7 @@ function render() {
 
   const record = $("record");
   record.classList.toggle("on", recording);
-  record.innerHTML = recording ? "&#9632;" : "&#9679;";
+  record.innerHTML = recording ? ICONS.stop : ICONS.record;
   record.setAttribute("aria-label", recording ? "Stop recording" : "Record the answer");
   record.title = record.getAttribute("aria-label");
   // Mock has one scripted answer per question; a second take would repeat it.
@@ -480,7 +546,8 @@ function render() {
 }
 
 // ---------------------------------------------------------------- start
-$("mock-banner").hidden = !MOCK;
+$("mock-banner").hidden = !MOCK || QUIET;
+$("play").innerHTML = ICONS.play;
 $("consent").addEventListener("change", event => { state.consent = event.target.checked; render(); });
 $("begin").addEventListener("click", () => {
   if (!state.consent) return;
