@@ -29,9 +29,10 @@ with no network at all.
 
 - `/` → `/start` → `/start/path`: a photo-led homepage, the caseworker's entry, then two ways
   in. The photos are Unsplash stock: the people are models, not refugees.
-- `/interview`: the fixed questions read aloud in Mandarin, answers recorded and
-  transcribed, or an ElevenLabs AI interviewer the jobseeker talks to on their
-  own phone; the transcript is sorted into the questions, Mandarin verbatim.
+- `/interview`: the fixed questions read aloud in Mandarin when the caseworker
+  taps the orb, answers recorded and transcribed, or an ElevenLabs AI interviewer
+  the jobseeker talks to on their own phone; the transcript is sorted into the
+  questions, Mandarin verbatim.
 - `/upload`: a resume the jobseeker already has, in any language, translated and
   tidied, shown side by side with the original.
 - `/review`: every section as a draft the caseworker edits and confirms, with the
