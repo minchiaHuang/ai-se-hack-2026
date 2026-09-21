@@ -1,0 +1,24 @@
+# Render Blueprint: the live site for the hackathon submission.
+#
+# Connect this repo once at https://dashboard.render.com/blueprints and Render
+# reads this file, so there is nothing to fill in by hand in the dashboard.
+#
+# No API keys are set here on purpose. Without them every page still runs and
+# says on screen what it could not do, and the homepage's "Live demo" button
+# opens the flow against fixtures. Putting the ElevenLabs or Anthropic key on a
+# public URL would let anyone spend it.
+services:
+  - type: web
+    name: bridgework
+    runtime: python
+    plan: free
+    branch: main
+    # Standard library only, so there is nothing to install. Render's Python
+    # runtime insists on a build command, so this one just records the version.
+    buildCommand: python3 --version
+    startCommand: python3 skeleton/app.py
+    healthCheckPath: /
+    envVars:
+      # Without this Python buffers stdout and the logs stay empty until it dies.
+      - key: PYTHONUNBUFFERED
+        value: "1"

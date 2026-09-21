@@ -671,5 +671,24 @@ class IntakeApi(Server):
             connection.close()
 
 
+class ListenAddressTest(unittest.TestCase):
+    """Where the server binds. A host like Render hands the port over in PORT
+    and routes from outside the container, so it needs every interface; a
+    laptop keeps the loopback, so running the demo never exposes it on the
+    local network by accident."""
+
+    def test_no_port_in_the_environment_stays_on_the_loopback(self):
+        with mock.patch.dict(os.environ, {}, clear=True):
+            self.assertEqual(app.listen_address(), ("127.0.0.1", 8000))
+
+    def test_a_port_in_the_environment_binds_every_interface(self):
+        with mock.patch.dict(os.environ, {"PORT": "10000"}, clear=True):
+            self.assertEqual(app.listen_address(), ("0.0.0.0", 10000))
+
+    def test_an_empty_port_is_treated_as_unset(self):
+        with mock.patch.dict(os.environ, {"PORT": ""}, clear=True):
+            self.assertEqual(app.listen_address(), ("127.0.0.1", 8000))
+
+
 if __name__ == "__main__":
     unittest.main()
