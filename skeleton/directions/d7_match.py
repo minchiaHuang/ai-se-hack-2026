@@ -50,23 +50,50 @@ def match_jobs(occupation, evidenced_units):
         raise KeyError(f"{occupation}: not a seeded occupation")
     units = _units_by_code()
     evidence = _evidenced(evidenced_units)
-    jobs = []
-    for job in load_jobs():
-        if job["occupation"] != occupation:
-            continue
-        required = job["required_units"]
-        matched = [{"code": c, "title": units[c]["title"], "sources": evidence[c]}
-                   for c in required if c in evidence]
-        missing = [{"code": c, "title": units[c]["title"]}
-                   for c in required if c not in evidence]
-        jobs.append({"id": job["id"], "title": job["title"], "setting": job["setting"],
-                     "location": job["location"], "employment_type": job["employment_type"],
-                     "level": job["level"], "shift": job["shift"],
-                     "note": job["note"], "matched": matched, "missing": missing,
-                     "fit": f"{len(matched)} of {len(required)} required units evidenced"})
+    jobs = [_counted(job, units, evidence) for job in load_jobs()
+            if job["occupation"] == occupation]
     # Stable sort: ties keep the order jobs.json lists them in.
     jobs.sort(key=lambda j: -len(j["matched"]))
     return jobs
+
+
+def _counted(job, units, evidence):
+    required = job["required_units"]
+    matched = [{"code": c, "title": units[c]["title"], "sources": evidence[c]}
+               for c in required if c in evidence]
+    missing = [{"code": c, "title": units[c]["title"]}
+               for c in required if c not in evidence]
+    return {"id": job["id"], "title": job["title"], "setting": job["setting"],
+            "location": job["location"], "employment_type": job["employment_type"],
+            "level": job["level"], "shift": job["shift"],
+            "note": job["note"], "matched": matched, "missing": missing,
+            "fit": f"{len(matched)} of {len(required)} required units evidenced"}
+
+
+def all_jobs(occupation, evidenced_units):
+    """Every job in jobs.json, counted the same way, for a board that hides nothing.
+
+    The occupation's jobs come first in match_jobs() order; the rest follow,
+    best evidenced first. They are counted, not assumed to be 0, so a unit two
+    occupations share would show on both. Each job says which occupation it is
+    for, so the page can mark the others honestly instead of dropping them.
+    """
+    occupations = _occupations()
+    if occupation not in occupations:
+        raise KeyError(f"{occupation}: not a seeded occupation")
+    units = _units_by_code()
+    evidence = _evidenced(evidenced_units)
+    ours, others = [], []
+    for job in load_jobs():
+        counted = _counted(job, units, evidence)
+        counted.update({"occupation": job["occupation"],
+                        "occupation_label": occupations[job["occupation"]]["label"],
+                        "for_occupation": job["occupation"] == occupation})
+        (ours if counted["for_occupation"] else others).append(counted)
+    # Stable sorts: ties keep the order jobs.json lists them in.
+    ours.sort(key=lambda j: -len(j["matched"]))
+    others.sort(key=lambda j: -len(j["matched"]))
+    return ours + others
 
 
 def courses_for(jobs):

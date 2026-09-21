@@ -181,6 +181,32 @@ class IntakeApi(Server):
         self.assertEqual(body["resume"]["job_id"], body["jobs"][0]["id"])
         self.assertIn("SITXFSA005", body["resume"]["text"])
 
+    def test_match_lists_every_job_with_other_occupations_at_zero(self):
+        """The page's board: all 17 jobs, the occupation's first as in "jobs",
+        the rest counted honestly at 0, and no percentage anywhere."""
+        units = [{"code": "SITXFSA005", "sources": [["transcript", "t=02:41"]]},
+                 {"code": "SITXFSA006", "sources": [["transcript", "t=02:41"]]}]
+        status, body = self.post_json("/api/match", {"occupation": "cookery",
+                                                     "evidenced_units": units,
+                                                     "transcript": DEMO_TRANSCRIPT})
+        self.assertEqual(status, 200)
+        board = body["all_jobs"]
+        required = {j["id"]: len(j["required_units"]) for j in app.d7_match.load_jobs()}
+        self.assertEqual(len(board), 17)
+        self.assertEqual({j["id"] for j in board}, set(required))
+        self.assertEqual([j["id"] for j in board[:len(body["jobs"])]],
+                         [j["id"] for j in body["jobs"]])
+        for job in board:
+            with self.subTest(job=job["id"]):
+                self.assertEqual(job["for_occupation"], job["occupation"] == "cookery")
+                self.assertEqual(len(job["matched"]) + len(job["missing"]), required[job["id"]])
+                self.assertEqual(job["note"], "Representative sample, not a real listing")
+                if not job["for_occupation"]:
+                    self.assertEqual(job["fit"], f"0 of {required[job['id']]} required units evidenced")
+        self.assertEqual({c["code"] for c in body["all_courses"]},
+                         {u["code"] for j in board for u in j["missing"]})
+        self.assertNotIn("%", json.dumps(body))
+
     def test_match_uses_a_transcript_when_one_is_sent(self):
         units = [{"code": "SITXFSA005", "sources": [["transcript", "t=02:41"]]}]
         status, body = self.post_json("/api/match", {"occupation": "cookery",
@@ -237,12 +263,14 @@ class IntakeApi(Server):
             return [line.strip().rstrip(",") for line in body.splitlines()]
         fixture = {"jobs": [json.loads(r) for r in rows("jobs", "[]")],
                    "courses": [json.loads(r) for r in rows("courses", "[]")],
-                   "resumes": json.loads("{" + ",".join(rows("resumes", "{}")) + "}")}
+                   "resumes": json.loads("{" + ",".join(rows("resumes", "{}")) + "}"),
+                   "all_jobs": [json.loads(r) for r in rows("all_jobs", "[]")],
+                   "all_courses": [json.loads(r) for r in rows("all_courses", "[]")]}
         units = [{"code": c, "sources": [["transcript", "t=02:41"]]} for c in ("SITXFSA005", "SITXFSA006")]
         status, body = self.post_json("/api/match", {"occupation": "cookery", "evidenced_units": units,
                                                      "transcript": DEMO_TRANSCRIPT})
         self.assertEqual(status, 200)
-        for key in ("jobs", "courses", "resumes"):
+        for key in ("jobs", "courses", "resumes", "all_jobs", "all_courses"):
             with self.subTest(key=key):
                 self.assertEqual(fixture[key], body[key])
 

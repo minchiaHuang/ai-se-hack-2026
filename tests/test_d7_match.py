@@ -97,6 +97,53 @@ class Matching(unittest.TestCase):
             d7_match.match_jobs("plumbing", EVIDENCED)
 
 
+class AllJobs(unittest.TestCase):
+    """The board lists every job; other occupations' jobs are counted, not hidden."""
+
+    def test_every_job_once_the_occupation_first_in_match_order(self):
+        board = d7_match.all_jobs("cookery", EVIDENCED)
+        ours = d7_match.match_jobs("cookery", EVIDENCED)
+
+        self.assertEqual(sorted(j["id"] for j in board),
+                         sorted(j["id"] for j in d7_match.load_jobs()))
+        self.assertEqual(len(board), 17)
+        self.assertEqual([j["id"] for j in board[:len(ours)]], [j["id"] for j in ours])
+        self.assertTrue(all(j["for_occupation"] for j in board[:len(ours)]))
+        self.assertFalse(any(j["for_occupation"] for j in board[len(ours):]))
+
+    def test_a_job_counts_the_same_as_match_jobs(self):
+        ours = {j["id"]: j for j in d7_match.match_jobs("cookery", EVIDENCED)}
+        for job in d7_match.all_jobs("cookery", EVIDENCED):
+            if job["id"] in ours:
+                with self.subTest(job=job["id"]):
+                    same = {k: v for k, v in job.items()
+                            if k not in ("occupation", "occupation_label", "for_occupation")}
+                    self.assertEqual(same, ours[job["id"]])
+
+    def test_other_occupations_show_zero_of_their_required_units(self):
+        required = {j["id"]: len(j["required_units"]) for j in d7_match.load_jobs()}
+        others = [j for j in d7_match.all_jobs("cookery", EVIDENCED) if not j["for_occupation"]]
+
+        self.assertEqual(len(others), 8)
+        for job in others:
+            with self.subTest(job=job["id"]):
+                self.assertEqual(job["matched"], [])
+                self.assertEqual(len(job["missing"]), required[job["id"]])
+                self.assertEqual(job["fit"], f"0 of {required[job['id']]} required units evidenced")
+                self.assertTrue(job["occupation_label"])
+
+    def test_the_board_never_carries_a_percentage_or_score(self):
+        for job in d7_match.all_jobs("welding", EVIDENCED):
+            with self.subTest(job=job["id"]):
+                self.assertNotIn("%", json.dumps(job))
+                self.assertRegex(job["fit"], r"^\d+ of \d+ required units evidenced$")
+                self.assertFalse({"score", "rank", "percent", "rating"} & set(job))
+
+    def test_an_unknown_occupation_is_refused(self):
+        with self.assertRaises(KeyError):
+            d7_match.all_jobs("plumbing", EVIDENCED)
+
+
 class Courses(unittest.TestCase):
     def test_courses_are_exactly_the_missing_units_never_an_evidenced_one(self):
         jobs = d7_match.match_jobs("cookery", EVIDENCED)

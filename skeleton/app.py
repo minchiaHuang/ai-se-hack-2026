@@ -212,6 +212,8 @@ def match(payload):
 
     With "source": "resume" the lines come from the resume the person brought
     ("resume": [{line, text, en}]) and the drafts cite resume lines.
+
+    "all_jobs" lists every job, the occupation's first, for the page's board.
     """
     evidenced = payload.get("evidenced_units", [])
     if not isinstance(evidenced, list) or not all(isinstance(u, dict) for u in evidenced):
@@ -230,8 +232,14 @@ def match(payload):
         resumes[job["id"]] = {"job_id": job["id"], "text": d7_match.resume_text(sections),
                               "sections": sections}
     resume = resumes[jobs[0]["id"]] if jobs else None
+    # "all_jobs" is the whole board, other occupations included; "all_courses"
+    # is the gap training for every one of them. "resumes" stays keyed to the
+    # occupation's jobs: a draft for another occupation's job would cite none
+    # of the units that job asks for.
+    board = d7_match.all_jobs(payload.get("occupation"), evidenced)
     return {"jobs": jobs, "courses": d7_match.courses_for(jobs),
-            "resume": resume, "resumes": resumes}
+            "resume": resume, "resumes": resumes,
+            "all_jobs": board, "all_courses": d7_match.courses_for(board)}
 
 
 PAGE = """<!doctype html><meta charset=utf-8><title>Direction skeleton</title>
