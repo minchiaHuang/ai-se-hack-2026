@@ -104,22 +104,58 @@ class Mapping(unittest.TestCase):
     def setUp(self):
         self.job = fetch_jobs.keep(COOK, "cookery")
 
-    def test_a_cited_candidate_unit_is_kept(self):
-        post = answering([{"code": "SITHCCC027", "quote": "prepare dishes"}])
+    def test_a_unit_quoted_from_the_snippet_is_stated(self):
+        post = answering([{"code": "SITHCCC027", "quote": "prepare dishes for a la carte",
+                           "basis": "stated"}])
         self.assertEqual(fetch_jobs.required_units(self.job, CANDIDATES, "k", "m", post),
-                         [{"code": "SITHCCC027", "quote": "prepare dishes"}])
+                         [{"code": "SITHCCC027", "quote": "prepare dishes for a la carte",
+                           "basis": "stated"}])
+
+    def test_a_unit_quoted_from_the_title_is_marked_title(self):
+        """Adzuna's snippet is a teaser, so a unit may rest on the title alone.
+        The page must be able to say so rather than imply the ad said it."""
+        job = fetch_jobs.keep(dict(COOK, title="Commercial Cook - Aged Care Kitchen",
+                                   description="Apply now."), "cookery")
+        post = answering([{"code": "SITHCCC027", "quote": "Commercial Cook", "basis": "title"}])
+        self.assertEqual(fetch_jobs.required_units(job, CANDIDATES, "k", "m", post),
+                         [{"code": "SITHCCC027", "quote": "Commercial Cook", "basis": "title"}])
+
+    def test_the_basis_recorded_is_where_the_quote_was_found(self):
+        """The model's own label is not evidence; where the words are is."""
+        post = answering([{"code": "SITHCCC027", "quote": "prepare dishes for a la carte",
+                           "basis": "title"}])
+        units = fetch_jobs.required_units(self.job, CANDIDATES, "k", "m", post)
+        self.assertEqual(units[0]["basis"], "stated")
 
     def test_a_unit_outside_the_candidates_is_dropped(self):
-        post = answering([{"code": "SITHCCC999", "quote": "prepare dishes"},
-                          {"code": "SITXFSA005", "quote": "food safety & hygiene"}])
+        post = answering([{"code": "SITHCCC999", "quote": "prepare dishes for a la carte",
+                           "basis": "stated"},
+                          {"code": "SITXFSA005", "quote": "food safety & hygiene",
+                           "basis": "stated"}])
         self.assertEqual(fetch_jobs.required_units(self.job, CANDIDATES, "k", "m", post),
-                         [{"code": "SITXFSA005", "quote": "food safety & hygiene"}])
+                         [{"code": "SITXFSA005", "quote": "food safety & hygiene",
+                           "basis": "stated"}])
 
-    def test_a_quote_not_in_the_snippet_is_dropped(self):
+    def test_a_quote_in_neither_the_snippet_nor_the_title_is_dropped(self):
         """A paraphrase is no citation: the page would cite words the ad never said."""
-        post = answering([{"code": "SITHCCC027", "quote": "cooks meals from scratch"},
-                          {"code": "SITXFSA005", "quote": ""}])
+        post = answering([{"code": "SITHCCC027", "quote": "cooks meals from scratch",
+                           "basis": "stated"},
+                          {"code": "SITXFSA005", "quote": "", "basis": "title"}])
         self.assertEqual(fetch_jobs.required_units(self.job, CANDIDATES, "k", "m", post), [])
+
+    def test_a_quote_shorter_than_the_minimum_is_dropped(self):
+        """One word like "welding" cites nothing; it fits any welding ad."""
+        job = fetch_jobs.keep(dict(COOK, description="MIG welding, Sydney."), "welding")
+        post = answering([{"code": "SITHCCC027", "quote": "welding", "basis": "stated"}])
+        self.assertEqual(fetch_jobs.required_units(job, CANDIDATES, "k", "m", post), [])
+        self.assertEqual(fetch_jobs.MIN_QUOTE, 12)
+
+    def test_a_vague_title_and_a_short_snippet_map_to_nothing(self):
+        """Empty is the honest answer; the page says the ad was too short."""
+        job = fetch_jobs.keep(WELDER, "welding")
+        post = answering([{"code": "SITHCCC027", "quote": "prepare dishes for a la carte",
+                           "basis": "stated"}])
+        self.assertEqual(fetch_jobs.required_units(job, CANDIDATES, "k", "m", post), [])
 
     def test_the_request_names_only_the_candidates_and_forbids_a_score(self):
         sent = {}
@@ -135,7 +171,11 @@ class Mapping(unittest.TestCase):
         content = json.loads(sent["payload"]["messages"][0]["content"])
         self.assertEqual(content["candidate_units"], CANDIDATES)
         self.assertEqual(content["snippet"], self.job["snippet"])
-        self.assertIn("Never output a score", sent["payload"]["system"])
+        self.assertEqual(content["title"], self.job["title"])
+        prompt = sent["payload"]["system"]
+        self.assertIn("Never output a score", prompt)
+        self.assertIn("3 to 6 units", prompt)
+        self.assertIn("never write a quote shorter than 12 characters", prompt)
 
 
 class Main(unittest.TestCase):
@@ -158,12 +198,15 @@ class Main(unittest.TestCase):
 
     def test_with_every_key_the_snapshot_is_mapped_and_carries_no_key(self):
         env = dict(KEYS, ANTHROPIC_API_KEY="sk-secret")
-        post = answering([{"code": "SITHCCC027", "quote": "prepare dishes"}])
+        post = answering([{"code": "SITHCCC027", "quote": "prepare dishes for a la carte",
+                           "basis": "stated"}])
         code, saved, out, _ = run(get=searching({"cook": [COOK], "welder": [WELDER]}),
                                   post=post, env=env)
         self.assertEqual(code, 0)
         cook, welder = saved["jobs"]
-        self.assertEqual(cook["required_units"], [{"code": "SITHCCC027", "quote": "prepare dishes"}])
+        self.assertEqual(cook["required_units"],
+                         [{"code": "SITHCCC027", "quote": "prepare dishes for a la carte",
+                           "basis": "stated"}])
         self.assertEqual(cook["mapped_by"], "claude-sonnet-5")
         # Mapped, but nothing the ad says could be cited: [] rather than a guess.
         self.assertEqual(welder["required_units"], [])

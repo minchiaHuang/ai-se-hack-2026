@@ -46,21 +46,37 @@ USAGE = ("Adzuna keys are not set. Get a free app id and key at "
          "  ADZUNA_APP_ID=... ADZUNA_APP_KEY=... python3 -m skeleton.tools.fetch_jobs\n"
          "Add ANTHROPIC_API_KEY=... to map each job to its required units.")
 
-INSTRUCTIONS = """You read one job advertisement snippet and list the units of
+INSTRUCTIONS = """You read one job advertisement and list the units of
 competency it requires. You do nothing else.
 
 Input: the job title, the ad snippet, and the candidate units of competency.
+Adzuna's snippet is about 500 characters, so it rarely names everything the
+job needs; the title often says more about the role than the snippet does.
 
-Return only a JSON array. Each item is an object: {"code": ..., "quote": ...}
+List the 3 to 6 units a competent worker in this role must be able to do,
+chosen only from the candidate units.
+
+Return only a JSON array. Each item is an object:
+{"code": ..., "quote": ..., "basis": ...}
 - code is copied exactly from the candidate units. Never write another code.
-- quote is copied character for character from the snippet: the words that
-  show the ad requires this unit. Never paraphrase it.
-- If the snippet does not show a unit is required, leave the unit out.
-  An empty array is a correct answer for a short or vague snippet.
+- basis is "stated" when the snippet itself says the job requires this unit,
+  or "title" when it is what a job with this title normally requires.
+- quote is copied character for character from the snippet (for "stated") or
+  from the title (for "title"): the words you took it from. Never paraphrase,
+  and never write a quote shorter than 12 characters.
+- If neither the snippet nor the title supports a unit, leave the unit out.
+  An empty array is a correct answer for a vague title and a short snippet.
 
 Never output a score, rating or judgement about any person."""
 
 TAG = re.compile(r"<[^>]+>")
+# Adzuna's snippet is a teaser, so a unit may rest on the title alone. Which
+# one it was has to travel with the unit: the page must be able to say "the ad
+# says this" apart from "a job with this title normally needs this".
+STATED, FROM_TITLE = "stated", "title"
+# Short enough for a real phrase, long enough that a single word like
+# "welding" cannot stand as the citation for a whole unit.
+MIN_QUOTE = 12
 
 
 def _get_json(url):
@@ -122,8 +138,10 @@ def fetch(app_id, app_key, get=None):
 def required_units(job, candidates, key, model, post=None):
     """The model's units, minus any it could not have taken from this ad.
 
-    A code outside the candidates is invented; a quote that is not in the
-    snippet is no citation. Either one drops the unit, never the job.
+    A code outside the candidates is invented; a quote that is in neither the
+    snippet nor the title is no citation. Either one drops the unit, never the
+    job. The basis recorded is the one the quote was actually found in, not
+    the one the model claimed.
     """
     sender = _post_json if post is None else post
     payload = {
@@ -147,10 +165,16 @@ def required_units(job, candidates, key, model, post=None):
         code, quote = item.get("code"), item.get("quote")
         if code not in allowed or code in codes:
             continue
-        if not isinstance(quote, str) or not quote.strip() or quote not in job["snippet"]:
+        if not isinstance(quote, str) or len(quote.strip()) < MIN_QUOTE:
+            continue
+        if quote in job["snippet"]:
+            basis = STATED
+        elif quote in job["title"]:
+            basis = FROM_TITLE
+        else:
             continue
         codes.add(code)
-        kept.append({"code": code, "quote": quote})
+        kept.append({"code": code, "quote": quote, "basis": basis})
     return kept
 
 
