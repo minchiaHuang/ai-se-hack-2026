@@ -26,13 +26,15 @@
 html { font-size: 18px; }
 body {
   margin: 0; background: var(--bg); color: var(--text);
-  font: 1rem/1.5 system-ui, -apple-system, "Segoe UI", "PingFang SC", "Noto Sans CJK SC", sans-serif;
+  font: 1rem/1.5 Inter, system-ui, sans-serif;
 }
-header.top { display: flex; align-items: baseline; gap: 1.25rem; padding: 14px 24px;
+/* Figma header: white bar, logo icon, "Bridge" bold and "Work" regular. */
+header.top { display: flex; align-items: center; gap: 1.25rem; padding: 14px 24px;
              border-bottom: 1px solid var(--line); background: var(--card); }
-.wordmark { font-size: 1.4rem; margin: 0; letter-spacing: -.01em; }
+.wordmark { display: flex; align-items: center; font-size: 1.6rem; margin: 0; letter-spacing: -.01em; }
+.wordmark img { height: 1.6em; width: auto; margin-right: .45rem; }
 .wordmark b { color: var(--text); }
-.wordmark span { color: var(--primary); font-weight: 400; }
+.wordmark span { color: var(--primary); font-weight: 400; margin-left: .15em; }
 .step { color: var(--muted); font-weight: 600; }
 main { max-width: 1280px; margin: 0 auto; padding: 16px 24px 48px; }
 h2 { font-size: 1.2rem; margin: 0 0 .25rem; }
@@ -125,7 +127,7 @@ details.said dd { margin: 0; }
 </head>
 <body>
 <header class="top">
-  <p class="wordmark"><b>Bridge</b><span>Work</span></p>
+  <p class="wordmark"><img src="/logo.svg" alt="" onerror="this.hidden = true"><b>Bridge</b><span>Work</span></p>
   <span class="step">Caseworker review</span>
 </header>
 <main>
@@ -178,6 +180,8 @@ details.said dd { margin: 0; }
 // shared API contract, and makes no /api/ request at all: the demo is recorded in it.
 const params = new URLSearchParams(location.search);
 const MOCK = params.get("mock") === "1";
+// ?quiet=1 hides only the mock banner, for the recorded demo; nothing else changes.
+const QUIET = params.get("quiet") === "1";
 
 // Handed over by /interview. sessionStorage keeps it to this tab.
 const INTERVIEW_KEY = "d7.interview";
@@ -185,7 +189,9 @@ const INTERVIEW_KEY = "d7.interview";
 const UPLOAD_KEY = "d7.sections";
 // Handed on to /jobs: the same key and shape intake.html writes.
 const SESSION_KEY = "d7-session";
-const asRoute = (route, file) => (location.protocol === "file:" ? file : route) + (MOCK ? "?mock=1" : "");
+// Both flags ride along on every link, so a demo opened quiet stays quiet.
+const FLAGS = [MOCK && "mock=1", QUIET && "quiet=1"].filter(Boolean).join("&");
+const asRoute = (route, file) => (location.protocol === "file:" ? file : route) + (FLAGS ? "?" + FLAGS : "");
 const JOBS_URL = asRoute("/jobs", "jobs.html");
 
 // NEEDS DECISION: the extract contract requires an occupation and the brief gives
@@ -631,7 +637,7 @@ function render() {
 }
 
 // ---------------------------------------------------------------- wiring
-$("mock-banner").hidden = !MOCK;
+$("mock-banner").hidden = !MOCK || QUIET;
 $("to-interview").href = asRoute("/interview", "interview.html");
 $("consent").addEventListener("change", event => { state.consent = event.target.checked; setStatus(""); });
 $("regenerate").addEventListener("click", regenerate);
