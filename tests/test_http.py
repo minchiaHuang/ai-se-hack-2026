@@ -414,51 +414,20 @@ class IntakeApi(Server):
                 "courses": [json.loads(r) for r in rows("courses", "[]")],
                 "resumes": json.loads("{" + ",".join(rows("resumes", "{}")) + "}"),
                 "all_jobs": [json.loads(r) for r in rows("all_jobs", "[]")],
-                "all_courses": [json.loads(r) for r in rows("all_courses", "[]")]}
+                "all_courses": [json.loads(r) for r in rows("all_courses", "[]")],
+                "jobs_source": json.loads(block.split("  jobs_source: ")[1].splitlines()[0].rstrip(","))}
 
-    def test_the_mock_fixture_is_the_board_the_jobs_page_can_still_render(self):
-        """NEEDS DECISION. This test used to assert that ?mock=1 shows exactly
-        what the server returns. The board is real Adzuna ads now, and the
-        fixture lives in intake.html, which this package was told not to touch,
-        so the two have parted: mock mode demos the older invented board.
-
-        What is pinned here is what still has to hold. The fixture is the
-        sample board built from jobs.json, and it carries every field
-        jobs.html reads, so ?mock=1 renders end to end instead of crashing.
-        Regenerating the fixture from the live snapshot is a follow-up and
-        needs an intake.html edit.
-        """
-        fixture = self.fixture_match()
-        sample = {j["id"] for j in json.loads(
-            app.d7_match.SAMPLE_JOBS.read_text(encoding="utf-8"))}
-
-        self.assertTrue(fixture["all_jobs"])
-        self.assertEqual({j["id"] for j in fixture["all_jobs"]}, sample)
-        for job in fixture["all_jobs"]:
-            with self.subTest(job=job["id"]):
-                # What renderJobCard() and renderJobDetail() read off a job.
-                for field in ("id", "title", "location", "matched", "missing", "fit"):
-                    self.assertIn(field, job)
-                # employerLine() falls back to the sample's setting; without
-                # either, every card would be headed by a blank.
-                self.assertTrue(job.get("company") or job.get("setting"))
-        for job_id, draft in fixture["resumes"].items():
-            with self.subTest(job=job_id):
-                self.assertEqual(draft["job_id"], job_id)
-                self.assertTrue(draft["sections"]["job"].get("company")
-                                or draft["sections"]["job"].get("setting"))
-
-    def test_the_mock_fixture_no_longer_matches_the_live_board(self):
-        """The divergence above, stated as a fact rather than left implied: if
-        a later package regenerates the fixture, this test fails and is the
-        reminder to delete it along with the note above."""
+    def test_the_mock_fixture_is_what_the_server_returns_for_the_demo(self):
+        """?mock=1 must show the same board and resumes as the real server,
+        the real Adzuna snapshot included, since the demo is recorded in mock mode."""
         fixture = self.fixture_match()
         units = [{"code": c, "sources": [["transcript", "t=02:41"]]} for c in ("SITXFSA005", "SITXFSA006")]
         status, body = self.post_json("/api/match", {"occupation": "cookery", "evidenced_units": units,
                                                      "transcript": DEMO_TRANSCRIPT})
         self.assertEqual(status, 200)
-        self.assertNotEqual({j["id"] for j in fixture["all_jobs"]},
-                            {j["id"] for j in body["all_jobs"]})
+        for key in ("jobs", "courses", "resumes", "all_jobs", "all_courses", "jobs_source"):
+            with self.subTest(key=key):
+                self.assertEqual(fixture[key], body[key])
 
     def units_of(self, pack):
         return [{"code": code, "sources": item["sources"]}
@@ -558,30 +527,16 @@ class IntakeApi(Server):
         self.assertEqual(status, 200)
         self.assertEqual(self.constant("FIXTURE_RESUME_EXTRACT"), pack)
 
-    def test_the_resume_mock_board_is_the_sample_board_the_page_can_render(self):
-        """NEEDS DECISION, the same one as the interview fixture above: the
-        board is real ads now and this fixture is in intake.html, which this
-        package was told not to touch. It still has to render, so its shape is
-        pinned, and the divergence from the server is stated rather than
-        silently tolerated."""
-        fixture = self.constant("FIXTURE_RESUME_MATCH")
-        sample = {j["id"] for j in json.loads(
-            app.d7_match.SAMPLE_JOBS.read_text(encoding="utf-8"))}
-        self.assertEqual({j["id"] for j in fixture["all_jobs"]}, sample)
-        for job in fixture["all_jobs"]:
-            with self.subTest(job=job["id"]):
-                for field in ("id", "title", "location", "matched", "missing", "fit"):
-                    self.assertIn(field, job)
-                self.assertTrue(job.get("company") or job.get("setting"))
-
+    def test_the_resume_mock_board_is_what_the_server_returns(self):
+        """?mock=1 on the resume path must show the same board as the server."""
         status, pack = self.post_json("/api/extract", resume())
         self.assertEqual(status, 200)
         status, body = self.post_json("/api/match", {
             "source": "resume", "occupation": "cookery",
             "evidenced_units": self.units_of(pack), "resume": SAMPLE_LINES})
         self.assertEqual(status, 200)
-        self.assertNotEqual({j["id"] for j in fixture["all_jobs"]},
-                            {j["id"] for j in body["all_jobs"]})
+        body.pop("resume")
+        self.assertEqual(self.constant("FIXTURE_RESUME_MATCH"), body)
 
     def test_an_unknown_occupation_is_a_400_without_a_traceback(self):
         for path, data in (("/api/extract", cook(occupation="astronaut")),

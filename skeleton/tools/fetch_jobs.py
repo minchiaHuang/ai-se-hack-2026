@@ -2,6 +2,7 @@
 
     ADZUNA_APP_ID=... ADZUNA_APP_KEY=... ANTHROPIC_API_KEY=... \\
         python3 -m skeleton.tools.fetch_jobs
+    python3 -m skeleton.tools.fetch_jobs --recheck
 
 Run once, ahead of time: the demo reads the saved snapshot, so it works
 offline on stage. Standard library only, keys from the environment only.
@@ -19,6 +20,7 @@ import sys
 import time
 import urllib.parse
 import urllib.request
+from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -45,7 +47,8 @@ SEARCHES = {
 USAGE = ("Adzuna keys are not set. Get a free app id and key at "
          "https://developer.adzuna.com, then run:\n"
          "  ADZUNA_APP_ID=... ADZUNA_APP_KEY=... python3 -m skeleton.tools.fetch_jobs\n"
-         "Add ANTHROPIC_API_KEY=... to map each job to its required units.")
+         "Add ANTHROPIC_API_KEY=... to map each job to its required units.\n"
+         "Add --recheck (no keys needed) to re-validate the saved snapshot offline.")
 
 INSTRUCTIONS = """You read one job advertisement and list the units of
 competency it requires. You do nothing else.
@@ -99,6 +102,15 @@ MIN_QUOTE = 12
 # the tool is run by hand the night before, so the wait costs nothing.
 ATTEMPTS = 3
 BACKOFF = 2
+# The prompt allows one phrase to carry two units ("safe and hygienic
+# environment" names both food-safety units) and calls a third use too
+# general. A real run ignored that anyway: "nutritious meals and snacks" was
+# the stated quote for hygiene, food handling and cookery on one ad, and the
+# verbatim check cannot see it. So the limit is enforced here, not only asked.
+# Needs a decision: a pair can be just as wrong. Ad 5870142114 (the same
+# snippet under another id) still cites that phrase for both food-safety
+# units, and code cannot judge meaning, so only the count is enforced.
+MAX_SHARED = 2
 
 
 def _get_json(url):
@@ -197,7 +209,50 @@ def required_units(job, candidates, key, model, post=None):
             continue
         codes.add(code)
         kept.append({"code": code, "quote": quote, "basis": basis})
+    return limit_shared(kept, job["title"])
+
+
+def limit_shared(units, title):
+    """No stated quote may stand for more than MAX_SHARED units of one ad.
+
+    Code cannot tell which of the units the phrase really names, so none of
+    them keeps it. A unit whose quote is also in the title stays, marked
+    "title": that claim, what a job with this title normally needs, is still
+    true. Any other is dropped: citing the whole title instead would be a
+    guess no one checked.
+    """
+    uses = Counter(unit["quote"] for unit in units if unit["basis"] == STATED)
+    kept = []
+    for unit in units:
+        if unit["basis"] == STATED and uses[unit["quote"]] > MAX_SHARED:
+            if unit["quote"] not in title:
+                continue
+            unit = dict(unit, basis=FROM_TITLE)
+        kept.append(unit)
     return kept
+
+
+def recheck(path=SNAPSHOT):
+    """Apply limit_shared to a saved snapshot, offline.
+
+    The ads are the ones the demo was built on and a new fetch would replace
+    them, so only their mappings are checked again: no Adzuna or model call.
+    Returns (jobs changed, units dropped).
+    """
+    data = json.loads(Path(path).read_text(encoding="utf-8"))
+    changed = dropped = 0
+    for job in data["jobs"]:
+        units = job.get("required_units")
+        if units is None:
+            continue
+        checked = limit_shared(units, job["title"])
+        if checked != units:
+            changed += 1
+            dropped += len(units) - len(checked)
+            job["required_units"] = checked
+    Path(path).write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n",
+                          encoding="utf-8")
+    return changed, dropped
 
 
 def map_jobs(jobs, occupations, key, model, post=None, sleep=time.sleep):
@@ -241,8 +296,19 @@ def snapshot(jobs, now=None):
     }
 
 
-def main(get=None, post=None, out=SNAPSHOT, now=None, sleep=time.sleep):
-    """Exit status, never a traceback: this is run by hand the night before."""
+def main(get=None, post=None, out=SNAPSHOT, now=None, sleep=time.sleep, argv=()):
+    """Exit status, never a traceback: this is run by hand the night before.
+
+    --recheck re-validates the saved snapshot's mappings instead of fetching.
+    """
+    if "--recheck" in argv:
+        try:
+            changed, dropped = recheck(out)
+        except (OSError, ValueError, KeyError) as error:
+            print(f"Could not recheck {out} ({type(error).__name__}).", file=sys.stderr)
+            return 1
+        print(f"Rechecked {out}: {changed} jobs changed, {dropped} units dropped")
+        return 0
     app_id = os.environ.get("ADZUNA_APP_ID", "")
     app_key = os.environ.get("ADZUNA_APP_KEY", "")
     if not app_id or not app_key:
@@ -296,4 +362,4 @@ def main(get=None, post=None, out=SNAPSHOT, now=None, sleep=time.sleep):
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(main(argv=sys.argv[1:]))

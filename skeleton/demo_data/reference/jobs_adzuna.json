@@ -74,23 +74,8 @@
       "snippet": "Nurturing the greatness in every child - and in you. The Opportunity Are you seeking a greater work /life balance? Do you enjoy being creative in the kitchen and running your own operation? Do you enjoy working with children? We are looking for an experienced Cook to join the team at Jannali Kinder Haven 2 to produce high quality, nutritious meals and snacks for up to 36 children each day. This role is Part-Time working 27.5 hours per week. About Us Our children enjoy delightful indoor and outd…",
       "required_units": [
         {
-          "code": "SITHCCC027",
-          "quote": "nutritious meals and snacks",
-          "basis": "stated"
-        },
-        {
           "code": "SITHCCC043",
           "quote": "experienced Cook to join the team",
-          "basis": "stated"
-        },
-        {
-          "code": "SITXFSA005",
-          "quote": "nutritious meals and snacks",
-          "basis": "stated"
-        },
-        {
-          "code": "SITXFSA006",
-          "quote": "nutritious meals and snacks",
           "basis": "stated"
         }
       ],
@@ -552,17 +537,17 @@
         {
           "code": "MEM05012",
           "quote": "Coded Welder",
-          "basis": "stated"
+          "basis": "title"
         },
         {
           "code": "MEM05050",
           "quote": "Coded Welder",
-          "basis": "stated"
+          "basis": "title"
         },
         {
           "code": "MEM05049",
           "quote": "Coded Welder",
-          "basis": "stated"
+          "basis": "title"
         }
       ],
       "mapped_by": "claude-sonnet-5"
@@ -801,7 +786,7 @@
         {
           "code": "CHCCCS040",
           "quote": "Community Support Worker - In Home Aged Care",
-          "basis": "stated"
+          "basis": "title"
         },
         {
           "code": "CHCCCS031",
@@ -811,12 +796,12 @@
         {
           "code": "CHCAGE013",
           "quote": "Community Support Worker - In Home Aged Care",
-          "basis": "stated"
+          "basis": "title"
         },
         {
           "code": "HLTWHS002",
           "quote": "Community Support Worker - In Home Aged Care",
-          "basis": "stated"
+          "basis": "title"
         }
       ],
       "mapped_by": "claude-sonnet-5"

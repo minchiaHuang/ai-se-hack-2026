@@ -100,6 +100,9 @@ class Fetch(unittest.TestCase):
 CANDIDATES = [{"code": "SITHCCC027", "title": "Prepare dishes using basic methods of cookery"},
               {"code": "SITXFSA005", "title": "Use hygienic practices for food safety"}]
 
+THREE = CANDIDATES + [{"code": "SITXFSA006", "title": "Participate in safe food handling practices"}]
+COOK_UNIT = {"code": "SITHCCC043", "title": "Work effectively as a cook"}
+
 
 class Mapping(unittest.TestCase):
     def setUp(self):
@@ -157,6 +160,47 @@ class Mapping(unittest.TestCase):
         post = answering([{"code": "SITHCCC027", "quote": "prepare dishes for a la carte",
                            "basis": "stated"}])
         self.assertEqual(fetch_jobs.required_units(job, CANDIDATES, "k", "m", post), [])
+
+    def test_a_stated_quote_may_carry_two_units(self):
+        """Some words name two kinds of work, and the prompt allows it."""
+        post = answering([{"code": c, "quote": "food safety & hygiene", "basis": "stated"}
+                          for c in ("SITXFSA005", "SITXFSA006")])
+        units = fetch_jobs.required_units(self.job, THREE, "k", "m", post)
+        self.assertEqual([(u["code"], u["basis"]) for u in units],
+                         [("SITXFSA005", "stated"), ("SITXFSA006", "stated")])
+
+    def test_a_stated_quote_used_for_three_units_is_dropped_for_all_three(self):
+        """PR #16's real ad: "nutritious meals and snacks" stood for hygiene,
+        food handling and cookery. A phrase that general evidences none of
+        them, and code cannot tell which one it meant."""
+        job = fetch_jobs.keep(dict(COOK, title="Cook", description=(
+            "An experienced Cook to join the team to produce nutritious meals and snacks.")),
+            "cookery")
+        post = answering([{"code": c, "quote": "nutritious meals and snacks", "basis": "stated"}
+                          for c in ("SITHCCC027", "SITXFSA005", "SITXFSA006")]
+                         + [{"code": "SITHCCC043", "quote": "experienced Cook to join the team",
+                             "basis": "stated"}])
+        self.assertEqual(fetch_jobs.required_units(job, THREE + [COOK_UNIT], "k", "m", post),
+                         [{"code": "SITHCCC043", "quote": "experienced Cook to join the team",
+                           "basis": "stated"}])
+
+    def test_an_overused_quote_that_is_also_the_title_is_demoted_to_title(self):
+        """The words still support "a job with this title needs this", just
+        not "the ad says so"."""
+        job = fetch_jobs.keep(dict(COOK, title="Coded Welder | Sydney", description=(
+            "We are seeking an experienced Coded Welder for our Sydney workshop.")), "cookery")
+        post = answering([{"code": c, "quote": "Coded Welder", "basis": "stated"}
+                          for c in ("SITHCCC027", "SITXFSA005", "SITXFSA006")])
+        units = fetch_jobs.required_units(job, THREE, "k", "m", post)
+        self.assertEqual([(u["code"], u["quote"], u["basis"]) for u in units],
+                         [(c, "Coded Welder", "title")
+                          for c in ("SITHCCC027", "SITXFSA005", "SITXFSA006")])
+
+    def test_only_stated_quotes_are_limited(self):
+        """A title quote already claims only what the title implies."""
+        units = [{"code": c, "quote": "Commercial Cook", "basis": "title"}
+                 for c in ("SITHCCC027", "SITXFSA005", "SITXFSA006")]
+        self.assertEqual(fetch_jobs.limit_shared(units, "Commercial Cook"), units)
 
     def test_the_request_names_only_the_candidates_and_forbids_a_score(self):
         sent = {}
@@ -281,6 +325,46 @@ class Main(unittest.TestCase):
         self.assertEqual(failed, 1)
         self.assertEqual(waits, [fetch_jobs.BACKOFF * 2 ** n
                                  for n in range(fetch_jobs.ATTEMPTS - 1)])
+
+    def test_recheck_rewrites_the_saved_snapshot_offline(self):
+        """No keys and no network: the snapshot's ads stay, only their
+        mappings are checked again."""
+        def no_network(*args):
+            raise AssertionError("recheck must not call Adzuna or the model")
+
+        overused = [{"code": c, "quote": "nutritious meals and snacks", "basis": "stated"}
+                    for c in ("SITHCCC027", "SITXFSA005", "SITXFSA006")]
+        fine = [{"code": "SITHCCC043", "quote": "experienced Cook to join the team",
+                 "basis": "stated"}]
+        data = fetch_jobs.snapshot([
+            dict(fetch_jobs.keep(COOK, "cookery"), title="Cook", required_units=overused + fine,
+                 mapped_by="m"),
+            dict(fetch_jobs.keep(WELDER, "welding"), required_units=None, mapped_by=None)],
+            now=datetime(2026, 9, 21, tzinfo=timezone.utc))
+        out, err = io.StringIO(), io.StringIO()
+        with tempfile.TemporaryDirectory() as tmp, mock.patch.dict(os.environ, CLEAR), \
+                contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+            path = Path(tmp) / "jobs_adzuna.json"
+            path.write_text(json.dumps(data), encoding="utf-8")
+            code = fetch_jobs.main(get=no_network, post=no_network, out=path,
+                                   argv=["--recheck"])
+            saved = json.loads(path.read_text())
+        self.assertEqual(code, 0, err.getvalue())
+        cook, welder = saved["jobs"]
+        self.assertEqual(cook["required_units"], fine)
+        self.assertEqual(cook["mapped_by"], "m")
+        self.assertIsNone(welder["required_units"])
+        self.assertEqual(saved["fetched_at"], "2026-09-21T00:00:00+00:00")
+        self.assertIn("1 jobs changed, 3 units dropped", out.getvalue())
+
+    def test_the_committed_snapshot_has_no_overused_stated_quote(self):
+        """The demo reads this file, so the rule must hold for it, not only
+        for the next fetch."""
+        data = json.loads(fetch_jobs.SNAPSHOT.read_text(encoding="utf-8"))
+        for job in data["jobs"]:
+            units = job["required_units"] or []
+            with self.subTest(job=job["id"]):
+                self.assertEqual(fetch_jobs.limit_shared(units, job["title"]), units)
 
     def test_a_network_failure_is_a_message_without_the_key(self):
         def broken_get(url):
