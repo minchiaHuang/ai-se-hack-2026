@@ -176,12 +176,27 @@ class HttpRoundTrip(Server):
 
     def test_the_jobs_page_grades_no_one_and_borrows_no_branding(self):
         """The ring is unit coverage of the job. Nothing on the page grades the
-        match or the person, and nothing carries another product's wording."""
+        match or the person, and nothing carries another product's wording.
+        A plain "Apply" button is allowed since the one-click apply flow; an
+        automated apply ("Autofill", "Auto apply") is still another product's."""
         _, body = self.get("/jobs")
         for word in ("GOOD MATCH", "STRONG MATCH", "Jobright", "jobright", "Orion",
-                     "Turbo", "Autofill", "applicants", "Apply"):
+                     "Turbo", "Autofill", "Auto apply", "Auto-apply", "applicants"):
             with self.subTest(word=word):
                 self.assertNotIn(word, body)
+
+    def test_applying_on_the_jobs_page_sends_nothing(self):
+        """Save and apply are recorded in this tab only. The page opens no
+        connection of any kind, so a confirmed application cannot leave it,
+        and the panel says who sends it and that this is a demo."""
+        _, body = self.get("/jobs")
+        self.assertIn("The caseworker sends this with the jobseeker's agreement.", body)
+        self.assertIn("Demo: recorded in this browser tab only", body)
+        self.assertIn('const APPLY_KEY = "d7-apply"', body)
+        for call in ("fetch(", "XMLHttpRequest", "sendBeacon", "WebSocket", "mailto:", "/api/",
+                     "window.confirm", "alert("):
+            with self.subTest(call=call):
+                self.assertNotIn(call, body)
 
     def test_the_jobs_page_carries_the_adzuna_mark_at_the_size_the_licence_asks(self):
         """Adzuna's terms: the mark links to the ad and is drawn at no less
