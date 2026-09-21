@@ -119,7 +119,7 @@ def _allowed_codes(prepared):
     }
 
 
-def _keep(item, allowed):
+def _keep(item, allowed, locators):
     """One bad item is dropped here; left in, schema.Suggestion would raise
     and take the whole batch down with it."""
     if not isinstance(item, dict) or item.get("field") not in FIELDS:
@@ -134,6 +134,10 @@ def _keep(item, allowed):
         return False
     if not all(isinstance(s, list) and len(s) == 2
                and all(isinstance(p, str) for p in s) for s in sources):
+        return False
+    # A locator the transcript does not have is a source in name only.
+    cited = [locator for label, locator in sources if label == "transcript"]
+    if not cited or not set(cited) <= locators:
         return False
     if not isinstance(item.get("value"), str) or not isinstance(item.get("reason"), str):
         return False
@@ -185,6 +189,7 @@ class LiveModel:
             if not isinstance(items, list):
                 raise ValueError("model output is not a JSON array")
             allowed = _allowed_codes(prepared)
+            locators = {"t=" + line["t"] for line in prepared.get("transcript", [])}
         except Exception:
             return self._fallback.suggest(direction_key, prepared)
-        return [item for item in items if _keep(item, allowed)]
+        return [item for item in items if _keep(item, allowed, locators)]

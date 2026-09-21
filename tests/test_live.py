@@ -106,6 +106,12 @@ class LiveModelSuggest(unittest.TestCase):
         model = live.LiveModel(Fallback(), api_key="k", post=answering([GOOD, invented]))
         self.assertEqual(model.suggest("d7", PREPARED), [GOOD])
 
+    def test_a_locator_not_in_the_transcript_is_dropped(self):
+        """No source, no suggestion: a made-up timestamp is no source."""
+        fabricated = dict(GOOD, field="osca_code", sources=[["transcript", "t=09:59"]])
+        model = live.LiveModel(Fallback(), api_key="k", post=answering([GOOD, fabricated]))
+        self.assertEqual(model.suggest("d7", PREPARED), [GOOD])
+
     def test_malformed_json_uses_the_fallback(self):
         def fake_post(url, headers, payload):
             return {"content": [{"type": "text", "text": "[{not json"}]}
