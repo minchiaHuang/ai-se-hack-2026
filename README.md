@@ -77,22 +77,23 @@ and builds the pack in one step. `/intake?mock=1` runs the whole page against in
                      + withheld items + unanswered fields + the occupation's legal gate
                                                             │ evidenced units only
                                                             ▼
-                                         /api/match ──► jobs (fit = count of units)
+                                         /api/match ──► sample jobs for the occupation
+                                                        (fit = "N of M required units evidenced")
                                                     ──► gap units (missing units → RTO)
-                                                    ──► draft resume for the best-fit job
+                                                    ──► a draft resume tailored to each job
 ```
 
 | Module | What it does |
 |---|---|
-| `skeleton/app.py` | Standard-library HTTP server. It serves `/intake` and the three JSON routes (`/api/transcribe`, `/api/extract`, `/api/match`), plus the older scenario pages at `/`. It also picks the stub or the live model. |
-| `skeleton/web/intake.html` | The two-person intake page: one inline HTML file with vanilla JS. It has language choice, consent, recording, a bilingual transcript, the evidence pack, the legal gate, job matches, gap units and the resume. |
+| `skeleton/app.py` | Standard-library HTTP server. It serves `/intake` and the three JSON routes (`/api/transcribe`, `/api/extract`, `/api/match`), plus the older scenario pages at `/`. It also picks the stub or the live model. `/api/match` returns a tailored resume for every job (`resumes`), and keeps the best-fit job's draft as `resume`. |
+| `skeleton/web/intake.html` | The two-person intake page: one inline HTML file with vanilla JS. It has language choice, consent, recording, a bilingual transcript, the evidence pack and the legal gate. Matches appear as a job-board list, with location and employment-type filters. Each card shows a count panel ("N of M required units evidenced") instead of a percentage. There are also the gap units and a side panel with the selected job's resume, which can be copied or printed on its own. |
 | `skeleton/core/pipeline.py` | The shared path every direction runs through: `guard` → `prepare` → model → split by confidence → gaps → metric. |
 | `skeleton/core/schema.py` | Data shapes. A suggestion with no source cannot be constructed, and anything below the confidence threshold is withheld. |
 | `skeleton/core/model.py` | `StubModel`, which returns canned suggestions so the pipeline runs offline. |
 | `skeleton/core/live.py` | Real ElevenLabs Scribe and Anthropic Messages calls over `urllib`, both falling back to offline. It drops any model item whose code is not among the candidates or whose timestamp is not in the transcript. |
 | `skeleton/core/registry.py` | Reads the reference data: both classification codes, the units, the qualification, and an optional check that the qualification's source PDF is reachable. |
 | `skeleton/directions/d7_credentials.py` | Direction 7: the red lines (`guard`), what the model sees (`prepare`), the fields asked for, and the metric. |
-| `skeleton/directions/d7_match.py` | Job matching, gap units and the draft resume, all built without a model. |
+| `skeleton/directions/d7_match.py` | Job matching, gap units and one draft resume per job, all built without a model. A resume is tailored by ordering alone: the units a job requires, and the lines that evidence them, move to the top, and nothing is added. |
 
 ### Where AI is used
 
@@ -133,8 +134,10 @@ There is **no database**. The reference data is two JSON files in the repository
   - its assessing authority. `verified: false` marks the ones not yet confirmed;
   - the **legal gate** for the occupation, with its government source. Examples are the aged care
     worker screening requirement and the NSW Food Safety Supervisor rule.
-- `skeleton/demo_data/reference/jobs.json` holds six jobs, two per occupation. Each is marked
-  "Representative sample, not a real listing".
+- `skeleton/demo_data/reference/jobs.json` holds 17 sample jobs: 9 for cooks, 4 for welders and 4
+  for aged care. Each has a title, a setting, a location in NSW, an employment type (full-time,
+  part-time or casual), a level, a shift and the units it requires. Each is marked "Representative
+  sample, not a real listing".
 
 **Why both ANZSCO and OSCA:** OSCA has replaced ANZSCO at the ABS, but migration still runs on
 ANZSCO, so each occupation carries both codes. Codes also move between the two. For example, ANZSCO
