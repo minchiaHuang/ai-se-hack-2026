@@ -10,6 +10,17 @@
 
 - `feat/d7-photo-homepage`（待合入）：首頁 `/` 改成 Figma「V3 / 01b — Homepage (photo-led)」(127:2)：滿版照片主視覺、三個產品保證（不放沒有來源的影響力數字）、附照片的三步驟、四格工作現場照片、顧問／雇主（雇主仍是 Coming soon）、CTA。9 張 Unsplash 照片（Unsplash License）放在 `skeleton/web/img/`，共 1.2 MB，由 `/img/<name>.jpg` 提供，只讀該資料夾。照片是模特兒不是難民，四格上的技能是示意。Figma 另有 `ref` page：8 個難民就業組織首頁截圖。
 
+- 2026-09-22 上午，`feat/d7-photo-homepage`（`96ae9a4`，已推送）：首頁文案重寫。
+  四個 H2 從「完整句子＋句號」改成標籤（How it works／The skills are already there／
+  Who it's for），hero H1 改 `Turning spoken experience into Australian resumes.`，
+  lede 從 26 字兩個破折號縮成兩句 19 字，收尾三連句改一句。整頁破折號清乾淨
+  （只剩 CSS 註解裡 Figma 的 frame 名）。新增 `.stats` 數字帶在 hero 下方：
+  88／51 個百分點 ＋ Guo & Tani 作者原句 ＋ DOI 連結。這是全頁唯一的數字，
+  講的是問題不是我們的成效。參考依據：Figma `ref` page 那 8 個組織首頁，
+  另抓了 TBB／CareerSeekers／SSI／Jobs for Humanity／Jobright／Simplify 的逐字文案，
+  它們的 H1 都是 5–9 字、標題都是標籤、每一站都有數字。
+  `tests/test_http.py` 裡寫死的舊標題跟著改。
+
 - PR #35 d7-occupation（`b7ed5e3`）：`/review` 不再寫死廚師。`POST /api/occupation` 由模型從三個職業中選一個或回 `none`，顧問可在選單改；不支援的職業不推職缺並說明原因。實測：廚師→cookery、IT→none、焊工→welding、長照→aged_care。
 
 - 2026-09-22 在 Orca 內建瀏覽器把整條流程點過一遍（`?mock=1&quiet=1`，首頁 → `/start` → `/start/path` → 電話面試 → `/review` → `/jobs` → 職缺頁 → Apply；另走上傳路徑）。
