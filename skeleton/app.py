@@ -519,9 +519,21 @@ def check():
         render_result(key)
 
 
+def listen_address():
+    """Where to serve. A host that runs this in a container hands the port over
+    in PORT and routes to it from outside, so there it has to bind every
+    interface; with no PORT set it is a laptop, and the loopback keeps the demo
+    off the local network."""
+    port = os.environ.get("PORT")
+    if port:
+        return "0.0.0.0", int(port)
+    return "127.0.0.1", 8000
+
+
 if __name__ == "__main__":
     if "--check" in sys.argv:
         check()
     else:
-        print("http://127.0.0.1:8000  (scenarios: http://127.0.0.1:8000/scenarios)")
-        ThreadingHTTPServer(("127.0.0.1", 8000), Handler).serve_forever()
+        host, port = listen_address()
+        print(f"http://{host}:{port}  (scenarios: http://{host}:{port}/scenarios)")
+        ThreadingHTTPServer((host, port), Handler).serve_forever()
