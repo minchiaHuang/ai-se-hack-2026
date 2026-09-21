@@ -172,6 +172,26 @@ class HttpRoundTrip(Server):
             with self.subTest(word=word):
                 self.assertNotIn(word, body)
 
+    def test_the_jobs_page_carries_the_adzuna_mark_at_the_size_the_licence_asks(self):
+        """Adzuna's terms: the mark links to the ad and is drawn at no less
+        than 116x23 px. Both numbers are pinned here so a later tidy-up of the
+        stylesheet cannot quietly shrink them."""
+        _, body = self.get("/jobs")
+        self.assertIn("Jobs by Adzuna", body)
+        self.assertIn("min-width: 116px", body)
+        self.assertIn("min-height: 23px", body)
+        self.assertIn('rel: "noopener"', body)
+        self.assertIn('target: "_blank"', body)
+
+    def test_the_jobs_page_tells_the_two_empty_cases_apart(self):
+        """An ad that named nothing and an ad that was never mapped read
+        differently, and neither shows a percentage."""
+        _, body = self.get("/jobs")
+        self.assertIn("Ad too short to name units", body)
+        self.assertIn("Ad not mapped to units", body)
+        self.assertIn("The ad says it needs this", body)
+        self.assertIn("Jobs with this title normally need this", body)
+
 
 class IntakeApi(Server):
     """The routes the intake page calls, against the real handler."""
@@ -230,8 +250,9 @@ class IntakeApi(Server):
         self.assertIn("SITXFSA005", body["resume"]["text"])
 
     def test_match_lists_every_job_with_other_occupations_at_zero(self):
-        """The page's board: all 17 jobs, the occupation's first as in "jobs",
-        the rest counted honestly at 0, and no percentage anywhere."""
+        """The page's board: every ad in the snapshot, the occupation's first as
+        in "jobs", the rest counted honestly at 0. Counts come from the file, so
+        a refetched snapshot does not need this test rewritten."""
         units = [{"code": "SITXFSA005", "sources": [["transcript", "t=02:41"]]},
                  {"code": "SITXFSA006", "sources": [["transcript", "t=02:41"]]}]
         status, body = self.post_json("/api/match", {"occupation": "cookery",
@@ -239,8 +260,8 @@ class IntakeApi(Server):
                                                      "transcript": DEMO_TRANSCRIPT})
         self.assertEqual(status, 200)
         board = body["all_jobs"]
-        required = {j["id"]: len(j["required_units"]) for j in app.d7_match.load_jobs()}
-        self.assertEqual(len(board), 17)
+        required = {j["id"]: len(j["required_units"] or ())
+                    for j in app.d7_match.load_jobs()}
         self.assertEqual({j["id"] for j in board}, set(required))
         self.assertEqual([j["id"] for j in board[:len(body["jobs"])]],
                          [j["id"] for j in body["jobs"]])
@@ -248,12 +269,45 @@ class IntakeApi(Server):
             with self.subTest(job=job["id"]):
                 self.assertEqual(job["for_occupation"], job["occupation"] == "cookery")
                 self.assertEqual(len(job["matched"]) + len(job["missing"]), required[job["id"]])
-                self.assertEqual(job["note"], "Representative sample, not a real listing")
-                if not job["for_occupation"]:
+                # The posting date is read from the ad and never passed on.
+                self.assertNotIn("created", job)
+                if not job["for_occupation"] and job["units_status"] == "mapped":
                     self.assertEqual(job["fit"], f"0 of {required[job['id']]} required units evidenced")
         self.assertEqual({c["code"] for c in body["all_courses"]},
                          {u["code"] for j in board for u in j["missing"]})
-        self.assertNotIn("%", json.dumps(body))
+        # Only what the server writes; a "%" inside an ad's own words is the
+        # employer's shift loading, and quoting it verbatim is the point.
+        self.assertNotIn("%", json.dumps([j["fit"] for j in board]))
+
+    def test_match_says_which_snapshot_the_board_came_from(self):
+        """Adzuna's mark and the snapshot date both need this."""
+        status, body = self.post_json("/api/match", {"occupation": "cookery",
+                                                     "evidenced_units": []})
+        self.assertEqual(status, 200)
+        self.assertEqual(body["jobs_source"]["source"], "Adzuna")
+        self.assertEqual(body["jobs_source"]["attribution"], "Jobs by Adzuna")
+        self.assertRegex(body["jobs_source"]["fetched_at"], r"^\d{4}-\d{2}-\d{2}T")
+
+    def test_an_ad_with_no_units_is_listed_and_never_counted_as_zero_of_zero(self):
+        """Both empty cases reach the page whole, with their own wording, and
+        no division by zero on the way."""
+        status, body = self.post_json("/api/match", {"occupation": "cookery",
+                                                     "evidenced_units": []})
+        self.assertEqual(status, 200)
+        by_status = {}
+        for job in body["all_jobs"]:
+            by_status.setdefault(job["units_status"], []).append(job)
+        self.assertTrue(by_status.get("mapped"))
+        for job in by_status.get("none_named", []):
+            with self.subTest(job=job["id"]):
+                self.assertEqual(job["fit"], app.d7_match.NONE_NAMED_FIT)
+                self.assertEqual((job["matched"], job["missing"]), ([], []))
+        for job in by_status.get("not_mapped", []):
+            with self.subTest(job=job["id"]):
+                self.assertEqual(job["fit"], app.d7_match.NOT_MAPPED_FIT)
+        for job in by_status.get("mapped", []):
+            with self.subTest(job=job["id"]):
+                self.assertRegex(job["fit"], r"^\d+ of [1-9]\d* required units evidenced$")
 
     def test_match_uses_a_transcript_when_one_is_sent(self):
         units = [{"code": "SITXFSA005", "sources": [["transcript", "t=02:41"]]}]
@@ -302,25 +356,61 @@ class IntakeApi(Server):
                 self.assertNotIn("roster", resume["text"])
                 self.assertNotIn("nobody there issued", resume["text"])
 
-    def test_the_mock_fixture_is_what_the_server_returns_for_the_demo(self):
-        """?mock=1 must show the same board and resumes as the real server."""
+    def fixture_match(self):
         page = app.INTAKE_PAGE.read_text(encoding="utf-8")
         block = page.split("const FIXTURE_MATCH = {")[1].split("\n};")[0]
         def rows(name, closer):
             body = block.split(f"  {name}: {closer[0]}\n")[1].split(f"\n  {closer[1]},")[0]
             return [line.strip().rstrip(",") for line in body.splitlines()]
-        fixture = {"jobs": [json.loads(r) for r in rows("jobs", "[]")],
-                   "courses": [json.loads(r) for r in rows("courses", "[]")],
-                   "resumes": json.loads("{" + ",".join(rows("resumes", "{}")) + "}"),
-                   "all_jobs": [json.loads(r) for r in rows("all_jobs", "[]")],
-                   "all_courses": [json.loads(r) for r in rows("all_courses", "[]")]}
+        return {"jobs": [json.loads(r) for r in rows("jobs", "[]")],
+                "courses": [json.loads(r) for r in rows("courses", "[]")],
+                "resumes": json.loads("{" + ",".join(rows("resumes", "{}")) + "}"),
+                "all_jobs": [json.loads(r) for r in rows("all_jobs", "[]")],
+                "all_courses": [json.loads(r) for r in rows("all_courses", "[]")]}
+
+    def test_the_mock_fixture_is_the_board_the_jobs_page_can_still_render(self):
+        """NEEDS DECISION. This test used to assert that ?mock=1 shows exactly
+        what the server returns. The board is real Adzuna ads now, and the
+        fixture lives in intake.html, which this package was told not to touch,
+        so the two have parted: mock mode demos the older invented board.
+
+        What is pinned here is what still has to hold. The fixture is the
+        sample board built from jobs.json, and it carries every field
+        jobs.html reads, so ?mock=1 renders end to end instead of crashing.
+        Regenerating the fixture from the live snapshot is a follow-up and
+        needs an intake.html edit.
+        """
+        fixture = self.fixture_match()
+        sample = {j["id"] for j in json.loads(
+            app.d7_match.SAMPLE_JOBS.read_text(encoding="utf-8"))}
+
+        self.assertTrue(fixture["all_jobs"])
+        self.assertEqual({j["id"] for j in fixture["all_jobs"]}, sample)
+        for job in fixture["all_jobs"]:
+            with self.subTest(job=job["id"]):
+                # What renderJobCard() and renderJobDetail() read off a job.
+                for field in ("id", "title", "location", "matched", "missing", "fit"):
+                    self.assertIn(field, job)
+                # employerLine() falls back to the sample's setting; without
+                # either, every card would be headed by a blank.
+                self.assertTrue(job.get("company") or job.get("setting"))
+        for job_id, draft in fixture["resumes"].items():
+            with self.subTest(job=job_id):
+                self.assertEqual(draft["job_id"], job_id)
+                self.assertTrue(draft["sections"]["job"].get("company")
+                                or draft["sections"]["job"].get("setting"))
+
+    def test_the_mock_fixture_no_longer_matches_the_live_board(self):
+        """The divergence above, stated as a fact rather than left implied: if
+        a later package regenerates the fixture, this test fails and is the
+        reminder to delete it along with the note above."""
+        fixture = self.fixture_match()
         units = [{"code": c, "sources": [["transcript", "t=02:41"]]} for c in ("SITXFSA005", "SITXFSA006")]
         status, body = self.post_json("/api/match", {"occupation": "cookery", "evidenced_units": units,
                                                      "transcript": DEMO_TRANSCRIPT})
         self.assertEqual(status, 200)
-        for key in ("jobs", "courses", "resumes", "all_jobs", "all_courses"):
-            with self.subTest(key=key):
-                self.assertEqual(fixture[key], body[key])
+        self.assertNotEqual({j["id"] for j in fixture["all_jobs"]},
+                            {j["id"] for j in body["all_jobs"]})
 
     def units_of(self, pack):
         return [{"code": code, "sources": item["sources"]}
@@ -408,23 +498,42 @@ class IntakeApi(Server):
                 self.assertNotIn("border", draft["text"])
                 self.assertNotIn(f"resume line {len(lines)}", draft["text"])
 
-    def test_the_resume_mock_fixtures_are_what_the_server_returns(self):
-        """?mock=1 on the resume path must show the same pack and board as the server."""
+    def constant(self, name):
         page = app.INTAKE_PAGE.read_text(encoding="utf-8")
+        return json.loads(page.split(f"const {name} = ")[1].split(";\n")[0])
 
-        def constant(name):
-            return json.loads(page.split(f"const {name} = ")[1].split(";\n")[0])
-
-        self.assertEqual(constant("SAMPLE_RESUME"), SAMPLE_RESUME)
+    def test_the_resume_mock_pack_is_what_the_server_returns(self):
+        """?mock=1 on the resume path must show the same pack as the server.
+        The pack is unchanged by real jobs: it is built from the resume alone."""
+        self.assertEqual(self.constant("SAMPLE_RESUME"), SAMPLE_RESUME)
         status, pack = self.post_json("/api/extract", resume())
         self.assertEqual(status, 200)
-        self.assertEqual(constant("FIXTURE_RESUME_EXTRACT"), pack)
+        self.assertEqual(self.constant("FIXTURE_RESUME_EXTRACT"), pack)
+
+    def test_the_resume_mock_board_is_the_sample_board_the_page_can_render(self):
+        """NEEDS DECISION, the same one as the interview fixture above: the
+        board is real ads now and this fixture is in intake.html, which this
+        package was told not to touch. It still has to render, so its shape is
+        pinned, and the divergence from the server is stated rather than
+        silently tolerated."""
+        fixture = self.constant("FIXTURE_RESUME_MATCH")
+        sample = {j["id"] for j in json.loads(
+            app.d7_match.SAMPLE_JOBS.read_text(encoding="utf-8"))}
+        self.assertEqual({j["id"] for j in fixture["all_jobs"]}, sample)
+        for job in fixture["all_jobs"]:
+            with self.subTest(job=job["id"]):
+                for field in ("id", "title", "location", "matched", "missing", "fit"):
+                    self.assertIn(field, job)
+                self.assertTrue(job.get("company") or job.get("setting"))
+
+        status, pack = self.post_json("/api/extract", resume())
+        self.assertEqual(status, 200)
         status, body = self.post_json("/api/match", {
             "source": "resume", "occupation": "cookery",
             "evidenced_units": self.units_of(pack), "resume": SAMPLE_LINES})
         self.assertEqual(status, 200)
-        body.pop("resume")
-        self.assertEqual(constant("FIXTURE_RESUME_MATCH"), body)
+        self.assertNotEqual({j["id"] for j in fixture["all_jobs"]},
+                            {j["id"] for j in body["all_jobs"]})
 
     def test_an_unknown_occupation_is_a_400_without_a_traceback(self):
         for path, data in (("/api/extract", cook(occupation="astronaut")),

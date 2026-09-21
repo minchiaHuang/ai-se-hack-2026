@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Jobs</title>
+<title>Jobs - Bridge Work</title>
 <style>
 /* The job platform the intake hands over to. Layout and colour follow a common
    job-board pattern (sidebar, tabbed top bar, filter pills, wide cards on grey,
@@ -112,6 +112,15 @@ svg.i { flex: none; width: 1.05em; height: 1.05em; }
          padding: .6rem 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); font-size: .92rem; }
 .fact { display: flex; align-items: center; gap: .4rem; min-width: 0; margin: 0; }
 
+/* "Jobs by Adzuna" is a licence requirement, not decoration: Adzuna's terms
+   require the mark to link to the ad and to be drawn at no less than
+   116x23 px. Do not shrink these two values or drop the link. */
+.adzuna { display: inline-flex; align-items: center; justify-content: center; min-width: 116px; min-height: 23px;
+          margin-top: .6rem; padding: 0 .5rem; border-radius: 6px; background: var(--pill); color: var(--accent);
+          font-size: .8rem; font-weight: 700; text-decoration: underline; }
+.source-line { margin: 0 0 .5rem; font-size: .88rem; color: var(--muted); }
+.source-line a { color: var(--accent); }
+
 /* The fit: unit coverage of this job, drawn as a ring. The caption carries the
    count it comes from; there is no label that grades the match or the person. */
 .fit { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .55rem;
@@ -123,6 +132,9 @@ svg.i { flex: none; width: 1.05em; height: 1.05em; }
              font-variant-numeric: tabular-nums; }
 .ring .pct small { font-size: .7rem; margin-left: 1px; }
 .fit .caption { font-size: .82rem; font-weight: 700; letter-spacing: .02em; text-transform: uppercase; }
+/* An ad that names no unit has nothing to divide, so the ring shows a dash
+   rather than a 0% that would read as a judgement of the person. */
+.ring .pct.none { font-size: 2rem; color: var(--ring-track); }
 
 .profile { position: sticky; top: 64px; align-self: start; max-height: calc(100vh - 64px); overflow: auto;
            padding: 16px 18px 32px; background: var(--card); border-left: 1px solid var(--line); }
@@ -131,6 +143,13 @@ svg.i { flex: none; width: 1.05em; height: 1.05em; }
 .job-detail ul { margin: .2rem 0; padding-left: 1.2rem; }
 .job-detail li { margin: .25rem 0; }
 .job-detail .cited { white-space: nowrap; }
+/* What the ad itself wrote down, kept visibly apart from what the job title
+   implies: a reader has to be able to tell the two sorts of unit apart. */
+.job-detail .basis-note { margin: .1rem 0 .4rem; font-size: .84rem; color: var(--muted); }
+.job-detail blockquote { margin: .15rem 0 .1rem; padding-left: .6rem; border-left: 3px solid var(--line);
+                         font-size: .88rem; color: var(--muted); overflow-wrap: anywhere; }
+.job-detail .unevidenced { font-size: .84rem; color: var(--muted); }
+.job-detail .snippet { font-size: .88rem; color: var(--muted); overflow-wrap: anywhere; }
 .fit-line { margin: .5rem 0; padding: .5rem .7rem; border-radius: 8px; background: var(--pill); font-weight: 700; }
 .other-note { padding: .4rem .6rem; background: var(--pill); border-radius: 6px; }
 .resume-panel { margin-top: 1rem; padding-top: .7rem; border-top: 1px solid var(--line); }
@@ -219,15 +238,14 @@ html:not([data-view=evidence]) #view-evidence, html:not([data-view=source]) #vie
 <body>
 <div class="shell">
   <aside class="sidebar">
-    <!-- NEEDS DECISION: no product name is settled, so the brand is a plain description. -->
-    <div class="brand"><span class="mark" aria-hidden="true"></span>Work history</div>
+    <div class="brand"><span class="mark" aria-hidden="true"></span>Bridge Work</div>
     <nav class="nav" aria-label="Views">
       <button type="button" data-view="jobs" id="nav-jobs">Jobs</button>
       <button type="button" data-view="evidence" id="nav-evidence">Your evidence</button>
       <button type="button" data-view="source" id="nav-source">Your resume</button>
       <a class="back" id="to-intake" href="/intake">Back to intake</a>
     </nav>
-    <p class="side-note">Every job here is a representative sample, not a real listing. Fit is shown to the jobseeker and consultant only, never to an employer.</p>
+    <p class="side-note" id="side-note">Coverage is shown to the jobseeker and consultant only, never to an employer.</p>
   </aside>
 
   <div class="main">
@@ -238,7 +256,7 @@ html:not([data-view=evidence]) #view-evidence, html:not([data-view=source]) #vie
         <button type="button" role="tab" id="tab-ours" data-ours="1">For your evidence <span class="badge" id="count-ours"></span></button>
       </div>
       <label class="search" id="search-label"><span class="visually-hidden">Search jobs</span>
-        <input type="search" id="job-search" placeholder="Search by job title or setting" autocomplete="off"></label>
+        <input type="search" id="job-search" placeholder="Search by job title or employer" autocomplete="off"></label>
     </header>
     <p id="mock-banner" class="banner" hidden>Mock mode: fixture data, no backend. Nothing is recorded or sent.</p>
 
@@ -252,10 +270,11 @@ html:not([data-view=evidence]) #view-evidence, html:not([data-view=source]) #vie
       <div class="board">
         <section class="list" aria-labelledby="h-jobs">
           <h2 id="h-jobs" class="visually-hidden">Jobs</h2>
+          <p class="source-line" id="jobs-source"></p>
           <div class="pills">
-            <label><span class="visually-hidden">Location</span><select id="filter-location"></select></label>
-            <label><span class="visually-hidden">Employment type</span><select id="filter-type"></select></label>
-            <label><span class="visually-hidden">Level</span><select id="filter-level"></select></label>
+            <label><span class="visually-hidden" id="facet-0-label"></span><select id="facet-0" aria-labelledby="facet-0-label"></select></label>
+            <label><span class="visually-hidden" id="facet-1-label"></span><select id="facet-1" aria-labelledby="facet-1-label"></select></label>
+            <label><span class="visually-hidden" id="facet-2-label"></span><select id="facet-2" aria-labelledby="facet-2-label"></select></label>
           </div>
           <p class="small muted shown" id="jobs-shown" aria-live="polite"></p>
           <div class="jobs" id="jobs"></div>
@@ -317,8 +336,9 @@ const state = {
   extract: session ? session.extract : null,
   match: session ? session.match : null,
   selectedJob: null, // null means the first job listed
-  // "" means any. onlyOurs is the top bar's tab: the occupation's jobs, or all of them.
-  filters: { q: "", location: "", type: "", level: "", onlyOurs: false },
+  // facets maps a job field to the one value kept; "" or absent means any.
+  // onlyOurs is the top bar's tab: the occupation's jobs, or all of them.
+  filters: { q: "", facets: {}, onlyOurs: false },
   view: "jobs",      // "jobs", "evidence" or "source"
 };
 
@@ -347,6 +367,7 @@ const ICONS = {
   clock: "M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zm0 2a7 7 0 1 1 0 14 7 7 0 0 1 0-14zm-1 2v6l5 3 1-1.7-4-2.3V7z",
   level: "M4 20V13h4v7zm6 0V8h4v12zm6 0V4h4v16z",
   shift: "M7 2v2H5a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-2V2h-2v2H9V2zM5 9h14v10H5z",
+  pay: "M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 2a8 8 0 1 1 0 16 8 8 0 0 1 0-16zm1 2h-2v1.1c-1.2.2-2 1.1-2 2.3 0 1.5 1.3 2.1 2.6 2.5 1.1.3 1.4.6 1.4 1.1s-.5.9-1.3.9c-.9 0-1.5-.4-1.6-1.1H8.9c.1 1.3 1 2.1 2.1 2.3V16h2v-1.1c1.3-.2 2.1-1.1 2.1-2.4 0-1.6-1.4-2.2-2.7-2.5-1-.3-1.3-.6-1.3-1s.4-.8 1.1-.8c.8 0 1.3.4 1.4 1h1.8c-.1-1.2-.9-2-2.1-2.2z",
   search: "M10 3a7 7 0 1 0 4.2 12.6l5.1 5.1 1.4-1.4-5.1-5.1A7 7 0 0 0 10 3zm0 2a5 5 0 1 1 0 10 5 5 0 0 1 0-10z",
   building: "M4 21V3h11v5h5v13h-7v-4h-2v4zm2-2h3v-4h6v4h3V10h-5V5H6zm2-11h2v2H8zm4 0h2v2h-2zm-4 4h2v2H8zm4 0h2v2h-2z",
   jobs: "M9 3h6a2 2 0 0 1 2 2v2h3a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h3V5a2 2 0 0 1 2-2zm0 4h6V5H9zM4 9v10h16V9z",
@@ -506,14 +527,24 @@ function boardJobs(match) {
   return match.all_jobs || match.jobs.map(job => Object.assign({ for_occupation: true }, job));
 }
 
+// The three filter pills, as [job field, label]. A real Adzuna ad carries the
+// first set; ?mock=1 still hands us the older sample board, whose jobs carry
+// employment_type and level instead, so the pills follow the data.
+const REAL_FACETS = [["location", "location"], ["contract_time", "employment type"],
+                     ["contract_type", "contract type"]];
+const SAMPLE_FACETS = [["location", "location"], ["employment_type", "employment type"],
+                       ["level", "level"]];
+
+function facetsFor(board) {
+  return board.some(job => job.contract_time || job.contract_type) ? REAL_FACETS : SAMPLE_FACETS;
+}
+
 function visibleJobs(match) {
   const f = state.filters;
   const q = f.q.trim().toLowerCase();
   return boardJobs(match).filter(job =>
     (!q || (job.title + " " + employerLine(job)).toLowerCase().includes(q)) &&
-    (!f.location || job.location === f.location) &&
-    (!f.type || job.employment_type === f.type) &&
-    (!f.level || job.level === f.level) &&
+    Object.entries(f.facets).every(([key, value]) => !value || job[key] === value) &&
     (!f.onlyOurs || job.for_occupation));
 }
 
@@ -532,10 +563,21 @@ function selectJob(id) {
   if (button) button.focus({ preventScroll: true });
 }
 
-// The name the search reads and the company line shows. Sample jobs name a
-// setting, never an employer; a real listing's company goes here.
+// The name the search reads and the company line shows: the employer who
+// placed the ad. ?mock=1 still carries the older sample board, whose jobs name
+// a setting instead of an employer, so that is the fallback.
 function employerLine(job) {
-  return job.company || job.setting;
+  return job.company || job.setting || "Employer not named in the ad";
+}
+
+// Adzuna's licence: every ad carries the mark, linking to that ad, drawn at no
+// less than 116x23 px (see .adzuna in the stylesheet). The click must not also
+// select the card underneath, or the board would jump as the tab opens.
+function adzunaLink(job, meta) {
+  if (!job.redirect_url) return null;
+  return el("a", { class: "adzuna", href: job.redirect_url, target: "_blank", rel: "noopener",
+                   onclick: event => event.stopPropagation() },
+            (meta && meta.attribution) || "Jobs by Adzuna");
 }
 
 // The one place the line under a job title is drawn: who is hiring, then which
@@ -548,10 +590,25 @@ function renderCompany(job) {
 // Unit coverage of this job: the share of the units it requires that the evidence
 // covers. It is worked out here from the server's count, so the percentage and
 // its caption can never disagree. It describes the job, not the person.
+//
+// An ad that names no unit has no denominator. percent is null, never 0: a 0%
+// ring would read as a verdict on the person when the truth is that the ad
+// asked for nothing we could count.
 function coverage(job) {
   const required = job.matched.length + job.missing.length;
   return { evidenced: job.matched.length, required,
-           percent: required ? Math.round(100 * job.matched.length / required) : 0 };
+           percent: required ? Math.round(100 * job.matched.length / required) : null };
+}
+
+// What the ring says when there is no percentage. The server sends
+// units_status; a board without it (the older sample fixture) always counted.
+const NO_COVERAGE = {
+  none_named: "Ad too short to name units",
+  not_mapped: "Ad not mapped to units",
+};
+
+function noCoverageReason(job) {
+  return NO_COVERAGE[job.units_status] || "No units to count";
 }
 
 // The one place the fit is drawn, on a card ("card") or in the side panel
@@ -559,13 +616,16 @@ function coverage(job) {
 // No label grades it: no "good" or "strong" match.
 function renderFit(job, where) {
   const { evidenced, required, percent } = coverage(job);
-  const caption = evidenced + " of " + required + " units evidenced";
-  if (where === "panel") return el("p", { class: "fit-line" }, percent + "% unit coverage: " + caption);
+  const none = percent === null;
+  const caption = none ? noCoverageReason(job) : evidenced + " of " + required + " units evidenced";
+  if (where === "panel") {
+    return el("p", { class: "fit-line" }, none ? caption : percent + "% unit coverage: " + caption);
+  }
   const radius = 40, circumference = 2 * Math.PI * radius;
   const svg = document.createElementNS(SVG, "svg");
   svg.setAttribute("viewBox", "0 0 92 92");
   svg.setAttribute("aria-hidden", "true");
-  for (const [stroke, dash] of [["var(--ring-track)", null], ["var(--ring)", circumference * (1 - percent / 100)]]) {
+  for (const [stroke, dash] of [["var(--ring-track)", null], ["var(--ring)", circumference * (1 - (percent || 0) / 100)]]) {
     const circle = document.createElementNS(SVG, "circle");
     for (const [key, value] of Object.entries({ cx: 46, cy: 46, r: radius, fill: "none", stroke, "stroke-width": 6 })) {
       circle.setAttribute(key, value);
@@ -575,12 +635,15 @@ function renderFit(job, where) {
       circle.setAttribute("stroke-dasharray", String(circumference));
       circle.setAttribute("stroke-dashoffset", String(dash));
       // A round cap on an empty arc would still draw a dot and read as some coverage.
-      if (!evidenced) circle.setAttribute("stroke", "none");
+      if (none || !evidenced) circle.setAttribute("stroke", "none");
     }
     svg.append(circle);
   }
-  return el("div", { class: "fit", role: "img", "aria-label": percent + " percent unit coverage, " + caption },
-    el("div", { class: "ring" }, svg, el("span", { class: "pct" }, el("span", {}, String(percent), el("small", {}, "%")))),
+  const label = none ? caption : percent + " percent unit coverage, " + caption;
+  const middle = none ? el("span", { class: "pct none" }, "\u2014")
+                      : el("span", { class: "pct" }, el("span", {}, String(percent), el("small", {}, "%")));
+  return el("div", { class: "fit", role: "img", "aria-label": label },
+    el("div", { class: "ring" }, svg, middle),
     el("span", { class: "caption" }, caption));
 }
 
@@ -588,21 +651,34 @@ function fact(name, text, label) {
   return text ? el("p", { class: "fact" }, icon(name), el("span", { class: "visually-hidden" }, label + ": "), text) : null;
 }
 
-function renderJobCard(job, selected) {
+// The tag row says only what a reader could not otherwise see: that an ad named
+// nothing, and that a job belongs to another occupation. A real ad needs no
+// "sample" tag, and the sample fixture still carries its note.
+function cardTags(job) {
+  return [job.note ? el("span", { class: "tag" }, job.note) : null,
+          job.units_status && job.units_status !== "mapped"
+            ? el("span", { class: "tag" }, noCoverageReason(job)) : null,
+          job.for_occupation ? null : el("span", { class: "tag" }, "Another occupation")];
+}
+
+function renderJobCard(job, selected, meta) {
   return el("article", { class: "job-card" + (selected ? " selected" : ""), "data-id": job.id,
                          onclick: () => selectJob(job.id) },
     el("div", { class: "job-main" },
       el("div", { class: "job-top" },
         el("div", { class: "logo" }, icon("building")),
         el("div", {},
-          el("div", { class: "tags" },
-            el("span", { class: "tag" }, job.note || "Representative sample, not a real listing"),
-            job.for_occupation ? null : el("span", { class: "tag" }, "Another occupation")),
+          el("div", { class: "tags" }, cardTags(job)),
           el("h3", {}, el("button", { type: "button", "aria-pressed": String(selected) }, job.title)),
           renderCompany(job))),
       el("div", { class: "facts" },
         fact("pin", job.location, "Location"), fact("clock", job.employment_type, "Employment type"),
-        fact("shift", job.shift, "Hours"), fact("level", job.level, "Level"))),
+        // Only a salary the employer stated reaches here; a predicted one is
+        // dropped when the snapshot is built, so the card says nothing at all
+        // about pay rather than showing a guess.
+        fact("pay", job.salary, "Salary stated by the employer"),
+        fact("shift", job.shift, "Hours"), fact("level", job.level, "Level")),
+      adzunaLink(job, meta)),
     renderFit(job, "card"));
 }
 
@@ -621,35 +697,77 @@ function citeButtons(unit) {
        ref.short)]);
 }
 
-function renderJobDetail(match, job) {
+// A required unit is either quoted from the ad itself or rests on the job
+// title. They are listed apart and labelled in plain English, because a reader
+// has to be able to see which of them the employer actually wrote down. A unit
+// with no basis at all is the older sample board's shape, grouped last.
+const BASIS_GROUPS = [
+  ["stated", "The ad says it needs this"],
+  ["title", "Jobs with this title normally need this"],
+  ["", "Units this job requires"],
+];
+
+function renderUnit(unit, evidenced) {
+  return el("li", {},
+    el("span", { class: "code" }, unit.code), " ", unit.title,
+    unit.quote ? el("blockquote", {}, "“", unit.quote, "”") : null,
+    evidenced ? el("div", { class: "small" }, "Evidenced in this " + sourceWord() + " ",
+                   el("span", { class: "cited" }, "(", citeButtons(unit), ")"))
+              : el("div", { class: "unevidenced" }, "Not evidenced yet"));
+}
+
+function renderUnitGroups(job) {
+  const required = [...job.matched.map(u => [u, true]), ...job.missing.map(u => [u, false])];
+  const groups = BASIS_GROUPS.map(([basis, heading]) => {
+    const mine = required.filter(([unit]) => (unit.basis || "") === basis);
+    return mine.length ? el("div", {}, el("h4", {}, heading),
+                             el("ul", {}, mine.map(([unit, evidenced]) => renderUnit(unit, evidenced)))) : null;
+  }).filter(Boolean);
+  if (!groups.length) return null;
+  return el("div", {}, ...groups,
+    el("p", { class: "basis-note" }, "Both groups count towards the coverage ring above."));
+}
+
+function renderJobDetail(match, job, meta) {
   const panel = $("job-detail");
   if (!job) {
     panel.replaceChildren(el("h3", { id: "h-detail" }, "No job selected"),
-                          el("p", { class: "empty" }, "No sample job matches this search and these filters."));
+                          el("p", { class: "empty" }, "No job matches this search and these filters."));
     return;
   }
   const courses = Object.fromEntries((match.all_courses || match.courses).map(c => [c.code, c]));
+  const noUnits = job.units_status && job.units_status !== "mapped";
   // Through el() so a part left out as null is skipped, not written as "null".
   panel.replaceChildren(...el("div", {},
-    el("span", { class: "tag" }, job.note || "Representative sample, not a real listing"),
+    el("div", { class: "tags" }, cardTags(job)),
     el("h3", { id: "h-detail" }, job.title),
     renderCompany(job),
-    el("p", { class: "muted small" }, [job.location, job.employment_type, job.shift, job.level].filter(Boolean).join(" · ")),
+    el("p", { class: "muted small" },
+      [job.location, job.employment_type, job.salary, job.shift, job.level].filter(Boolean).join(" · ")),
     renderFit(job, "panel"),
+    // The two empty cases are different facts and are never merged: one ad was
+    // read and asked for nothing checkable, the other was never read at all.
+    job.units_status === "none_named" ? el("p", { class: "other-note small" },
+      "This ad was read and is too short to name a unit of competency. There is nothing to count, so it has no " +
+      "coverage percentage. Open it on Adzuna to read the full listing.") : null,
+    job.units_status === "not_mapped" ? el("p", { class: "other-note small" },
+      "This ad was not mapped to units, so nothing about it has been counted. It is listed so no job is hidden. " +
+      "Open it on Adzuna to read the full listing.") : null,
     job.for_occupation ? null : el("p", { class: "other-note small" },
       "This job is for a " + job.occupation_label + ". It asks for units from another qualification, and nothing in this " +
       sourceWord() + " evidences them. It is listed so no job is hidden, not as a match."),
-    el("h4", {}, "Evidenced in this " + sourceWord()),
-    job.matched.length ? el("ul", {}, job.matched.map(unit =>
-      el("li", {}, el("span", { class: "code" }, unit.code), " ", unit.title, " ",
-         el("span", { class: "cited" }, "(", citeButtons(unit), ")"))))
-      : el("p", { class: "muted small" }, "None of this job's units yet."),
+    noUnits ? null : renderUnitGroups(job),
     el("h4", {}, "Still to evidence: gap training for this job"),
     job.missing.length ? el("ul", {}, job.missing.map(unit => {
       const course = courses[unit.code];
       return el("li", {}, el("span", { class: "code" }, unit.code), " ", unit.title,
         course ? el("div", { class: "small muted" }, course.qualification + ". " + course.note) : null);
-    })) : el("p", { class: "muted small" }, "None: every unit this job asks for is evidenced.")).childNodes);
+    })) : el("p", { class: "muted small" }, noUnits
+        ? "Nothing to list: this ad names no unit."
+        : "None: every unit this job asks for is evidenced."),
+    job.snippet ? el("div", {}, el("h4", {}, "From the ad"),
+                      el("p", { class: "snippet" }, job.snippet)) : null,
+    adzunaLink(job, meta)).childNodes);
 }
 
 function transcriptRef(t) {
@@ -683,7 +801,7 @@ function renderResume(match, job) {
   const resume = job && match.resumes ? match.resumes[job.id] : null;
   if (!resume) {
     panel.replaceChildren(el("h3", { id: "h-resume" }, "Draft resume for this job"),
-      el("p", { class: "empty" }, !job ? "No sample job selected, so no resume yet." :
+      el("p", { class: "empty" }, !job ? "No job selected, so no resume yet." :
         "No draft for this job: none of the units it asks for is evidenced, so a resume for it would claim nothing it needs."));
     return;
   }
@@ -700,7 +818,8 @@ function renderResume(match, job) {
        " by order alone: the units it asks for, and the lines that evidence them, come first (bar on the left). Nothing is added. The jobseeker checks it before it goes anywhere."),
     el("article", { class: "resume-doc", lang: "en" },
       el("p", { class: "kicker" }, "Draft resume"),
-      el("h3", {}, "For: " + doc.job.title + ", " + doc.job.setting + (doc.job.location ? ", " + doc.job.location : "")),
+      el("h3", {}, "For: " + [doc.job.title, doc.job.company || doc.job.setting, doc.job.location]
+                              .filter(Boolean).join(", ")),
       el("h4", {}, "Work experience"),
       el("p", { class: "small muted" }, fromResume ? "From the jobseeker's own resume" : "The jobseeker's own account, translated"),
       doc.experience.length ? el("ul", {}, doc.experience.map(line =>
@@ -726,13 +845,27 @@ function fillFilter(select, label, values, current) {
     ...values.map(value => el("option", { value, selected: value === current }, value)));
 }
 
+// The snapshot is committed so the demo runs offline, which means the board is
+// as old as the fetch. Saying when it was taken is part of showing real ads.
+function renderSource(meta) {
+  const line = $("jobs-source");
+  if (!meta || !meta.fetched_at) { line.textContent = ""; return; }
+  const day = String(meta.fetched_at).slice(0, 10);
+  line.replaceChildren((meta.source || "Adzuna") + " snapshot taken " + day +
+    ", committed so the demo runs offline. Every card links to the ad on ",
+    el("a", { href: "https://www.adzuna.com.au/", target: "_blank", rel: "noopener" }, "Adzuna"), ".");
+}
+
 function renderMatches() {
   const match = state.match;
+  const meta = match.jobs_source;
   const board = boardJobs(match);
   const unique = key => [...new Set(board.map(job => job[key]).filter(Boolean))].sort();
-  fillFilter($("filter-location"), "location", unique("location"), state.filters.location);
-  fillFilter($("filter-type"), "employment type", unique("employment_type"), state.filters.type);
-  fillFilter($("filter-level"), "level", unique("level"), state.filters.level);
+  renderSource(meta);
+  facetsFor(board).forEach(([key, label], i) => {
+    $("facet-" + i + "-label").textContent = label[0].toUpperCase() + label.slice(1);
+    fillFilter($("facet-" + i), label, unique(key), state.filters.facets[key] || "");
+  });
   const ours = board.filter(job => job.for_occupation).length;
   $("count-ours").textContent = String(ours);
   $("count-all").textContent = String(board.length);
@@ -741,12 +874,12 @@ function renderMatches() {
   const visible = visibleJobs(match);
   const selectedId = selectedJobId(visible);
   const selected = visible.find(job => job.id === selectedId) || null;
-  $("jobs-shown").textContent = visible.length + " of " + board.length + " sample jobs shown. " +
+  $("jobs-shown").textContent = visible.length + " of " + board.length + " jobs shown. " +
     ours + " are for your evidence and come first, best evidenced first. Coverage counts units evidenced in this " +
     sourceWord() + " against the units a job requires; it describes the job, not the person.";
-  $("jobs").replaceChildren(...(visible.length ? visible.map(job => renderJobCard(job, job.id === selectedId))
-                                               : [el("p", { class: "empty" }, "No sample job matches this search and these filters.")]));
-  renderJobDetail(match, selected);
+  $("jobs").replaceChildren(...(visible.length ? visible.map(job => renderJobCard(job, job.id === selectedId, meta))
+                                               : [el("p", { class: "empty" }, "No job matches this search and these filters.")]));
+  renderJobDetail(match, selected, meta);
   renderResume(match, selected);
 }
 
@@ -776,9 +909,12 @@ if (!session) {
   for (const tab of document.querySelectorAll(".tabs [role=tab]")) {
     tab.addEventListener("click", () => { state.filters.onlyOurs = tab.dataset.ours === "1"; renderMatches(); });
   }
-  $("filter-location").addEventListener("change", event => { state.filters.location = event.target.value; renderMatches(); });
-  $("filter-type").addEventListener("change", event => { state.filters.type = event.target.value; renderMatches(); });
-  $("filter-level").addEventListener("change", event => { state.filters.level = event.target.value; renderMatches(); });
+  facetsFor(boardJobs(state.match)).forEach(([key], i) => {
+    $("facet-" + i).addEventListener("change", event => {
+      state.filters.facets[key] = event.target.value;
+      renderMatches();
+    });
+  });
   $("job-search").addEventListener("input", event => { state.filters.q = event.target.value; renderMatches(); });
   setView("jobs");
   renderPack();

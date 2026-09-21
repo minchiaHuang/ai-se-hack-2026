@@ -4,8 +4,8 @@ A consultant at a refugee employment service and a jobseeker who has no papers s
 The jobseeker describes their work in their own language. The system turns what they said into an
 **evidence pack**: the ANZSCO and OSCA occupation codes, the Australian units of competency the
 account supports, and the qualification it points towards. Every item links back to the transcript
-line it came from. It also matches the evidenced units against sample jobs, lists the units still to
-evidence as gap training, and drafts a resume.
+line it came from. It also matches the evidenced units against real Sydney job ads, lists the units
+still to evidence as gap training, and drafts a resume.
 
 The interview is the main way in, because most people this serves have no papers to bring. Someone
 who does hold a partial written record, such as an overseas resume that nobody has mapped to
@@ -107,7 +107,7 @@ resume that isn't the sample gets a gaps-only pack and an empty job board.
                      + withheld items + unanswered fields + the occupation's legal gate
                                                             │ evidenced units only
                                                             ▼
-                                         /api/match ──► sample jobs for the occupation
+                                         /api/match ──► real Adzuna ads for the occupation
                                                         (fit = "N of M required units evidenced")
                                                     ──► gap units (missing units → RTO)
                                                     ──► a draft resume tailored to each job
@@ -115,15 +115,16 @@ resume that isn't the sample gets a gaps-only pack and an empty job board.
 
 | Module | What it does |
 |---|---|
-| `skeleton/app.py` | Standard-library HTTP server. It serves `/intake` and the three JSON routes (`/api/transcribe`, `/api/extract`, `/api/match`), plus the older scenario pages at `/`. It also picks the stub or the live model. On the resume path, the offline stub answers only the built-in sample resume (`skeleton/demo_data/canned/d7_resume.json`). `/api/match` returns a tailored resume for every job (`resumes`), and keeps the best-fit job's draft as `resume`. |
-| `skeleton/web/intake.html` | The two-person intake page: one inline HTML file with vanilla JS. It opens on a start screen with two ways in: the interview, or a resume pasted or uploaded as `.txt`. It has language choice, consent, recording or the resume input, a bilingual transcript or the numbered resume lines, the evidence pack and the legal gate. Matches appear as a job-board list, with location and employment-type filters. Each card shows a count panel ("N of M required units evidenced") instead of a percentage. There are also the gap units and a side panel with the selected job's resume, which can be copied or printed on its own. |
+| `skeleton/app.py` | Standard-library HTTP server. It serves `/intake`, the jobs board at `/jobs`, and the three JSON routes (`/api/transcribe`, `/api/extract`, `/api/match`), plus the older scenario pages at `/`. It also picks the stub or the live model. On the resume path, the offline stub answers only the built-in sample resume (`skeleton/demo_data/canned/d7_resume.json`). `/api/match` returns a tailored resume for every job (`resumes`), and keeps the best-fit job's draft as `resume`. |
+| `skeleton/web/intake.html` | The two-person intake page: one inline HTML file with vanilla JS. It opens on a start screen with two ways in: the interview, or a resume pasted or uploaded as `.txt`. It has language choice, consent, recording or the resume input, a bilingual transcript or the numbered resume lines, the evidence pack and the legal gate. It then hands the pack to the jobs board in `sessionStorage` and navigates to `/jobs`. |
+| `skeleton/web/jobs.html` | The jobs board at `/jobs`, its own page. It reads the pack the intake left in `sessionStorage` and calls no endpoint. Cards carry the real ad's title, employer, location, employment type, an employer-stated salary where the ad gave one, and the "Jobs by Adzuna" link. Filters are location, employment type and contract type. Each card has a coverage ring with "N of M units evidenced" beneath it. The side panel splits the units the ad states from the units the job title implies, quotes the words each came from, and lists the gap units and the selected job's draft resume, which can be copied or printed on its own. |
 | `skeleton/core/pipeline.py` | The shared path every direction runs through: `guard` → `prepare` → model → split by confidence → gaps → metric. |
 | `skeleton/core/schema.py` | Data shapes. A suggestion with no source cannot be constructed, and anything below the confidence threshold is withheld. |
 | `skeleton/core/model.py` | `StubModel`, which returns canned suggestions so the pipeline runs offline. |
 | `skeleton/core/live.py` | Real ElevenLabs Scribe and Anthropic Messages calls over `urllib`, both falling back to offline. It drops any model item whose code is not among the candidates, or whose source is not in what was submitted: a timestamp the transcript does not have, or a line the resume does not have. Sources are checked as (label, locator) pairs, so a resume line cannot stand in for a timestamp or the reverse. |
 | `skeleton/core/registry.py` | Reads the reference data: both classification codes, the units, the qualification, and an optional check that the qualification's source PDF is reachable. |
 | `skeleton/directions/d7_credentials.py` | Direction 7: the red lines (`guard`), what the model sees (`prepare`: the transcript, or on the resume path the numbered resume lines), the fields asked for, and the metric. It holds both language lists: `SUPPORTED_LANGUAGES` for speech and `WRITTEN_LANGUAGES` for a resume. |
-| `skeleton/directions/d7_match.py` | Job matching, gap units and one draft resume per job, all built without a model. A resume is tailored by ordering alone: the units a job requires, and the lines that evidence them, move to the top, and nothing is added. On the resume path the drafts cite `[resume line N]` instead of a timestamp. |
+| `skeleton/directions/d7_match.py` | Job matching against the committed Adzuna snapshot, gap units and one draft resume per job, all built without a model. It carries each required unit's verbatim quote and its basis (`stated` or `title`) through to the page, and reports an ad that names no unit as its own case rather than as nought out of nought. A resume is tailored by ordering alone: the units a job requires, and the lines that evidence them, move to the top, and nothing is added. On the resume path the drafts cite `[resume line N]` instead of a timestamp. |
 
 ### `/api/extract` and `/api/match`
 
@@ -134,7 +135,9 @@ no `source`, or any other value, is treated as an interview. Malformed resume li
 - `/api/extract` also takes `occupation`, `language` and `consent`. Each item's `sources` is
   `[["transcript", "t=MM:SS"]]` for the interview or `[["resume", "line=N"]]` for a resume. On the
   resume path `metric_name` reads "evidence items mapped to a resume line".
-- `/api/match` also takes `occupation` and `evidenced_units`. Lines with no `en` are left out of the
+- `/api/match` also takes `occupation` and `evidenced_units`, and returns `jobs_source` with the
+  snapshot's `source`, `fetched_at` and `attribution` so the board can state where the ads came
+  from and when. Lines with no `en` are left out of the
   drafts, because the draft is written in English. The page sends an English resume as its own
   English gloss. A Mandarin or Arabic resume is not translated, so its drafts list units and
   qualifications but quote no lines.
@@ -179,10 +182,14 @@ There is **no database**. The reference data is two JSON files in the repository
   - its assessing authority. `verified: false` marks the ones not yet confirmed;
   - the **legal gate** for the occupation, with its government source. Examples are the aged care
     worker screening requirement and the NSW Food Safety Supervisor rule.
-- `skeleton/demo_data/reference/jobs.json` holds 17 sample jobs: 9 for cooks, 4 for welders and 4
-  for aged care. Each has a title, a setting, a location in NSW, an employment type (full-time,
-  part-time or casual), a level, a shift and the units it requires. Each is marked "Representative
-  sample, not a real listing".
+- `skeleton/demo_data/reference/jobs_adzuna.json` holds the jobs the board shows. They are **real
+  Sydney advertisements from the Adzuna public API**, fetched by `skeleton/tools/fetch_jobs.py` and
+  committed as a snapshot, so the demo runs offline and shows the same board every time. The file
+  records `source`, `fetched_at` and the attribution alongside the ads, and the page states the
+  snapshot date.
+- `skeleton/demo_data/reference/jobs.json` holds the 17 invented sample jobs the board used before
+  real ads landed. Nothing in the product reads it now; it stays on disk for the older scenario
+  pages, and `/intake?mock=1` still demos that board.
 
 **Why both ANZSCO and OSCA:** OSCA has replaced ANZSCO at the ABS, but migration still runs on
 ANZSCO, so each occupation carries both codes. Codes also move between the two. For example, ANZSCO
@@ -194,6 +201,38 @@ The superseded PDF still downloads, so the optional reachability check proves on
 exists, not that it is current. Currency comes from the seeded record.
 
 Three occupations are not the full ANZSCO. They were prepared by hand for this demo.
+
+### The jobs board: real ads, and what the percentage means
+
+Bridge Work shows real job advertisements, not invented ones, so the claim it makes can be checked
+against something a reader can open.
+
+- **Where they come from.** The Adzuna public API, fetched once by hand with
+  `ADZUNA_APP_ID=... ADZUNA_APP_KEY=... ANTHROPIC_API_KEY=... python3 -m skeleton.tools.fetch_jobs`.
+  Nothing is scraped. The snapshot is committed, so the demo runs with no network and no keys, and
+  the board is exactly as old as the fetch it records.
+- **What the percentage is.** **Unit coverage**: the units the ad requires that this person's
+  evidence covers, divided by the units the ad requires, `round(100 x evidenced / required)`. The
+  count it comes from is printed beneath it as "N of M units evidenced". It is **not** an AI
+  similarity or match score, there is no "good match" label anywhere, and it describes the job
+  against the evidence, never the person.
+- **`stated` and `title`.** Every required unit records which words it was read from. **stated**
+  means the ad itself says the job needs it, quoted from the ad. **title** means it is what a job
+  with that title normally requires, quoted from the title. The two are shown in separate, labelled
+  groups so a reader can see at a glance what the employer actually wrote down. Both count towards
+  the ring. Every quote is verbatim and at least 12 characters; a unit whose quote is in neither
+  the ad nor the title is dropped when the snapshot is built.
+- **Ads that name nothing.** An Adzuna snippet is a teaser, so some ads are too short to require
+  anything checkable. Those carry `required_units: []` and the card says the ad is too short to name
+  its units. An ad the mapping call never reached carries `null` and the card says it was not mapped.
+  Both are listed, neither is dropped, and neither shows a percentage: there is nothing to divide,
+  and a 0% would read as a verdict on the person.
+- **"Jobs by Adzuna" is a licence requirement.** Adzuna's terms require the mark on every ad,
+  linking to that ad and drawn at no less than 116x23 px. It is pinned as an explicit
+  `min-width` / `min-height` in `jobs.html` and by a test; do not shrink it or drop the link. The
+  same terms require a predicted salary to be labelled as predicted, so `fetch_jobs.py` keeps only
+  salaries the employer stated and the board shows no others rather than showing a guess.
+- **What the board never shows.** The posting date, applicant counts, and one-click apply.
 
 ## Red lines and failure paths
 
@@ -215,7 +254,8 @@ guessed in its place.
 | No model / model call fails | The canned answer comes back through the same pipeline. On the resume path it exists only for the built-in sample resume; any other resume gets gaps only. |
 
 Two further rules hold in `d7_match.py`. A job's fit is a count ("2 of 4 required units evidenced"),
-never a percentage or a score of the person. And the fit never appears in the resume.
+never a percentage or a score of the person; an ad that names no unit gets its own sentence instead
+of a count, so nothing ever divides by zero. And the fit never appears in the resume.
 
 ## Honest limits
 
@@ -224,7 +264,9 @@ never a percentage or a score of the person. And the fit never appears in the re
 - **Arabic is configured but not validated** by a native speaker. We do not claim it works well.
 - **The Mandarin demo transcripts were written with AI help.** They are fictional examples, not a
   real person's account.
-- **The jobs are representative samples**, not real listings.
+- **The jobs are real Adzuna ads, but the mapping to units is a model's reading of a ~500-character
+  teaser**, checked only by code: the quote must appear verbatim in the ad or its title. No employer
+  has confirmed that any of these units is what they meant.
 - **No ElevenLabs accuracy figure for Chinese is claimed.** We have not checked one.
 - **Audio retention settings at ElevenLabs have not been verified.** We make no claim of zero
   retention.
