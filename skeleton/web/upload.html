@@ -1,0 +1,505 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BridgeWork resume upload</title>
+<style>
+/* BridgeWork theme from the Figma "Design Theme" frame, the same tokens as
+   review.html. Inline and without external fonts: the page must render offline
+   from the stdlib server. */
+:root {
+  --primary: #1B4B5A;
+  --accent: #E8874A;
+  --success: #4C9A6B;
+  --bg: #F7F5F1;
+  --text: #2B2B2B;
+  --muted: #5b6168;
+  --card: #fff;
+  --line: #d9d4cb;
+  --warn: #7a4a00;
+  --warn-bg: #fff3d6;
+  --stop: #9b1111;
+  --stop-bg: #fdecec;
+  --focus: #ffbf00;
+}
+* { box-sizing: border-box; }
+html { font-size: 18px; }
+body {
+  margin: 0; background: var(--bg); color: var(--text);
+  font: 1rem/1.5 system-ui, -apple-system, "Segoe UI", "PingFang SC", "Noto Sans CJK SC", sans-serif;
+}
+header.top { display: flex; align-items: baseline; gap: 1.25rem; padding: 14px 24px;
+             border-bottom: 1px solid var(--line); background: var(--card); }
+.wordmark { font-size: 1.4rem; margin: 0; letter-spacing: -.01em; }
+.wordmark b { color: var(--text); }
+.wordmark span { color: var(--primary); font-weight: 400; }
+.step { color: var(--muted); font-weight: 600; }
+main { max-width: 1280px; margin: 0 auto; padding: 16px 24px 48px; }
+h2 { font-size: 1.2rem; margin: 0 0 .25rem; }
+h3 { font-size: 1rem; margin: 0; }
+p { margin: .3rem 0; }
+.muted { color: var(--muted); }
+.small { font-size: .88rem; }
+button, input, textarea, select { font: inherit; }
+:focus-visible { outline: 4px solid var(--focus); outline-offset: 2px; }
+button {
+  min-height: 44px; padding: .35rem 1rem; border-radius: 8px; cursor: pointer;
+  border: 2px solid var(--primary); background: var(--primary); color: #fff; font-weight: 600;
+}
+button.secondary { background: var(--card); color: var(--primary); }
+button.small-btn { min-height: 34px; padding: .1rem .7rem; font-size: .88rem; }
+button.go { background: var(--accent); border-color: var(--accent); color: #1f1a15; }
+button:disabled { background: #d1d5db; border-color: #9ca3af; color: #333; cursor: not-allowed; }
+[hidden] { display: none !important; }
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+.banner { padding: .5rem .8rem; border-radius: 6px; margin: 0 0 .75rem; font-weight: 600; }
+.banner.mock { background: var(--card); border: 2px dashed var(--line); font-weight: 500; }
+.banner.offline { background: var(--warn-bg); color: var(--warn); border: 2px solid var(--warn); }
+.banner.error { background: var(--stop-bg); color: var(--stop); border: 2px solid var(--stop); }
+
+/* Figma "Upload existing Resume" (node 10:347): a centred title and one large
+   dashed drop zone that is itself the button. */
+.pick { max-width: 640px; margin: 7vh auto 0; text-align: center; }
+.pick h1 { font-size: 1.6rem; color: var(--primary); margin: 0; }
+.pick .sub { color: var(--muted); font-size: .9rem; margin: .4rem 0 1.25rem; }
+.pick-opts { display: grid; gap: .5rem; justify-items: center; margin-bottom: 1rem; }
+.consent { display: flex; gap: .55rem; align-items: flex-start; cursor: pointer; text-align: left; font-size: .9rem; }
+.consent input { width: 22px; height: 22px; flex: none; margin-top: .1rem; accent-color: var(--primary); }
+.lang-pick { display: flex; gap: .6rem; align-items: center; font-weight: 600; font-size: .9rem; }
+.lang-pick select { padding: .25rem .5rem; border: 2px solid var(--line); border-radius: 6px; background: #fff; }
+button.drop { display: block; width: 100%; min-height: 0; padding: 56px 20px; border: 2px dashed #b9b3aa; border-radius: 14px;
+              background: var(--card); color: var(--primary); font-weight: 400; text-align: center; }
+button.drop:hover, button.drop.over { border-color: var(--primary); background: #eef4f5; }
+.drop svg { width: 48px; height: 48px; display: block; margin: 0 auto .8rem; }
+.drop strong { display: block; font-size: 1.4rem; }
+.drop .formats { display: block; color: var(--muted); font-size: .82rem; font-weight: 600; margin-top: .5rem; }
+.why { display: block; min-height: 1.4rem; margin-top: .6rem; color: var(--warn); font-weight: 600; }
+.back { color: var(--muted); font-size: .88rem; font-weight: 600; text-decoration: none; }
+.back:hover { color: var(--primary); text-decoration: underline; }
+
+/* Figma node 10:84: the wait, reworded for a resume. */
+.loading { max-width: 640px; margin: 22vh auto; text-align: center; }
+.loading h2 { font-size: 1.6rem; }
+.spinner { width: 56px; height: 56px; margin: 0 auto 1rem; border-radius: 50%;
+           border: 6px solid #e4ded3; border-top-color: var(--primary); animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .spinner { animation: none; border-top-color: var(--accent); } }
+
+/* The compare page: the original on the left, the optimised draft on the right. */
+.compare { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+.col { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 20px 24px; }
+.col-head { display: flex; align-items: baseline; justify-content: space-between; gap: .75rem;
+            border-bottom: 2px solid var(--primary); padding-bottom: .35rem; margin-bottom: .75rem; }
+.col-head h2 { color: var(--primary); }
+.tag { font-size: .75rem; font-weight: 800; letter-spacing: .05em; text-transform: uppercase;
+       border: 2px solid currentColor; border-radius: 999px; padding: 0 .5rem; white-space: nowrap; }
+.tag.orig { color: var(--muted); }
+.tag.draft { color: var(--accent); }
+pre.original { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font: inherit; line-height: 1.7; }
+.sec { border-top: 1px solid var(--line); padding: .6rem 0; }
+.sec:first-of-type { border-top: 0; padding-top: 0; }
+.sec-head { display: flex; align-items: center; gap: .6rem; }
+.sec-head h3 { flex: 1; font-size: .8rem; letter-spacing: .08em; text-transform: uppercase; color: var(--primary); }
+.sec .entry { margin: .2rem 0 .4rem; }
+.sec .entry-head { font-weight: 700; }
+.sec .entry-meta { color: var(--muted); font-size: .9rem; }
+.sec ul { margin: .2rem 0; padding-left: 1.2rem; }
+.sec .none { color: var(--warn); font-weight: 600; font-size: .9rem; }
+.form { display: grid; gap: .5rem; margin-top: .5rem; }
+.form label { display: grid; gap: .1rem; font-size: .85rem; font-weight: 600; }
+.form input, .form textarea { width: 100%; padding: .35rem .5rem; border: 2px solid var(--line); border-radius: 6px;
+                              background: #fff; color: var(--text); font-size: .95rem; }
+.form textarea { min-height: 4.5rem; resize: vertical; }
+.form fieldset { border: 1px solid var(--line); border-radius: 8px; padding: .4rem .6rem .6rem; margin: 0; display: grid; gap: .4rem; }
+.form legend { font-size: .85rem; font-weight: 700; padding: 0 .25rem; }
+.row { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; }
+.actions { display: flex; flex-wrap: wrap; gap: .6rem; justify-content: space-between; margin-top: 16px; }
+
+@media (max-width: 900px) {
+  .compare { grid-template-columns: 1fr; }
+  button.drop { padding: 36px 16px; }
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <p class="wordmark"><b>Bridge</b><span>Work</span></p>
+  <span class="step">Upload a resume</span>
+</header>
+<main>
+  <p id="mock-banner" class="banner mock" hidden>Mock mode: a fictional cook's Mandarin resume stands in for any file, no backend. Nothing is recorded or sent.</p>
+  <p id="offline" class="banner offline" role="status" hidden></p>
+  <p id="error" class="banner error" role="alert" hidden></p>
+
+  <section id="pick" class="pick" aria-labelledby="h-pick">
+    <h1 id="h-pick">Add the client's resume</h1>
+    <p class="sub">Any language, any format. We'll translate and clean it up next.</p>
+    <div class="pick-opts">
+      <label class="consent">
+        <input type="checkbox" id="consent">
+        <span>The jobseeker agrees that the resume they bring is read, translated and used to find matching jobs.</span>
+      </label>
+      <label class="lang-pick">Written in
+        <select id="lang">
+          <option value="zh" lang="zh">中文 (Chinese)</option>
+          <option value="ar" lang="ar">العربية (Arabic)</option>
+          <option value="en">English</option>
+        </select></label>
+    </div>
+    <!-- The whole zone is one button, as in the Figma frame: click or drop. -->
+    <button type="button" class="drop" id="drop">
+      <svg viewBox="0 0 48 48" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M24 30V8M14 17l10-10 10 10M7 30v10h34V30"/></svg>
+      <strong>Drop a file here, or click to choose</strong>
+      <!-- Figma lists DOCX, JPG and PNG; this version reads only PDF text and .txt. -->
+      <span class="formats">PDF or .txt &mdash; up to 2 MB. A PDF needs selectable text; scans and photos cannot be read.</span>
+    </button>
+    <input type="file" id="file" class="visually-hidden" tabindex="-1" aria-hidden="true" accept=".pdf,application/pdf,.txt,text/plain">
+    <span class="why" id="why" aria-live="polite"></span>
+    <p><a class="back" id="back" href="/intake">&larr; Back</a></p>
+  </section>
+
+  <section id="loading" class="loading" aria-live="polite" hidden>
+    <div class="spinner" aria-hidden="true"></div>
+    <h2>Reading, translating and polishing the resume…</h2>
+    <p class="muted small">This usually takes about 30 seconds. Nothing is final: every section comes back as a draft to check.</p>
+  </section>
+
+  <div id="compare-view" hidden>
+    <div class="compare">
+      <section class="col" aria-labelledby="h-orig">
+        <div class="col-head"><h2 id="h-orig">Original</h2><span class="tag orig" id="orig-tag"></span></div>
+        <pre class="original" id="original"></pre>
+      </section>
+      <section class="col" aria-labelledby="h-draft">
+        <div class="col-head"><h2 id="h-draft">Optimised for Australia</h2><span class="tag draft">Draft</span></div>
+        <p class="muted small">Translated and reworded from the original. Check each section against the left and edit anything that is wrong or missing.</p>
+        <div id="sections"></div>
+      </section>
+    </div>
+    <div class="actions">
+      <button type="button" class="secondary" id="restart">&larr; Use another file</button>
+      <button type="button" class="go" id="continue">Continue to review &rarr;</button>
+    </div>
+  </div>
+</main>
+
+<script>
+"use strict";
+
+// ?mock=1 runs the whole page against the fixtures below and makes no /api/
+// request at all: the demo is recorded in it.
+const params = new URLSearchParams(location.search);
+const MOCK = params.get("mock") === "1";
+
+// Read by /review. sessionStorage keeps the resume to this tab.
+const SECTIONS_KEY = "d7.sections";
+const INTERVIEW_KEY = "d7.interview";
+const asRoute = (route, file) => (location.protocol === "file:" ? file : route) + (MOCK ? "?mock=1" : "");
+const REVIEW_URL = asRoute("/review", "review.html");
+
+const MAX_TEXT_BYTES = 100 * 1024;
+const MAX_PDF_BYTES = 2 * 1024 * 1024;
+const LANGUAGE_NAME = { zh: "中文", ar: "العربية", en: "English" };
+
+// Same keys, labels and fields as review.html, so a section edited here is the
+// section the caseworker sees there.
+const SECTIONS = [
+  { key: "profile", label: "Profile" },
+  { key: "contacts", label: "Contacts" },
+  { key: "education", label: "Education",
+    fields: [["major", "Course or major"], ["school", "School"], ["location", "Location"], ["dates", "Dates"], ["description", "What was learned"]] },
+  { key: "employment", label: "Employment",
+    fields: [["position", "Position"], ["company", "Company"], ["location", "Location"], ["dates", "Dates"], ["description", "Main tasks"]] },
+  { key: "volunteer", label: "Volunteer Experience",
+    fields: [["role", "Role"], ["location", "Location"], ["dates", "Dates"], ["description", "What was done"]] },
+  { key: "skills", label: "Technical Skills" },
+  { key: "certificates", label: "Certificates" },
+];
+
+// ---------------------------------------------------------------- fixtures
+// The fictional cook Li Wei's resume in Mandarin, written from the team's
+// mock_interview_answers.json so it says what the interview says, nothing more.
+const MOCK_RESUME = `李伟
+电话：0400 000 000
+邮箱：liwei.cook@example.com
+
+个人简介
+做了六年厨师，一直是餐厅的主厨。每天给一百五十位客人做饭，从来没有出过食品安全问题。希望继续在厨房工作。
+
+工作经历
+主厨｜蓉香楼｜成都｜2016年–2022年，共六年
+每天早上从头熬高汤、做汤和酱汁，准备羊肉、牛肉和鸡肉菜品。
+生熟食物分开存放，每个班次记录冷库温度。
+
+志愿经历
+食物分发站志愿者｜社区中心｜去年至今，每周六，大约一年
+整理捐赠的食物，检查保质期，帮忙给大家做热饭。
+
+教育背景
+烹饪｜职业技术学校｜成都｜2012年–2014年
+学习中餐基本功和厨房卫生。
+
+技能
+商用厨房设备：蒸烤箱、大炒锅、切片机
+语言：普通话、四川话；英语在学习中
+
+证书
+中式烹调师证书（中国）`;
+
+// Exactly review.html's FIXTURE_SECTIONS (a test pins the two together), so the
+// upload path and the interview path land on the same /jobs board and the
+// match fixtures there stay valid.
+const FIXTURE_SECTIONS = {"profile": "Head cook with six years of experience running a restaurant kitchen. Proud of cooking for 150 guests a day without a single food safety problem. Looking to continue working in a kitchen.", "contacts": {"phone": "0400 000 000", "email": "liwei.cook@example.com"}, "education": [{"major": "Cooking", "school": "Vocational school", "location": "Chengdu", "dates": "2012 to 2014", "description": "Learned the basics of Chinese cooking and kitchen hygiene."}], "employment": [{"position": "Head Cook", "company": "Rongxiang Lou", "location": "Chengdu", "dates": "2016 to 2022, six years in total", "description": "Made stocks, soups and sauces from scratch every morning, and prepared lamb, beef and chicken dishes. Kept raw and cooked food apart, and recorded the cool-room temperature every shift."}], "volunteer": [{"role": "Food distribution volunteer", "location": "Community centre", "dates": "Since last year, every Saturday, about a year", "description": "Sorted donated food, checked use-by dates, and helped cook hot meals for people."}], "skills": ["Commercial kitchen equipment, including combi ovens, large woks and slicers", "Mandarin", "Sichuanese", "Learning English"], "certificates": ["Chinese cook certificate for Chinese cuisine (China)"]};
+
+function mockPolish() {
+  // Long enough that the processing state shows in the video.
+  return new Promise(resolve => setTimeout(() => resolve({ sections: clone(FIXTURE_SECTIONS) }), 2400));
+}
+
+// ---------------------------------------------------------------- state
+const state = {
+  consent: false,
+  language: "zh",
+  original: "",     // the text as extracted, shown unchanged on the left
+  sections: null,   // the polished sections, as edited here
+  editing: null,    // the key of the section open for editing
+};
+
+const $ = id => document.getElementById(id);
+const clone = value => JSON.parse(JSON.stringify(value));
+const joinParts = (...parts) => parts.map(p => String(p || "").trim()).filter(Boolean).join(", ");
+
+function el(tag, attrs, ...children) {
+  const node = document.createElement(tag);
+  for (const [key, value] of Object.entries(attrs || {})) {
+    if (value === null || value === undefined || value === false) continue;
+    if (key === "class") node.className = value;
+    else if (key.startsWith("on")) node.addEventListener(key.slice(2), value);
+    else node.setAttribute(key, value === true ? "" : value);
+  }
+  for (const child of children.flat(Infinity)) {
+    if (child === null || child === undefined || child === false) continue;
+    node.append(child instanceof Node ? child : document.createTextNode(String(child)));
+  }
+  return node;
+}
+
+function showError(message) { $("error").textContent = message || ""; $("error").hidden = !message; }
+function showOffline(reason) { $("offline").textContent = reason || ""; $("offline").hidden = !reason; }
+
+function emptySections() {
+  return { profile: "", contacts: { phone: "", email: "" }, education: [], employment: [],
+           volunteer: [], skills: [], certificates: [] };
+}
+
+function show(view) {
+  $("pick").hidden = view !== "pick";
+  $("loading").hidden = view !== "loading";
+  $("compare-view").hidden = view !== "compare";
+}
+
+// ---------------------------------------------------------------- network
+async function post(path, json) {
+  const response = await fetch(path, { method: "POST", headers: { "Content-Type": "application/json" },
+                                       body: JSON.stringify(json) });
+  if (!response.ok) throw new Error(path + " answered HTTP " + response.status);
+  return response.json();
+}
+
+// ---------------------------------------------------------------- read
+function needConsent() {
+  if (state.consent) return false;
+  $("why").textContent = "Tick consent first: nothing is read or sent until the jobseeker agrees.";
+  $("consent").focus();
+  return true;
+}
+
+function chooseFile() {
+  if (needConsent()) return;
+  // Mock mode has no file dialog: the fictional resume stands in for any file.
+  if (MOCK) return polishResume(MOCK_RESUME);
+  $("file").click();
+}
+
+// A .txt file stays in the browser. A PDF goes to the local server, which
+// returns its text lines and never writes the file.
+async function readFile(file) {
+  if (!file || needConsent()) return;
+  $("file").value = "";
+  if (MOCK) return polishResume(MOCK_RESUME);
+  showError("");
+  const isText = /\.txt$/i.test(file.name);
+  const isPdf = /\.pdf$/i.test(file.name);
+  if (!isText && !isPdf) {
+    showError(file.name + ": upload a PDF with selectable text or a plain-text .txt file.");
+    return;
+  }
+  if (file.size > (isPdf ? MAX_PDF_BYTES : MAX_TEXT_BYTES)) {
+    showError(file.name + ": larger than " + (isPdf ? "2 MB" : "100 KB") + ", so it is not read.");
+    return;
+  }
+  show("loading");
+  try {
+    const text = isPdf ? await pdfText(file) : await file.text();
+    if (text.includes("\u0000")) throw new Error("this does not look like plain text");
+    if (!text.trim()) throw new Error("no text was found in it");
+    await polishResume(text);
+  } catch (err) {
+    show("pick");
+    showError(file.name + ": could not be read (" + err.message + "). Nothing was sent.");
+  }
+}
+
+async function pdfText(file) {
+  const bytes = new Uint8Array(await file.arrayBuffer());
+  let binary = "";
+  for (let start = 0; start < bytes.length; start += 0x8000) {
+    binary += String.fromCharCode(...bytes.subarray(start, start + 0x8000));
+  }
+  const body = await post("/api/resume-text", { source: "resume", consent: state.consent, language: state.language,
+                                                filename: file.name, pdf_base64: btoa(binary) });
+  if (typeof body.refused === "string") throw new Error(body.refused);
+  return body.lines.map(line => line.text).join("\n");
+}
+
+// ---------------------------------------------------------------- process
+async function polishResume(text) {
+  state.original = text.trim();
+  state.editing = null;
+  showError(""); showOffline("");
+  show("loading");
+  let body;
+  try {
+    body = await (MOCK ? mockPolish() : post("/api/resume-polish", { text: state.original, language: state.language }));
+  } catch (err) {
+    body = { error: err.message };
+  }
+  // Offline or refused, nothing is written in the model's place: the caseworker
+  // gets empty sections to type into beside the original, and the banner says why.
+  if (body && body.sections) {
+    state.sections = body.sections;
+  } else {
+    state.sections = emptySections();
+    if (body && typeof body.refused === "string") showError("Not translated: " + body.refused);
+    else if (body && body.offline) showOffline("Not translated: " + (body.reason || "the service is offline.") + " Type the sections in from the original on the left.");
+    else showError("Could not translate the resume: " + ((body && body.error) || "no sections came back") + ". Type the sections in from the original on the left.");
+  }
+  render();
+  show("compare");
+}
+
+// ---------------------------------------------------------------- hand-over
+function continueToReview() {
+  state.editing = null;
+  const carried = { source: "upload", language: state.language, sections: state.sections, original: state.original };
+  try {
+    sessionStorage.setItem(SECTIONS_KEY, JSON.stringify(carried));
+    // An older interview in this tab must not be what /review drafts from instead.
+    sessionStorage.removeItem(INTERVIEW_KEY);
+  } catch (err) {
+    showError("Could not open the review page: this browser is blocking session storage for this site. " +
+              "Nothing was lost; allow site data and press the button again.");
+    return;
+  }
+  location.assign(REVIEW_URL);
+}
+
+// ---------------------------------------------------------------- render
+function field(label, value, onValue, multiline) {
+  const input = el(multiline ? "textarea" : "input", multiline ? {} : { type: "text" });
+  input.value = value || "";
+  input.addEventListener("input", () => onValue(input.value));
+  return el("label", {}, label, input);
+}
+
+function editor(section) {
+  const s = state.sections;
+  const key = section.key;
+  if (key === "profile") return [field("Profile", s.profile, v => { s.profile = v; }, true)];
+  if (key === "contacts") {
+    return [field("Phone", s.contacts.phone, v => { s.contacts.phone = v; }),
+            field("Email", s.contacts.email, v => { s.contacts.email = v; })];
+  }
+  if (key === "skills" || key === "certificates") {
+    return [field("One per line", s[key].join("\n"),
+                  v => { s[key] = v.split("\n").map(x => x.trim()).filter(Boolean); }, true)];
+  }
+  const blank = Object.fromEntries(section.fields.map(([name]) => [name, ""]));
+  return [
+    s[key].map((entry, i) => el("fieldset", {},
+      el("legend", {}, section.label + " " + (i + 1)),
+      section.fields.map(([name, label]) => field(label, entry[name], v => { entry[name] = v; }, name === "description")),
+      el("div", { class: "row" }, el("button", { type: "button", class: "secondary small-btn",
+        onclick: () => { s[key].splice(i, 1); render(); } }, "Remove")))),
+    el("div", { class: "row" }, el("button", { type: "button", class: "secondary small-btn",
+      onclick: () => { s[key].push(Object.assign({}, blank)); render(); } }, "Add " + section.label.toLowerCase())),
+  ];
+}
+
+function view(key) {
+  const s = state.sections;
+  const none = el("p", { class: "none" }, "Nothing found in the original: check with the jobseeker.");
+  if (key === "profile") return s.profile ? el("p", {}, s.profile) : none;
+  if (key === "contacts") {
+    const contact = [s.contacts.phone, s.contacts.email].filter(Boolean).join("  ·  ");
+    return contact ? el("p", {}, contact) : none;
+  }
+  if (key === "skills" || key === "certificates") {
+    return s[key].length ? el("ul", {}, s[key].map(x => el("li", {}, x))) : none;
+  }
+  const head = { education: e => joinParts(e.major, e.school) || "Study",
+                 employment: e => joinParts(e.position, e.company) || "Untitled role",
+                 volunteer: e => e.role || "Volunteer" }[key];
+  return s[key].length ? s[key].map(e => el("div", { class: "entry" },
+    el("div", { class: "entry-head" }, head(e)),
+    joinParts(e.location, e.dates) ? el("div", { class: "entry-meta" }, joinParts(e.location, e.dates)) : null,
+    e.description ? el("p", {}, e.description) : null)) : none;
+}
+
+function render() {
+  $("original").textContent = state.original;
+  $("original").lang = state.language;
+  $("original").dir = state.language === "ar" ? "rtl" : "ltr";
+  $("orig-tag").textContent = LANGUAGE_NAME[state.language] + ", as extracted";
+  $("sections").replaceChildren(...SECTIONS.map(section => {
+    const open = state.editing === section.key;
+    return el("div", { class: "sec" },
+      el("div", { class: "sec-head" },
+        el("h3", {}, section.label),
+        el("button", { type: "button", class: "secondary small-btn", "aria-expanded": open ? "true" : "false",
+                       onclick: () => toggleEdit(section.key) }, open ? "Done" : "Edit")),
+      open ? el("div", { class: "form" }, editor(section)) : view(section.key));
+  }));
+}
+
+function toggleEdit(key) {
+  state.editing = state.editing === key ? null : key;
+  render();
+  const index = SECTIONS.findIndex(s => s.key === key);
+  const first = $("sections").children[index].querySelector("input, textarea");
+  if (first) first.focus();
+}
+
+// ---------------------------------------------------------------- wiring
+$("mock-banner").hidden = !MOCK;
+$("consent").addEventListener("change", event => { state.consent = event.target.checked; $("why").textContent = ""; });
+$("lang").addEventListener("change", event => { state.language = event.target.value; });
+$("drop").addEventListener("click", chooseFile);
+$("back").href = asRoute("/intake", "intake.html");
+$("file").addEventListener("change", event => readFile(event.target.files[0]));
+const drop = $("drop");
+drop.addEventListener("dragover", event => { event.preventDefault(); drop.classList.add("over"); });
+drop.addEventListener("dragleave", () => drop.classList.remove("over"));
+drop.addEventListener("drop", event => {
+  event.preventDefault();
+  drop.classList.remove("over");
+  readFile(event.dataTransfer.files[0]);
+});
+$("restart").addEventListener("click", () => { showError(""); showOffline(""); show("pick"); });
+$("continue").addEventListener("click", continueToReview);
+</script>
+</body>
+</html>

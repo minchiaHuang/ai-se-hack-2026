@@ -1,6 +1,7 @@
 """Direction 7 - the interview's answers drafted into resume sections.
 
-POST /api/resume-sections. The model only rearranges what the person said
+POST /api/resume-sections, and POST /api/resume-polish for a resume the person
+already has, in any language. The model only rearranges what the person said
 into the resume's sections; the caseworker edits and confirms every section
 on /review before anything is matched. Missing information stays an empty
 string or list: a blank a caseworker can see beats a fact nobody said.
@@ -9,6 +10,7 @@ import json
 import os
 
 from skeleton.core import live
+from skeleton.directions.d7_credentials import WRITTEN_LANGUAGES
 
 LIST_FIELDS = {
     "education": ("major", "school", "location", "dates", "description"),
@@ -44,6 +46,39 @@ Rules:
 - Never output a score, rating or judgement about the person.
 - If an answer mentions how the person came to Australia, their journey,
   detention, persecution or why they left, leave it out of every section."""
+
+
+POLISH_INSTRUCTIONS = """You turn a jobseeker's existing resume into the sections
+of an Australian resume. You do nothing else.
+
+Input: the resume's text as it was extracted from the file, in any language
+(the language code is given first). Lines may be out of order or broken.
+
+Return only one JSON object, exactly this shape:
+{"profile": str,
+ "contacts": {"phone": str, "email": str},
+ "education": [{"major": str, "school": str, "location": str, "dates": str, "description": str}],
+ "employment": [{"position": str, "company": str, "location": str, "dates": str, "description": str}],
+ "volunteer": [{"role": str, "location": str, "dates": str, "description": str}],
+ "skills": [str],
+ "certificates": [str]}
+
+Rules:
+- Translate into plain Australian English and use professional resume wording,
+  without "I". The profile is two or three short sentences.
+- Use only facts the resume states. Never invent or guess an employer, school,
+  date, place, duration, number, skill or certificate.
+- If something is not in the resume, leave that string empty or that list empty.
+- Keep the person's own numbers and names exactly as given; romanise a name
+  only where it has no English form. Do not add praise or qualifiers the
+  resume does not say ("experienced", "known for", "up to").
+- Never output a score, rating or judgement about the person.
+- If the resume mentions how the person came to Australia, their journey,
+  detention, persecution or why they left, leave it out of every section."""
+
+# The page's textarea takes 100 000 characters; a resume is far shorter, and a
+# longer body is a paste mistake, not a resume.
+MAX_POLISH_CHARS = 100_000
 
 
 def _clean_string(value):
@@ -116,4 +151,39 @@ def draft(payload, post=None, api_key=None, model=None):
     except Exception:
         return {"offline": True, "reason": "The model could not be reached or did not answer "
                                            "in the expected shape. Nothing was drafted."}
+    return {"sections": _clean(raw)}
+
+
+def polish(payload, post=None, api_key=None, model=None):
+    """A resume in any language, translated and reworded into the same sections
+    as draft(): {"sections": {...}}, {"offline": True, "reason": ...}, or
+    {"refused": ...} for a language the team cannot check.
+
+    Same rule as draft(): offline is never a canned resume.
+    """
+    text, language = payload.get("text"), payload.get("language")
+    if not isinstance(text, str) or not text.strip():
+        raise ValueError("text must be a non-empty string")
+    if len(text) > MAX_POLISH_CHARS:
+        raise ValueError(f"text must be at most {MAX_POLISH_CHARS} characters")
+    if language not in WRITTEN_LANGUAGES:
+        return {"refused": f"{language}: not supported. A resume is read in "
+                           f"{', '.join(WRITTEN_LANGUAGES)}. We will not fake a language we cannot verify."}
+    key = os.environ.get("ANTHROPIC_API_KEY", "") if api_key is None else api_key
+    if not key:
+        return {"offline": True, "reason": "No model key is set, so the resume was not translated."}
+    request = {
+        "model": model or os.environ.get("ANTHROPIC_MODEL") or live.DEFAULT_MODEL,
+        "max_tokens": 2048,
+        "system": POLISH_INSTRUCTIONS,
+        "messages": [{"role": "user", "content": f"Language: {language}\n\n{text.strip()}"}],
+    }
+    headers = {"x-api-key": key, "anthropic-version": "2023-06-01",
+               "content-type": "application/json"}
+    sender = live._post_json if post is None else post
+    try:
+        raw = _parse(sender(live.MESSAGES_URL, headers, request))
+    except Exception:
+        return {"offline": True, "reason": "The model could not be reached or did not answer "
+                                           "in the expected shape. Nothing was translated."}
     return {"sections": _clean(raw)}
