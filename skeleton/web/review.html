@@ -32,6 +32,8 @@ body {
 /* Figma header: white bar, logo icon, "Bridge" bold and "Work" regular. */
 header.top { display: flex; align-items: center; gap: 1.25rem; padding: 14px 24px;
              border-bottom: 1px solid var(--line); background: var(--card); }
+.back { margin-left: auto; color: var(--muted); font-size: .88rem; font-weight: 600; text-decoration: none; }
+.back:hover { color: var(--primary); text-decoration: underline; }
 .wordmark { display: flex; align-items: center; font-size: 1.6rem; margin: 0; letter-spacing: -.01em; }
 .wordmark img { height: 1.6em; width: auto; margin-right: .45rem; }
 .wordmark b { color: var(--text); }
@@ -121,6 +123,7 @@ details.said dd { margin: 0; }
 <header class="top">
   <p class="wordmark"><img src="/logo.svg" alt="" onerror="this.hidden = true"><b>Bridge</b><span>Work</span></p>
   <span class="step">Caseworker review</span>
+  <a class="back" id="back" href="/start/path">&larr; Back</a>
 </header>
 <main>
   <p id="mock-banner" class="banner mock" hidden>Mock mode: fixture data for a fictional cook, no backend. Nothing is recorded or sent.</p>
@@ -129,7 +132,7 @@ details.said dd { margin: 0; }
 
   <section id="loading" class="loading" aria-live="polite">
     <div class="spinner" aria-hidden="true"></div>
-    <h2>Generating resume from the conversation…</h2>
+    <h2>Drafting the resume…</h2>
     <p class="muted">About 30 seconds. Nothing is final: every section comes back as a draft for you to check.</p>
   </section>
 
@@ -638,6 +641,7 @@ function render() {
 // ---------------------------------------------------------------- wiring
 $("mock-banner").hidden = !MOCK || QUIET;
 $("to-interview").href = asRoute("/interview", "interview.html");
+$("back").href = asRoute("/start/path", "path.html");
 $("consent").addEventListener("change", event => { state.consent = event.target.checked; setStatus(""); });
 $("regenerate").addEventListener("click", regenerate);
 $("confirm").addEventListener("click", confirmAndContinue);

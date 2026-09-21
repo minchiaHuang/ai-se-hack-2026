@@ -6,6 +6,9 @@ static hrefs and the routes handed to asRoute() or written as string literals
 are checked.
 """
 import re
+import shutil
+import subprocess
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -62,3 +65,27 @@ class JobsPage(unittest.TestCase):
         # It once did, and the board rendered its count but not a single card.
         body = re.search(r"function initialsMark\(job\) \{(.*?)\n\}", page("jobs"), re.S).group(1)
         self.assertNotIn("initialsMark(", body)
+
+
+class Wording(unittest.TestCase):
+    def test_the_interview_page_does_not_write_down_a_question_count(self):
+        # The count lives in interview_questions.json; the page said "seven" long after it became six.
+        words = r"\b(?:one|two|three|four|five|six|seven|eight|nine|ten|\d+) questions\b"
+        self.assertNotRegex(page("interview").lower(), words)
+
+    def test_the_home_page_does_not_claim_applications_are_sent(self):
+        # Apply is simulated: /jobs says "Nothing was sent."
+        self.assertNotIn("submitted", page("home"))
+
+
+@unittest.skipUnless(shutil.which("node"), "node is not installed")
+class Scripts(unittest.TestCase):
+    def test_every_pages_script_parses(self):
+        # Twice on 2026-09-22 a page's script broke while every Python test passed.
+        for path in sorted(WEB.glob("*.html")):
+            script = "\n".join(re.findall(r"<script>(.*?)</script>", path.read_text(encoding="utf-8"), re.S))
+            with self.subTest(page=path.name), tempfile.NamedTemporaryFile("w", suffix=".js") as js:
+                js.write(script)
+                js.flush()
+                result = subprocess.run(["node", "--check", js.name], capture_output=True, text=True)
+                self.assertEqual(result.returncode, 0, result.stderr)
