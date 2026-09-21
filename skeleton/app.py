@@ -8,6 +8,7 @@ import base64
 import html
 import json
 import os
+import re
 import sys
 import traceback
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -19,7 +20,7 @@ from urllib.parse import parse_qs, urlparse
 if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from skeleton.core import interview, live, pdf_text, registry
+from skeleton.core import interview, live, pdf_text, phone, registry
 from skeleton.core.model import CANNED, StubModel
 from skeleton.core.pipeline import run
 from skeleton.core.schema import AggregationError
@@ -272,6 +273,33 @@ def translate(payload):
     return refused or interview.translate(text, payload["source"])
 
 
+# E.164: the only form Twilio dials. Checked here so a typo never becomes a call.
+PHONE_NUMBER = re.compile(r"\+[1-9]\d{7,14}")
+CONVERSATION_ID = re.compile(r"[A-Za-z0-9_-]{1,128}")
+
+
+def start_call(payload):
+    to = payload.get("to")
+    to = to.strip() if isinstance(to, str) else ""
+    if not PHONE_NUMBER.fullmatch(to):
+        raise BadRequest("to must be a phone number in international format, e.g. +61400000000")
+    return phone.start_call(to)
+
+
+def call_result(query):
+    conversation_id = parse_qs(query).get("id", [""])[0]
+    if not CONVERSATION_ID.fullmatch(conversation_id):
+        raise BadRequest("id must be the conversation id /api/call/start returned")
+    return phone.call_result(conversation_id)
+
+
+def talk_latest(query):
+    since = parse_qs(query).get("since", [""])[0]
+    if not since.isdigit():
+        raise BadRequest("since must be unix seconds, a whole number")
+    return phone.latest_conversation(int(since))
+
+
 def speak(payload):
     text, refused = _interview_text(payload, "language")
     if refused:
@@ -377,6 +405,14 @@ class Handler(BaseHTTPRequestHandler):
             return self._send(200, "text/html; charset=utf-8", UPLOAD_PAGE.read_bytes())
         if parsed.path == "/api/interview/questions":
             return self._json(200, interview.questions())
+        if parsed.path == "/api/talk/link":
+            return self._json(200, phone.talk_link())
+        if parsed.path in ("/api/call/result", "/api/talk/latest"):
+            reader = call_result if parsed.path == "/api/call/result" else talk_latest
+            try:
+                return self._json(200, reader(parsed.query))
+            except BadRequest as bad:
+                return self._json(400, {"error": str(bad)})
         scenario = parse_qs(parsed.query).get("s", [None])[0]
         if parsed.path == "/run" and scenario in SCENARIOS:
             body = render_result(scenario)
@@ -404,6 +440,8 @@ class Handler(BaseHTTPRequestHandler):
                 body = resume_polish(self._read_json())
             elif parsed.path == "/api/translate":
                 body = translate(self._read_json())
+            elif parsed.path == "/api/call/start":
+                body = start_call(self._read_json())
             elif parsed.path == "/api/speak":
                 body = speak(self._read_json())
                 if isinstance(body, bytes):
