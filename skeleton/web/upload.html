@@ -160,7 +160,7 @@ pre.original { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font: 
     </button>
     <input type="file" id="file" class="visually-hidden" tabindex="-1" aria-hidden="true" accept=".pdf,application/pdf,.txt,text/plain">
     <span class="why" id="why" aria-live="polite"></span>
-    <p><a class="back" id="back" href="/intake">&larr; Back</a></p>
+    <p><a class="back" id="back" href="/start/path">&larr; Back</a></p>
   </section>
 
   <section id="loading" class="loading" aria-live="polite" hidden>
@@ -494,7 +494,7 @@ $("mock-banner").hidden = !MOCK || QUIET;
 $("consent").addEventListener("change", event => { state.consent = event.target.checked; $("why").textContent = ""; });
 $("lang").addEventListener("change", event => { state.language = event.target.value; });
 $("drop").addEventListener("click", chooseFile);
-$("back").href = asRoute("/intake", "intake.html");
+$("back").href = asRoute("/start/path", "path.html");
 $("file").addEventListener("change", event => readFile(event.target.files[0]));
 const drop = $("drop");
 drop.addEventListener("dragover", event => { event.preventDefault(); drop.classList.add("over"); });
