@@ -171,12 +171,12 @@ def transcribe(audio, language):
 
 
 def match(payload):
-    """Jobs, gap courses and a draft resume for the best-fit job.
+    """Jobs, gap courses and a draft resume tailored to each job.
 
-    The page sends no transcript to this route, so the resume's experience
-    lines are empty unless a caller passes one; units and qualifications are
-    still listed. Lines without an English gloss are left out because the
-    resume is written in English.
+    Without a transcript the resume's experience lines are empty; units and
+    qualifications are still listed. Lines without an English gloss are left
+    out because the resume is written in English. "resume" stays the best-fit
+    job's draft so callers written before "resumes" existed keep working.
     """
     evidenced = payload.get("evidenced_units", [])
     if not isinstance(evidenced, list) or not all(isinstance(u, dict) for u in evidenced):
@@ -184,11 +184,14 @@ def match(payload):
     transcript = [line for line in payload.get("transcript") or []
                   if isinstance(line, dict) and "t" in line and "en" in line]
     jobs = d7_match.match_jobs(payload.get("occupation"), evidenced)
-    resume = None
-    if jobs:
-        resume = {"job_id": jobs[0]["id"],
-                  "text": d7_match.resume_for(jobs[0], evidenced, transcript)}
-    return {"jobs": jobs, "courses": d7_match.courses_for(jobs), "resume": resume}
+    resumes = {}
+    for job in jobs:
+        sections = d7_match.resume_sections(job, evidenced, transcript)
+        resumes[job["id"]] = {"job_id": job["id"], "text": d7_match.resume_text(sections),
+                              "sections": sections}
+    resume = resumes[jobs[0]["id"]] if jobs else None
+    return {"jobs": jobs, "courses": d7_match.courses_for(jobs),
+            "resume": resume, "resumes": resumes}
 
 
 PAGE = """<!doctype html><meta charset=utf-8><title>Direction skeleton</title>

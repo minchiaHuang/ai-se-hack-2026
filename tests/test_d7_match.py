@@ -63,7 +63,9 @@ class Matching(unittest.TestCase):
     def test_only_jobs_for_the_occupation_come_back_best_fit_first(self):
         jobs = d7_match.match_jobs("cookery", EVIDENCED)
 
-        self.assertEqual([j["id"] for j in jobs], ["cookery-1", "cookery-2"])
+        self.assertEqual([j["id"] for j in jobs],
+                         ["cookery-5", "cookery-1", "cookery-3", "cookery-6", "cookery-7",
+                          "cookery-8", "cookery-2", "cookery-4", "cookery-9"])
         counts = [len(j["matched"]) for j in jobs]
         self.assertEqual(counts, sorted(counts, reverse=True))
 
@@ -108,8 +110,10 @@ class Courses(unittest.TestCase):
         jobs = d7_match.match_jobs("cookery", EVIDENCED)
         courses = {c["code"]: c for c in d7_match.courses_for(jobs)}
 
-        self.assertEqual(courses["SITHCCC043"]["for_jobs"], ["cookery-1", "cookery-2"])
-        self.assertEqual(courses["SITHCCC036"]["for_jobs"], ["cookery-2"])
+        self.assertEqual(courses["SITHCCC043"]["for_jobs"],
+                         ["cookery-1", "cookery-7", "cookery-2", "cookery-9"])
+        self.assertEqual(courses["SITHCCC036"]["for_jobs"],
+                         ["cookery-7", "cookery-8", "cookery-2", "cookery-9"])
         self.assertEqual(courses["SITHCCC036"]["qualification"],
                          "SIT30821 Certificate III in Commercial Cookery")
         self.assertEqual(courses["SITHCCC036"]["note"],
@@ -154,15 +158,91 @@ class Resume(unittest.TestCase):
         self.assertNotIn("%", self.text)
 
 
+def _skill_codes(text):
+    section = text.split("SKILLS MAPPED")[1].split("\n\n")[0]
+    return [l.split()[1] for l in section.splitlines() if l.startswith("- ")]
+
+
+def _experience_stamps(text):
+    section = text.split("WORK EXPERIENCE")[1].split("\n\n")[0]
+    return re.findall(r"\[transcript (\d\d:\d\d)\]$", section, re.M)
+
+
+class TailoredResume(unittest.TestCase):
+    """One resume per job, tailored by ordering alone: never a new claim."""
+
+    def setUp(self):
+        self.jobs = d7_match.match_jobs("cookery", EVIDENCED)
+        self.texts = {job["id"]: d7_match.resume_for(job, EVIDENCED, TRANSCRIPT)
+                      for job in self.jobs}
+
+    def test_each_job_lists_its_required_and_evidenced_units_first(self):
+        self.assertEqual(_skill_codes(self.texts["cookery-1"]),
+                         ["SITXFSA005", "SITXFSA006", "SITHCCC027", "SITHCCC029"])
+        self.assertEqual(_skill_codes(self.texts["cookery-2"]),
+                         ["SITHCCC027", "SITHCCC029", "SITXFSA005", "SITXFSA006"])
+        for job in self.jobs:
+            matched = [u["code"] for u in job["matched"]]
+            with self.subTest(job=job["id"]):
+                codes = _skill_codes(self.texts[job["id"]])
+                self.assertEqual(set(codes[:len(matched)]), set(matched))
+
+    def test_the_lines_that_evidence_the_job_come_first(self):
+        self.assertEqual(_experience_stamps(self.texts["cookery-1"]), ["00:12", "02:41", "01:05"])
+        self.assertEqual(_experience_stamps(self.texts["cookery-2"]), ["00:12", "01:05", "02:41"])
+
+    def test_tailoring_only_reorders_the_same_claims(self):
+        def claims(text):
+            return sorted(l for l in text.splitlines()[1:] if l.strip())
+        first, *others = self.texts.values()
+        for other in others:
+            self.assertEqual(claims(other), claims(first))
+
+    def test_no_resume_holds_an_unevidenced_unit_a_percentage_or_an_uncited_line(self):
+        seeded = {u["code"] for occ in d7_match._occupations().values() for u in occ["units"]}
+        unevidenced = seeded - {u["code"] for u in EVIDENCED}
+        for job_id, text in self.texts.items():
+            with self.subTest(job=job_id):
+                self.assertFalse({code for code in unevidenced if code in text})
+                self.assertNotIn("%", text)
+                self.assertNotIn("required units evidenced", text)
+                self.assertNotIn("border", text)
+                self.assertNotIn("03:30", text)
+
+    def test_the_text_is_rendered_from_the_sections(self):
+        for job in self.jobs:
+            sections = d7_match.resume_sections(job, EVIDENCED, TRANSCRIPT)
+            with self.subTest(job=job["id"]):
+                self.assertEqual(d7_match.resume_text(sections), self.texts[job["id"]])
+                self.assertEqual(sections["job"]["id"], job["id"])
+                self.assertFalse({"fit", "missing", "matched", "score"} & set(sections))
+                for q in sections["qualifications"]:
+                    self.assertEqual(q["status"],
+                                     "Recognition of Prior Learning in progress, not yet assessed")
+
+
 class JobData(unittest.TestCase):
-    def test_six_jobs_two_per_occupation_all_marked_as_samples(self):
+    def test_nine_cookery_four_welding_four_aged_care_all_marked_as_samples(self):
         jobs = d7_match.load_jobs()
-        self.assertEqual(len(jobs), 6)
-        for occupation in ("cookery", "welding", "aged_care"):
-            self.assertEqual(sum(j["occupation"] == occupation for j in jobs), 2)
+        self.assertEqual(len(jobs), 17)
+        for occupation, count in (("cookery", 9), ("welding", 4), ("aged_care", 4)):
+            self.assertEqual(sum(j["occupation"] == occupation for j in jobs), count)
         for job in jobs:
             with self.subTest(job=job["id"]):
                 self.assertEqual(job["note"], "Representative sample, not a real listing")
+
+    def test_every_job_has_a_board_row_and_nothing_a_sample_cannot_honestly_carry(self):
+        """Salaries, posted dates and applicant counts would read as a real
+        listing, so a sample never carries them."""
+        jobs = d7_match.load_jobs()
+        self.assertEqual(len({j["id"] for j in jobs}), len(jobs))
+        for job in jobs:
+            with self.subTest(job=job["id"]):
+                self.assertIn(job["employment_type"], {"Full-time", "Part-time", "Casual"})
+                self.assertRegex(job["location"], r" NSW$")
+                self.assertTrue(job["level"] and job["shift"] and job["setting"])
+                self.assertFalse({"salary", "pay", "posted", "applicants", "employer", "company"} & set(job))
+                self.assertNotRegex(json.dumps(job), r"\$|\d+ ?(days?|hours?) ago|applicant")
 
     def test_every_required_unit_is_a_seeded_unit_of_its_occupation(self):
         occupations = d7_match._occupations()

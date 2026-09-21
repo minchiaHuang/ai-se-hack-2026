@@ -60,6 +60,8 @@ def match_jobs(occupation, evidenced_units):
         missing = [{"code": c, "title": units[c]["title"]}
                    for c in required if c not in evidence]
         jobs.append({"id": job["id"], "title": job["title"], "setting": job["setting"],
+                     "location": job["location"], "employment_type": job["employment_type"],
+                     "level": job["level"], "shift": job["shift"],
                      "note": job["note"], "matched": matched, "missing": missing,
                      "fit": f"{len(matched)} of {len(required)} required units evidenced"})
     # Stable sort: ties keep the order jobs.json lists them in.
@@ -88,35 +90,66 @@ def _timestamp(locator):
     return locator[2:] if locator.startswith("t=") else locator
 
 
-def resume_for(job, evidenced_units, transcript):
-    """A plain-text draft for the jobseeker to check, built without a model.
+RPL_STATUS = "Recognition of Prior Learning in progress, not yet assessed"
+TO_ADD = "Name, contact details, employers and dates are for the jobseeker to add."
+
+
+def resume_sections(job, evidenced_units, transcript):
+    """The resume as data, tailored to one job by ordering alone.
 
     Only what the person said and what they evidenced goes in. No name,
     employer, date or fit is written, because none of them were evidenced and
     a guessed one on a resume is a false claim made in the person's name.
+    Tailoring never adds anything: the units this job requires, and the lines
+    that evidence them, move to the top; everything else keeps its place.
     """
     units = _units_by_code()
     evidence = _evidenced(evidenced_units)
     lines = {line["t"]: line["en"] for line in transcript}
+    # What match_jobs() matched is exactly required-and-evidenced.
+    required = {u["code"] for u in job["matched"]}
 
-    cited = set()
     skills = []
     qualifications = []
     for code, sources in evidence.items():
         if code not in units:
             continue
         stamps = [_timestamp(loc) for label, loc in sources if label == "transcript"]
-        cited.update(t for t in stamps if t in lines)
-        skills.append(f"- {code} {units[code]['title']} (described at {', '.join(stamps)})")
+        skills.append({"code": code, "title": units[code]["title"], "described_at": stamps,
+                       "for_this_job": code in required})
         if units[code]["qualification"] not in qualifications:
             qualifications.append(units[code]["qualification"])
+    # Stable sort: within each group, the order the pack evidenced them in.
+    skills.sort(key=lambda s: not s["for_this_job"])
 
-    out = [f"DRAFT RESUME - for: {job['title']}, {job['setting']}",
+    # A line is only ever here because a unit cites it, so a line about the
+    # journey, which no unit cites, cannot reach the resume.
+    for_job = {t for s in skills if s["for_this_job"] for t in s["described_at"]}
+    cited = {t for s in skills for t in s["described_at"] if t in lines}
+    experience = [{"t": t, "en": lines[t], "for_this_job": t in for_job}
+                  for t in sorted(cited, key=lambda t: (t not in for_job, t))]
+
+    return {"job": {"id": job["id"], "title": job["title"], "setting": job["setting"],
+                    "location": job["location"]},
+            "experience": experience, "skills": skills,
+            "qualifications": [{"title": q, "status": RPL_STATUS} for q in qualifications],
+            "to_add": TO_ADD}
+
+
+def resume_text(sections):
+    job = sections["job"]
+    out = [f"DRAFT RESUME - for: {job['title']}, {job['setting']}, {job['location']}",
            "", "WORK EXPERIENCE (the jobseeker's own account, translated)"]
-    out += [f"- {lines[t]} [transcript {t}]" for t in sorted(cited)]
-    out += ["", "SKILLS MAPPED TO AUSTRALIAN UNITS OF COMPETENCY"] + skills
+    out += [f"- {line['en']} [transcript {line['t']}]" for line in sections["experience"]]
+    out += ["", "SKILLS MAPPED TO AUSTRALIAN UNITS OF COMPETENCY"]
+    out += [f"- {s['code']} {s['title']} (described at {', '.join(s['described_at'])})"
+            for s in sections["skills"]]
     out += ["", "QUALIFICATIONS"]
-    out += [f"- {q}: Recognition of Prior Learning in progress, not yet assessed"
-            for q in qualifications]
-    out += ["", "Name, contact details, employers and dates are for the jobseeker to add."]
+    out += [f"- {q['title']}: {q['status']}" for q in sections["qualifications"]]
+    out += ["", sections["to_add"]]
     return "\n".join(out)
+
+
+def resume_for(job, evidenced_units, transcript):
+    """A plain-text draft for the jobseeker to check, built without a model."""
+    return resume_text(resume_sections(job, evidenced_units, transcript))

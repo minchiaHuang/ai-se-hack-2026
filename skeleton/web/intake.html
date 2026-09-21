@@ -105,15 +105,67 @@ input[type=radio], input[type=checkbox] { width: 26px; height: 26px; accent-colo
 .gate .hit-units { margin-top: .5rem; padding: .4rem .6rem; background: var(--paper); border-radius: 6px; }
 .metric { margin-top: 1rem; padding: .6rem .8rem; background: var(--panel); border-radius: 6px; font-weight: 600; }
 
-.jobs, .courses { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 12px; }
+.courses { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 12px; }
+.courses .card { scroll-margin: 80px; }
+.courses .card.hit { background: #fff1a8; box-shadow: inset 0 0 0 3px #b58900; }
 .sample { display: inline-block; font-size: .8rem; font-weight: 700; text-transform: uppercase; letter-spacing: .03em;
           padding: 0 .4rem; border: 2px solid var(--muted); color: var(--muted); border-radius: 4px; }
-.fit { font-size: 1.1rem; font-weight: 700; margin: .3rem 0; }
-.units { margin: .2rem 0 .4rem; padding-left: 1.2rem; }
-.units li { margin: .15rem 0; }
 .code { font-family: ui-monospace, Menlo, Consolas, monospace; font-weight: 700; }
-pre.resume { white-space: pre-wrap; overflow-wrap: anywhere; font: inherit; font-size: .95rem;
-             background: var(--panel); padding: .6rem; border-radius: 6px; margin: .5rem 0 0; }
+
+/* A job board's shape: a filter row, a scrolling list of wide cards, and the
+   selected job's resume in a side column. Where job boards put a percentage
+   ring and a "good match" label, this card puts the count and nothing else:
+   the fit describes the job's units, never a rating of the person. */
+.board-filters { display: flex; flex-wrap: wrap; gap: .6rem 1rem; align-items: flex-end; margin: .4rem 0 .8rem; }
+.board-filters label { display: flex; flex-direction: column; font-weight: 700; font-size: .85rem; }
+.board-filters select { min-height: 44px; min-width: 12rem; padding: .2rem .5rem; border: 2px solid var(--line);
+                        border-radius: 8px; background: var(--paper); color: var(--ink); font-weight: 500; }
+.board-filters .shown { margin-left: auto; }
+.match-layout { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 20px; align-items: start; }
+.jobs { display: flex; flex-direction: column; gap: 12px; min-width: 0; max-height: calc(100vh - 32px);
+        overflow-y: auto; padding: 2px 6px 2px 2px; }
+.job-card { display: grid; grid-template-columns: minmax(0, 1fr) 9.5rem; border: 2px solid var(--line);
+            border-radius: 12px; overflow: hidden; cursor: pointer; flex: none; }
+.job-card.selected { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent); }
+.job-body { padding: .7rem .9rem; min-width: 0; }
+.job-card h3 { font-size: 1.3rem; margin: .35rem 0 0; line-height: 1.25; }
+.job-card .setting { color: var(--muted); margin: .1rem 0 .4rem; }
+.facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .15rem 1rem; margin: 0;
+         padding: .4rem 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); font-size: .9rem; }
+.fact { display: flex; align-items: center; gap: .4rem; min-width: 0; }
+.fact svg { flex: none; width: 1em; height: 1em; }
+.job-card .label { font-weight: 700; font-size: .9rem; margin: .5rem 0 .2rem; }
+.count { display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;
+         padding: .8rem .5rem; background: #0b2545; color: #fff; }
+.count .n { font-size: 2rem; font-weight: 800; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.count .caption { font-size: .8rem; font-weight: 600; margin-top: .3rem; }
+.chips { display: flex; flex-wrap: wrap; gap: .35rem; }
+.unit-chip {
+  display: inline-flex; flex-wrap: wrap; gap: .3rem; align-items: baseline; min-height: 40px; max-width: 100%;
+  padding: .2rem .7rem; border-radius: 999px; font-size: .85rem; font-weight: 600; text-align: left;
+  overflow-wrap: anywhere; cursor: pointer;
+}
+.unit-chip.have { border: 2px solid var(--ok); background: var(--ok-bg); color: var(--ok); }
+.unit-chip.gap { border: 2px dashed var(--warn); background: var(--paper); color: var(--warn); text-decoration: none; }
+.unit-chip .when { font-variant-numeric: tabular-nums; font-weight: 800; }
+.job-card .select-job { margin-top: .6rem; }
+
+.resume-panel { position: sticky; top: 12px; border: 2px solid var(--accent); border-radius: 10px;
+                padding: .7rem .9rem; min-width: 0; max-height: calc(100vh - 24px); overflow: auto; }
+.resume-actions { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; }
+.resume-actions h3 { margin: 0 auto 0 0; }
+.resume-doc { margin-top: .6rem; padding: .8rem 1rem; background: var(--paper); border: 1px solid var(--line);
+              border-radius: 6px; font-size: .95rem; overflow-wrap: anywhere; }
+.resume-doc .kicker { font-size: .8rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin: 0; }
+.resume-doc h3 { font-size: 1.2rem; margin: .1rem 0 .4rem; }
+.resume-doc h4 { font-size: .95rem; text-transform: uppercase; letter-spacing: .03em; margin: .9rem 0 .25rem;
+                 padding-bottom: .15rem; border-bottom: 2px solid var(--ink); }
+.resume-doc ul { margin: .2rem 0; padding-left: 1.2rem; }
+.resume-doc li { margin: .2rem 0; padding-left: .3rem; }
+/* Screen-only emphasis for what the selected job asks for; print drops it. */
+.resume-doc li.req { border-left: 4px solid var(--accent); }
+.offscreen { position: fixed; left: -9999px; top: 0; }
+.resume-doc .to-add { margin-top: .9rem; font-style: italic; }
 
 .refusal { margin: 2rem auto; max-width: 900px; border: 4px solid var(--stop); background: var(--stop-bg);
            border-radius: 10px; padding: 1rem 1.25rem; }
@@ -121,9 +173,32 @@ pre.resume { white-space: pre-wrap; overflow-wrap: anywhere; font: inherit; font
 .refusal .reason { font-size: 1.2rem; font-weight: 600; overflow-wrap: anywhere; }
 .status { min-height: 1.5rem; font-weight: 600; }
 [hidden] { display: none !important; }
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
 @media (max-width: 900px) {
-  .setup, .columns { grid-template-columns: 1fr; }
+  .setup, .columns, .match-layout { grid-template-columns: 1fr; }
+  .resume-panel { position: static; max-height: none; }
+  .jobs { max-height: none; overflow: visible; }
+  .job-card { grid-template-columns: minmax(0, 1fr) 7rem; }
+  .facts { grid-template-columns: 1fr; }
+}
+
+/* Printing gives the selected resume alone on A4: nothing from the interview
+   screen, no fit, no missing units, since the page may go to an employer. */
+@media print {
+  @page { size: A4; margin: 18mm 16mm; }
+  html { font-size: 11pt; }
+  body { background: #fff; color: #000; }
+  main { max-width: none; padding: 0; }
+  main > header, #refusal, #session > :not(#matches), #matches > :not(.match-layout),
+  .match-layout > :not(.resume-panel), .resume-panel > :not(.resume-doc) { display: none !important; }
+  .match-layout { display: block; }
+  .resume-panel { position: static; max-height: none; overflow: visible; border: 0; padding: 0; }
+  .resume-doc { margin: 0; padding: 0; border: 0; font-size: 1rem; }
+  .resume-doc li.req { border-left: 0; }
+  .resume-doc button.link { color: #000; text-decoration: none; font-weight: 400; }
+  .resume-doc h4 { break-after: avoid; }
+  .resume-doc li { break-inside: avoid; }
 }
 </style>
 </head>
@@ -189,9 +264,17 @@ pre.resume { white-space: pre-wrap; overflow-wrap: anywhere; font: inherit; font
     </div>
 
     <section id="matches" hidden aria-labelledby="h-jobs">
-      <h2 id="h-jobs">5. Job matches</h2>
-      <p class="small muted">Fit counts units evidenced in this interview against the units a job requires. It describes the job, not the person, and is not shown to employers.</p>
-      <div class="jobs" id="jobs"></div>
+      <h2 id="h-jobs">5. Job matches and a tailored resume</h2>
+      <p class="small muted">Fit counts units evidenced in this interview against the units a job requires. It describes the job, not the person, and is not shown to employers. Select a job to see the resume tailored to it.</p>
+      <div class="board-filters" id="board-filters">
+        <label>Location <select id="filter-location"></select></label>
+        <label>Employment type <select id="filter-type"></select></label>
+        <p class="shown small muted" id="jobs-shown" aria-live="polite"></p>
+      </div>
+      <div class="match-layout">
+        <div class="jobs" id="jobs"></div>
+        <section class="resume-panel" id="resume-panel" aria-labelledby="h-resume"></section>
+      </div>
       <h2 id="h-courses">6. Units still to evidence: gap training</h2>
       <div class="courses" id="courses"></div>
     </section>
@@ -286,67 +369,41 @@ const FIXTURE_EXTRACT = {
   metric_value: 3,
 };
 
-// Unit codes and titles come only from the cookery entry in occupations.json.
+// The real /api/match response for the Mandarin demo transcript and the units in
+// FIXTURE_EXTRACT, generated from app.match(), so mock and server render the same.
+// The Arabic mock reuses it; its resume quotes the Mandarin session's English gloss.
 const FIXTURE_MATCH = {
   jobs: [
-    { id: "job-1", title: "Cook", setting: "Aged care home kitchen, Western Sydney",
-      note: "Representative sample, not a real listing",
-      matched: [
-        { code: "SITXFSA005", title: "Use hygienic practices for food safety", sources: [["transcript", "t=02:41"]] },
-        { code: "SITXFSA006", title: "Participate in safe food handling practices", sources: [["transcript", "t=02:41"]] },
-      ],
-      missing: [
-        { code: "SITHCCC027", title: "Prepare dishes using basic methods of cookery" },
-        { code: "SITHCCC036", title: "Prepare meat dishes" },
-      ],
-      fit: "2 of 4 required units evidenced" },
-    { id: "job-2", title: "Kitchen hand, food preparation", setting: "Hospital catering, Parramatta",
-      note: "Representative sample, not a real listing",
-      matched: [
-        { code: "SITXFSA005", title: "Use hygienic practices for food safety", sources: [["transcript", "t=02:41"]] },
-        { code: "SITXFSA006", title: "Participate in safe food handling practices", sources: [["transcript", "t=02:41"]] },
-      ],
-      missing: [
-        { code: "SITHCCC027", title: "Prepare dishes using basic methods of cookery" },
-      ],
-      fit: "2 of 3 required units evidenced" },
-    { id: "job-3", title: "Line cook", setting: "Cafe, Inner West",
-      note: "Representative sample, not a real listing",
-      matched: [
-        { code: "SITXFSA005", title: "Use hygienic practices for food safety", sources: [["transcript", "t=02:41"]] },
-        { code: "SITXFSA006", title: "Participate in safe food handling practices", sources: [["transcript", "t=02:41"]] },
-      ],
-      missing: [
-        { code: "SITHCCC027", title: "Prepare dishes using basic methods of cookery" },
-        { code: "SITHCCC029", title: "Prepare stocks, sauces and soups" },
-        { code: "SITHCCC043", title: "Work effectively as a cook" },
-      ],
-      fit: "2 of 5 required units evidenced" },
+    {"id": "cookery-1", "title": "Cook and Food Safety Supervisor", "setting": "Independent cafe kitchen", "location": "Parramatta NSW", "employment_type": "Full-time", "level": "Experienced", "shift": "Early starts", "note": "Representative sample, not a real listing", "matched": [{"code": "SITXFSA005", "title": "Use hygienic practices for food safety", "sources": [["transcript", "t=02:41"]]}, {"code": "SITXFSA006", "title": "Participate in safe food handling practices", "sources": [["transcript", "t=02:41"]]}], "missing": [{"code": "SITHCCC027", "title": "Prepare dishes using basic methods of cookery"}, {"code": "SITHCCC043", "title": "Work effectively as a cook"}], "fit": "2 of 4 required units evidenced"},
+    {"id": "cookery-3", "title": "Kitchen hand and food preparation", "setting": "Aged care home kitchen", "location": "Blacktown NSW", "employment_type": "Part-time", "level": "Entry level", "shift": "Day shifts", "note": "Representative sample, not a real listing", "matched": [{"code": "SITXFSA005", "title": "Use hygienic practices for food safety", "sources": [["transcript", "t=02:41"]]}, {"code": "SITXFSA006", "title": "Participate in safe food handling practices", "sources": [["transcript", "t=02:41"]]}], "missing": [{"code": "SITHCCC027", "title": "Prepare dishes using basic methods of cookery"}], "fit": "2 of 3 required units evidenced"},
+    {"id": "cookery-5", "title": "Catering cook", "setting": "Contract catering kitchen", "location": "Auburn NSW", "employment_type": "Full-time", "level": "Experienced", "shift": "Weekdays", "note": "Representative sample, not a real listing", "matched": [{"code": "SITXFSA005", "title": "Use hygienic practices for food safety", "sources": [["transcript", "t=02:41"]]}, {"code": "SITXFSA006", "title": "Participate in safe food handling practices", "sources": [["transcript", "t=02:41"]]}], "missing": [{"code": "SITHCCC027", "title": "Prepare dishes using basic methods of cookery"}, {"code": "SITHCCC029", "title": "Prepare stocks, sauces and soups"}], "fit": "2 of 4 required units evidenced"},
+    {"id": "cookery-6", "title": "Canteen cook", "setting": "School canteen", "location": "Liverpool NSW", "employment_type": "Part-time", "level": "Entry level", "shift": "School hours", "note": "Representative sample, not a real listing", "matched": [{"code": "SITXFSA005", "title": "Use hygienic practices for food safety", "sources": [["transcript", "t=02:41"]]}, {"code": "SITXFSA006", "title": "Participate in safe food handling practices", "sources": [["transcript", "t=02:41"]]}], "missing": [{"code": "SITHCCC027", "title": "Prepare dishes using basic methods of cookery"}], "fit": "2 of 3 required units evidenced"},
+    {"id": "cookery-4", "title": "Breakfast cook", "setting": "Club bistro", "location": "Bankstown NSW", "employment_type": "Casual", "level": "Entry level", "shift": "Early starts, weekends", "note": "Representative sample, not a real listing", "matched": [{"code": "SITXFSA005", "title": "Use hygienic practices for food safety", "sources": [["transcript", "t=02:41"]]}], "missing": [{"code": "SITHCCC027", "title": "Prepare dishes using basic methods of cookery"}], "fit": "1 of 2 required units evidenced"},
+    {"id": "cookery-7", "title": "Banquet cook", "setting": "Hotel function kitchen", "location": "Sydney CBD NSW", "employment_type": "Casual", "level": "Experienced", "shift": "Evenings and weekends", "note": "Representative sample, not a real listing", "matched": [{"code": "SITXFSA005", "title": "Use hygienic practices for food safety", "sources": [["transcript", "t=02:41"]]}], "missing": [{"code": "SITHCCC027", "title": "Prepare dishes using basic methods of cookery"}, {"code": "SITHCCC029", "title": "Prepare stocks, sauces and soups"}, {"code": "SITHCCC036", "title": "Prepare meat dishes"}, {"code": "SITHCCC043", "title": "Work effectively as a cook"}], "fit": "1 of 5 required units evidenced"},
+    {"id": "cookery-8", "title": "Production cook", "setting": "Central production kitchen", "location": "Wetherill Park NSW", "employment_type": "Full-time", "level": "Experienced", "shift": "Early starts", "note": "Representative sample, not a real listing", "matched": [{"code": "SITXFSA005", "title": "Use hygienic practices for food safety", "sources": [["transcript", "t=02:41"]]}], "missing": [{"code": "SITHCCC027", "title": "Prepare dishes using basic methods of cookery"}, {"code": "SITHCCC029", "title": "Prepare stocks, sauces and soups"}, {"code": "SITHCCC036", "title": "Prepare meat dishes"}], "fit": "1 of 4 required units evidenced"},
+    {"id": "cookery-2", "title": "Commercial cook", "setting": "Public hospital kitchen", "location": "Westmead NSW", "employment_type": "Full-time", "level": "Entry level", "shift": "Rotating roster", "note": "Representative sample, not a real listing", "matched": [], "missing": [{"code": "SITHCCC027", "title": "Prepare dishes using basic methods of cookery"}, {"code": "SITHCCC029", "title": "Prepare stocks, sauces and soups"}, {"code": "SITHCCC036", "title": "Prepare meat dishes"}, {"code": "SITHCCC043", "title": "Work effectively as a cook"}], "fit": "0 of 4 required units evidenced"},
+    {"id": "cookery-9", "title": "Grill cook", "setting": "Pub bistro", "location": "Penrith NSW", "employment_type": "Casual", "level": "Experienced", "shift": "Evenings", "note": "Representative sample, not a real listing", "matched": [], "missing": [{"code": "SITHCCC027", "title": "Prepare dishes using basic methods of cookery"}, {"code": "SITHCCC036", "title": "Prepare meat dishes"}, {"code": "SITHCCC043", "title": "Work effectively as a cook"}], "fit": "0 of 3 required units evidenced"},
   ],
   courses: [
-    { code: "SITHCCC027", title: "Prepare dishes using basic methods of cookery",
-      qualification: "SIT30821 Certificate III in Commercial Cookery",
-      for_jobs: ["job-1", "job-2", "job-3"], note: "Gap training through a Registered Training Organisation" },
-    { code: "SITHCCC036", title: "Prepare meat dishes",
-      qualification: "SIT30821 Certificate III in Commercial Cookery",
-      for_jobs: ["job-1"], note: "Gap training through a Registered Training Organisation" },
-    { code: "SITHCCC029", title: "Prepare stocks, sauces and soups",
-      qualification: "SIT30821 Certificate III in Commercial Cookery",
-      for_jobs: ["job-3"], note: "Gap training through a Registered Training Organisation" },
-    { code: "SITHCCC043", title: "Work effectively as a cook",
-      qualification: "SIT30821 Certificate III in Commercial Cookery",
-      for_jobs: ["job-3"], note: "Gap training through a Registered Training Organisation" },
+    {"code": "SITHCCC027", "title": "Prepare dishes using basic methods of cookery", "qualification": "SIT30821 Certificate III in Commercial Cookery", "for_jobs": ["cookery-1", "cookery-3", "cookery-5", "cookery-6", "cookery-4", "cookery-7", "cookery-8", "cookery-2", "cookery-9"], "note": "Gap training through a Registered Training Organisation"},
+    {"code": "SITHCCC043", "title": "Work effectively as a cook", "qualification": "SIT30821 Certificate III in Commercial Cookery", "for_jobs": ["cookery-1", "cookery-7", "cookery-2", "cookery-9"], "note": "Gap training through a Registered Training Organisation"},
+    {"code": "SITHCCC029", "title": "Prepare stocks, sauces and soups", "qualification": "SIT30821 Certificate III in Commercial Cookery", "for_jobs": ["cookery-5", "cookery-7", "cookery-8", "cookery-2"], "note": "Gap training through a Registered Training Organisation"},
+    {"code": "SITHCCC036", "title": "Prepare meat dishes", "qualification": "SIT30821 Certificate III in Commercial Cookery", "for_jobs": ["cookery-7", "cookery-8", "cookery-2", "cookery-9"], "note": "Gap training through a Registered Training Organisation"},
   ],
-  resume: { job_id: "job-1", text:
-"Cook (representative sample)\n\n" +
-"Experience\n" +
-"Cook, camp kitchen, 3 years (t=00:12)\n" +
-"- Cooked for about 200 people a day.\n" +
-"- Kept raw meat and cooked food apart; logged fridge temperatures daily (t=02:41).\n\n" +
-"Units of competency evidenced in interview, for RPL assessment by an RTO\n" +
-"- SITXFSA005 Use hygienic practices for food safety\n" +
-"- SITXFSA006 Participate in safe food handling practices" },
+  resumes: {
+    "cookery-1": {"job_id": "cookery-1", "text": "DRAFT RESUME - for: Cook and Food Safety Supervisor, Independent cafe kitchen, Parramatta NSW\n\nWORK EXPERIENCE (the jobseeker's own account, translated)\n- Raw meat and cooked food had to be kept apart, and I wrote the fridge temperature in a notebook every day. [transcript 02:41]\n\nSKILLS MAPPED TO AUSTRALIAN UNITS OF COMPETENCY\n- SITXFSA005 Use hygienic practices for food safety (described at 02:41)\n- SITXFSA006 Participate in safe food handling practices (described at 02:41)\n\nQUALIFICATIONS\n- SIT30821 Certificate III in Commercial Cookery: Recognition of Prior Learning in progress, not yet assessed\n\nName, contact details, employers and dates are for the jobseeker to add.", "sections": {"job": {"id": "cookery-1", "title": "Cook and Food Safety Supervisor", "setting": "Independent cafe kitchen", "location": "Parramatta NSW"}, "experience": [{"t": "02:41", "en": "Raw meat and cooked food had to be kept apart, and I wrote the fridge temperature in a notebook every day.", "for_this_job": true}], "skills": [{"code": "SITXFSA005", "title": "Use hygienic practices for food safety", "described_at": ["02:41"], "for_this_job": true}, {"code": "SITXFSA006", "title": "Participate in safe food handling practices", "described_at": ["02:41"], "for_this_job": true}], "qualifications": [{"title": "SIT30821 Certificate III in Commercial Cookery", "status": "Recognition of Prior Learning in progress, not yet assessed"}], "to_add": "Name, contact details, employers and dates are for the jobseeker to add."}},
+    "cookery-3": {"job_id": "cookery-3", "text": "DRAFT RESUME - for: Kitchen hand and food preparation, Aged care home kitchen, Blacktown NSW\n\nWORK EXPERIENCE (the jobseeker's own account, translated)\n- Raw meat and cooked food had to be kept apart, and I wrote the fridge temperature in a notebook every day. [transcript 02:41]\n\nSKILLS MAPPED TO AUSTRALIAN UNITS OF COMPETENCY\n- SITXFSA005 Use hygienic practices for food safety (described at 02:41)\n- SITXFSA006 Participate in safe food handling practices (described at 02:41)\n\nQUALIFICATIONS\n- SIT30821 Certificate III in Commercial Cookery: Recognition of Prior Learning in progress, not yet assessed\n\nName, contact details, employers and dates are for the jobseeker to add.", "sections": {"job": {"id": "cookery-3", "title": "Kitchen hand and food preparation", "setting": "Aged care home kitchen", "location": "Blacktown NSW"}, "experience": [{"t": "02:41", "en": "Raw meat and cooked food had to be kept apart, and I wrote the fridge temperature in a notebook every day.", "for_this_job": true}], "skills": [{"code": "SITXFSA005", "title": "Use hygienic practices for food safety", "described_at": ["02:41"], "for_this_job": true}, {"code": "SITXFSA006", "title": "Participate in safe food handling practices", "described_at": ["02:41"], "for_this_job": true}], "qualifications": [{"title": "SIT30821 Certificate III in Commercial Cookery", "status": "Recognition of Prior Learning in progress, not yet assessed"}], "to_add": "Name, contact details, employers and dates are for the jobseeker to add."}},
+    "cookery-5": {"job_id": "cookery-5", "text": "DRAFT RESUME - for: Catering cook, Contract catering kitchen, Auburn NSW\n\nWORK EXPERIENCE (the jobseeker's own account, translated)\n- Raw meat and cooked food had to be kept apart, and I wrote the fridge temperature in a notebook every day. [transcript 02:41]\n\nSKILLS MAPPED TO AUSTRALIAN UNITS OF COMPETENCY\n- SITXFSA005 Use hygienic practices for food safety (described at 02:41)\n- SITXFSA006 Participate in safe food handling practices (described at 02:41)\n\nQUALIFICATIONS\n- SIT30821 Certificate III in Commercial Cookery: Recognition of Prior Learning in progress, not yet assessed\n\nName, contact details, employers and dates are for the jobseeker to add.", "sections": {"job": {"id": "cookery-5", "title": "Catering cook", "setting": "Contract catering kitchen", "location": "Auburn NSW"}, "experience": [{"t": "02:41", "en": "Raw meat and cooked food had to be kept apart, and I wrote the fridge temperature in a notebook every day.", "for_this_job": true}], "skills": [{"code": "SITXFSA005", "title": "Use hygienic practices for food safety", "described_at": ["02:41"], "for_this_job": true}, {"code": "SITXFSA006", "title": "Participate in safe food handling practices", "described_at": ["02:41"], "for_this_job": true}], "qualifications": [{"title": "SIT30821 Certificate III in Commercial Cookery", "status": "Recognition of Prior Learning in progress, not yet assessed"}], "to_add": "Name, contact details, employers and dates are for the jobseeker to add."}},
+    "cookery-6": {"job_id": "cookery-6", "text": "DRAFT RESUME - for: Canteen cook, School canteen, Liverpool NSW\n\nWORK EXPERIENCE (the jobseeker's own account, translated)\n- Raw meat and cooked food had to be kept apart, and I wrote the fridge temperature in a notebook every day. [transcript 02:41]\n\nSKILLS MAPPED TO AUSTRALIAN UNITS OF COMPETENCY\n- SITXFSA005 Use hygienic practices for food safety (described at 02:41)\n- SITXFSA006 Participate in safe food handling practices (described at 02:41)\n\nQUALIFICATIONS\n- SIT30821 Certificate III in Commercial Cookery: Recognition of Prior Learning in progress, not yet assessed\n\nName, contact details, employers and dates are for the jobseeker to add.", "sections": {"job": {"id": "cookery-6", "title": "Canteen cook", "setting": "School canteen", "location": "Liverpool NSW"}, "experience": [{"t": "02:41", "en": "Raw meat and cooked food had to be kept apart, and I wrote the fridge temperature in a notebook every day.", "for_this_job": true}], "skills": [{"code": "SITXFSA005", "title": "Use hygienic practices for food safety", "described_at": ["02:41"], "for_this_job": true}, {"code": "SITXFSA006", "title": "Participate in safe food handling practices", "described_at": ["02:41"], "for_this_job": true}], "qualifications": [{"title": "SIT30821 Certificate III in Commercial Cookery", "status": "Recognition of Prior Learning in progress, not yet assessed"}], "to_add": "Name, contact details, employers and dates are for the jobseeker to add."}},
+    "cookery-4": {"job_id": "cookery-4", "text": "DRAFT RESUME - for: Breakfast cook, Club bistro, Bankstown NSW\n\nWORK EXPERIENCE (the jobseeker's own account, translated)\n- Raw meat and cooked food had to be kept apart, and I wrote the fridge temperature in a notebook every day. [transcript 02:41]\n\nSKILLS MAPPED TO AUSTRALIAN UNITS OF COMPETENCY\n- SITXFSA005 Use hygienic practices for food safety (described at 02:41)\n- SITXFSA006 Participate in safe food handling practices (described at 02:41)\n\nQUALIFICATIONS\n- SIT30821 Certificate III in Commercial Cookery: Recognition of Prior Learning in progress, not yet assessed\n\nName, contact details, employers and dates are for the jobseeker to add.", "sections": {"job": {"id": "cookery-4", "title": "Breakfast cook", "setting": "Club bistro", "location": "Bankstown NSW"}, "experience": [{"t": "02:41", "en": "Raw meat and cooked food had to be kept apart, and I wrote the fridge temperature in a notebook every day.", "for_this_job": true}], "skills": [{"code": "SITXFSA005", "title": "Use hygienic practices for food safety", "described_at": ["02:41"], "for_this_job": true}, {"code": "SITXFSA006", "title": "Participate in safe food handling practices", "described_at": ["02:41"], "for_this_job": false}], "qualifications": [{"title": "SIT30821 Certificate III in Commercial Cookery", "status": "Recognition of Prior Learning in progress, not yet assessed"}], "to_add": "Name, contact details, employers and dates are for the jobseeker to add."}},
+    "cookery-7": {"job_id": "cookery-7", "text": "DRAFT RESUME - for: Banquet cook, Hotel function kitchen, Sydney CBD NSW\n\nWORK EXPERIENCE (the jobseeker's own account, translated)\n- Raw meat and cooked food had to be kept apart, and I wrote the fridge temperature in a notebook every day. [transcript 02:41]\n\nSKILLS MAPPED TO AUSTRALIAN UNITS OF COMPETENCY\n- SITXFSA005 Use hygienic practices for food safety (described at 02:41)\n- SITXFSA006 Participate in safe food handling practices (described at 02:41)\n\nQUALIFICATIONS\n- SIT30821 Certificate III in Commercial Cookery: Recognition of Prior Learning in progress, not yet assessed\n\nName, contact details, employers and dates are for the jobseeker to add.", "sections": {"job": {"id": "cookery-7", "title": "Banquet cook", "setting": "Hotel function kitchen", "location": "Sydney CBD NSW"}, "experience": [{"t": "02:41", "en": "Raw meat and cooked food had to be kept apart, and I wrote the fridge temperature in a notebook every day.", "for_this_job": true}], "skills": [{"code": "SITXFSA005", "title": "Use hygienic practices for food safety", "described_at": ["02:41"], "for_this_job": true}, {"code": "SITXFSA006", "title": "Participate in safe food handling practices", "described_at": ["02:41"], "for_this_job": false}], "qualifications": [{"title": "SIT30821 Certificate III in Commercial Cookery", "status": "Recognition of Prior Learning in progress, not yet assessed"}], "to_add": "Name, contact details, employers and dates are for the jobseeker to add."}},
+    "cookery-8": {"job_id": "cookery-8", "text": "DRAFT RESUME - for: Production cook, Central production kitchen, Wetherill Park NSW\n\nWORK EXPERIENCE (the jobseeker's own account, translated)\n- Raw meat and cooked food had to be kept apart, and I wrote the fridge temperature in a notebook every day. [transcript 02:41]\n\nSKILLS MAPPED TO AUSTRALIAN UNITS OF COMPETENCY\n- SITXFSA005 Use hygienic practices for food safety (described at 02:41)\n- SITXFSA006 Participate in safe food handling practices (described at 02:41)\n\nQUALIFICATIONS\n- SIT30821 Certificate III in Commercial Cookery: Recognition of Prior Learning in progress, not yet assessed\n\nName, contact details, employers and dates are for the jobseeker to add.", "sections": {"job": {"id": "cookery-8", "title": "Production cook", "setting": "Central production kitchen", "location": "Wetherill Park NSW"}, "experience": [{"t": "02:41", "en": "Raw meat and cooked food had to be kept apart, and I wrote the fridge temperature in a notebook every day.", "for_this_job": true}], "skills": [{"code": "SITXFSA005", "title": "Use hygienic practices for food safety", "described_at": ["02:41"], "for_this_job": true}, {"code": "SITXFSA006", "title": "Participate in safe food handling practices", "described_at": ["02:41"], "for_this_job": false}], "qualifications": [{"title": "SIT30821 Certificate III in Commercial Cookery", "status": "Recognition of Prior Learning in progress, not yet assessed"}], "to_add": "Name, contact details, employers and dates are for the jobseeker to add."}},
+    "cookery-2": {"job_id": "cookery-2", "text": "DRAFT RESUME - for: Commercial cook, Public hospital kitchen, Westmead NSW\n\nWORK EXPERIENCE (the jobseeker's own account, translated)\n- Raw meat and cooked food had to be kept apart, and I wrote the fridge temperature in a notebook every day. [transcript 02:41]\n\nSKILLS MAPPED TO AUSTRALIAN UNITS OF COMPETENCY\n- SITXFSA005 Use hygienic practices for food safety (described at 02:41)\n- SITXFSA006 Participate in safe food handling practices (described at 02:41)\n\nQUALIFICATIONS\n- SIT30821 Certificate III in Commercial Cookery: Recognition of Prior Learning in progress, not yet assessed\n\nName, contact details, employers and dates are for the jobseeker to add.", "sections": {"job": {"id": "cookery-2", "title": "Commercial cook", "setting": "Public hospital kitchen", "location": "Westmead NSW"}, "experience": [{"t": "02:41", "en": "Raw meat and cooked food had to be kept apart, and I wrote the fridge temperature in a notebook every day.", "for_this_job": false}], "skills": [{"code": "SITXFSA005", "title": "Use hygienic practices for food safety", "described_at": ["02:41"], "for_this_job": false}, {"code": "SITXFSA006", "title": "Participate in safe food handling practices", "described_at": ["02:41"], "for_this_job": false}], "qualifications": [{"title": "SIT30821 Certificate III in Commercial Cookery", "status": "Recognition of Prior Learning in progress, not yet assessed"}], "to_add": "Name, contact details, employers and dates are for the jobseeker to add."}},
+    "cookery-9": {"job_id": "cookery-9", "text": "DRAFT RESUME - for: Grill cook, Pub bistro, Penrith NSW\n\nWORK EXPERIENCE (the jobseeker's own account, translated)\n- Raw meat and cooked food had to be kept apart, and I wrote the fridge temperature in a notebook every day. [transcript 02:41]\n\nSKILLS MAPPED TO AUSTRALIAN UNITS OF COMPETENCY\n- SITXFSA005 Use hygienic practices for food safety (described at 02:41)\n- SITXFSA006 Participate in safe food handling practices (described at 02:41)\n\nQUALIFICATIONS\n- SIT30821 Certificate III in Commercial Cookery: Recognition of Prior Learning in progress, not yet assessed\n\nName, contact details, employers and dates are for the jobseeker to add.", "sections": {"job": {"id": "cookery-9", "title": "Grill cook", "setting": "Pub bistro", "location": "Penrith NSW"}, "experience": [{"t": "02:41", "en": "Raw meat and cooked food had to be kept apart, and I wrote the fridge temperature in a notebook every day.", "for_this_job": false}], "skills": [{"code": "SITXFSA005", "title": "Use hygienic practices for food safety", "described_at": ["02:41"], "for_this_job": false}, {"code": "SITXFSA006", "title": "Participate in safe food handling practices", "described_at": ["02:41"], "for_this_job": false}], "qualifications": [{"title": "SIT30821 Certificate III in Commercial Cookery", "status": "Recognition of Prior Learning in progress, not yet assessed"}], "to_add": "Name, contact details, employers and dates are for the jobseeker to add."}},
+  },
 };
+// The best-fit job's draft, as the server also returns it for older callers.
+FIXTURE_MATCH.resume = FIXTURE_MATCH.resumes[FIXTURE_MATCH.jobs[0].id];
 
 // Mirrors the server's guard order (consent before language) and message shape,
 // so a refusal looks the same in mock mode as it will against the real API.
@@ -388,7 +445,8 @@ const state = {
   busy: false,
   recorder: null,
   startedAt: null, // first segment start, for real-mode timestamps
-  resumeOpen: false,
+  selectedJob: null, // null means the best-fit job, the first one listed
+  filters: { location: "", type: "" }, // "" means any
 };
 
 const $ = id => document.getElementById(id);
@@ -458,7 +516,8 @@ function resetSession() {
   state.extract = null;
   state.match = null;
   state.startedAt = null;
-  state.resumeOpen = false;
+  state.selectedJob = null;
+  state.filters = { location: "", type: "" };
   mockNext.zh = 0; mockNext.ar = 0;
   $("offline").hidden = true;
   showError("");
@@ -599,6 +658,7 @@ async function buildPack() {
       occupation: OCCUPATION, evidenced_units: evidencedUnits(extract), transcript } });
     if (refusedBy(match)) return;
     state.match = match;
+    state.selectedJob = null;
     setStatus("");
   } catch (err) {
     showError("Could not build the evidence pack: " + err.message + ". The transcript is kept; try again.");
@@ -705,34 +765,177 @@ function renderPack() {
     el("p", { class: "metric" }, extract.metric_name + ": " + extract.metric_value));
 }
 
+// Gap chips jump to the course that closes the gap, lit the same way a cited
+// transcript line is, so "what is missing" always lands on "how to get it".
+function highlightCourse(code) {
+  document.querySelectorAll(".courses .card.hit").forEach(card => card.classList.remove("hit"));
+  const card = $("course-" + code);
+  if (!card) return;
+  card.classList.add("hit");
+  card.scrollIntoView({ behavior: "smooth", block: "center" });
+  card.focus({ preventScroll: true });
+}
+
+function selectJob(id) {
+  state.selectedJob = id;
+  renderMatches();
+  // The clicked button was replaced by the re-render; keep keyboard focus on its successor.
+  const button = document.querySelector('.job-card[data-id="' + CSS.escape(id) + '"] .select-job');
+  if (button) button.focus({ preventScroll: true });
+}
+
+function visibleJobs(match) {
+  return match.jobs.filter(job => (!state.filters.location || job.location === state.filters.location) &&
+                                  (!state.filters.type || job.employment_type === state.filters.type));
+}
+
+// A job hidden by the filters cannot stay selected, or the resume would name a
+// card that is no longer on screen.
+function selectedJobId(match, visible) {
+  const ids = visible.map(job => job.id);
+  return ids.includes(state.selectedJob) ? state.selectedJob : (ids[0] || null);
+}
+
+function transcriptStamps(sources) {
+  return (sources || []).filter(([label]) => label === "transcript")
+                        .map(([, locator]) => String(locator).replace(/^t=/, ""));
+}
+
+const ICONS = {
+  pin: "M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21zm0-9a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z",
+  clock: "M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zm0 2a7 7 0 1 1 0 14 7 7 0 0 1 0-14zm-1 2v6l5 3 1-1.7-4-2.3V7z",
+  level: "M4 20V13h4v7zm6 0V8h4v12zm6 0V4h4v16z",
+  shift: "M7 2v2H5a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-2V2h-2v2H9V2zM5 9h14v10H5z",
+};
+
+function icon(name) {
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("viewBox", "0 0 24 24");
+  svg.setAttribute("aria-hidden", "true");
+  const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  path.setAttribute("d", ICONS[name]);
+  path.setAttribute("fill", "currentColor");
+  svg.append(path);
+  return svg;
+}
+
+function fact(name, text, label) {
+  return text ? el("p", { class: "fact" }, icon(name), el("span", { class: "visually-hidden" }, label + ": "), text) : null;
+}
+
+function renderJobCard(job, selected) {
+  // "2 of 4 required units evidenced" -> the big "2 of 4" and its caption.
+  const [, count, caption] = /^(\d+ of \d+) (.*)$/.exec(job.fit) || [null, job.fit, ""];
+  return el("article", { class: "job-card" + (selected ? " selected" : ""), "data-id": job.id,
+                         // Chips inside the card do their own thing; anywhere else selects it.
+                         onclick: event => { if (!event.target.closest("a, button:not(.select-job)")) selectJob(job.id); } },
+    el("div", { class: "job-body" },
+      el("span", { class: "sample" }, job.note || "Representative sample, not a real listing"),
+      el("h3", {}, job.title),
+      el("p", { class: "setting" }, job.setting),
+      el("div", { class: "facts" },
+        fact("pin", job.location, "Location"), fact("clock", job.employment_type, "Employment type"),
+        fact("shift", job.shift, "Hours"), fact("level", job.level, "Level")),
+      el("p", { class: "label" }, "Evidenced in this interview"),
+      job.matched.length ? el("div", { class: "chips" }, job.matched.map(unit => {
+        const stamps = transcriptStamps(unit.sources);
+        return el("button", { type: "button", class: "unit-chip have",
+                              onclick: () => stamps.length && highlight(stamps[0]),
+                              "aria-label": unit.code + " " + unit.title + ", show transcript line at " + stamps.join(", ") },
+          el("span", { class: "code" }, unit.code), unit.title,
+          stamps.length ? el("span", { class: "when" }, "· " + stamps.join(", ")) : null);
+      })) : el("p", { class: "muted small" }, "None yet"),
+      el("p", { class: "label" }, "Still to evidence"),
+      job.missing.length ? el("div", { class: "chips" }, job.missing.map(unit =>
+        el("a", { class: "unit-chip gap", href: "#course-" + unit.code,
+                  onclick: event => { event.preventDefault(); highlightCourse(unit.code); },
+                  "aria-label": unit.code + " " + unit.title + ", go to gap training" },
+          el("span", { class: "code" }, unit.code), unit.title, el("span", { class: "when" }, "→ gap training"))))
+        : el("p", { class: "muted small" }, "None"),
+      el("button", { type: "button", class: "select-job" + (selected ? "" : " secondary"), "aria-pressed": String(selected) },
+         selected ? "Resume shown for this job" : "Show tailored resume")),
+    el("div", { class: "count" },
+      el("span", { class: "n" }, count),
+      el("span", { class: "caption" }, caption)));
+}
+
+function fillFilter(select, label, values, current) {
+  select.replaceChildren(el("option", { value: "" }, "Any " + label),
+    ...values.map(value => el("option", { value, selected: value === current }, value)));
+}
+
+function transcriptRef(t) {
+  return el("button", { type: "button", class: "link", onclick: () => highlight(t),
+                        "aria-label": "Show transcript line at " + t }, "[transcript " + t + "]");
+}
+
+async function copyResume(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+  } catch (err) {
+    // The async clipboard needs a secure context and permission; fall back to a selection copy.
+    const area = el("textarea", { class: "offscreen", readonly: true });
+    area.value = text;
+    document.body.append(area);
+    area.select();
+    const copied = document.execCommand("copy");
+    area.remove();
+    if (!copied) { $("resume-status").textContent = "Could not copy; select the text and copy it by hand."; return; }
+  }
+  $("resume-status").textContent = "Copied as plain text.";
+}
+
+function renderResume(match, jobId) {
+  const panel = $("resume-panel");
+  const resume = jobId && match.resumes ? match.resumes[jobId] : null;
+  if (!resume) {
+    panel.replaceChildren(el("h3", { id: "h-resume" }, "Draft resume"),
+                          el("p", { class: "empty" }, "No sample job selected, so no resume yet."));
+    return;
+  }
+  const doc = resume.sections;
+  panel.replaceChildren(
+    el("div", { class: "resume-actions" },
+      el("h3", { id: "h-resume" }, "Draft resume"),
+      el("button", { type: "button", class: "secondary", onclick: () => copyResume(resume.text) }, "Copy"),
+      el("button", { type: "button", class: "secondary", onclick: () => window.print() }, "Print")),
+    el("p", { class: "status small", id: "resume-status", role: "status", "aria-live": "polite" }),
+    el("p", { class: "small muted" }, "Tailored to ", el("b", {}, doc.job.title),
+       " by order alone: the units it asks for, and the lines that evidence them, come first (blue bar). Nothing is added. The jobseeker checks it before it goes anywhere."),
+    el("article", { class: "resume-doc", lang: "en" },
+      el("p", { class: "kicker" }, "Draft resume"),
+      el("h3", {}, "For: " + doc.job.title + ", " + doc.job.setting + (doc.job.location ? ", " + doc.job.location : "")),
+      el("h4", {}, "Work experience"),
+      el("p", { class: "small muted" }, "The jobseeker's own account, translated"),
+      doc.experience.length ? el("ul", {}, doc.experience.map(line =>
+        el("li", { class: line.for_this_job ? "req" : null }, line.en, " ", transcriptRef(line.t))))
+        : el("p", { class: "muted" }, "No transcript line is cited yet."),
+      el("h4", {}, "Skills mapped to Australian units of competency"),
+      el("ul", {}, doc.skills.map(skill =>
+        el("li", { class: skill.for_this_job ? "req" : null },
+          el("span", { class: "code" }, skill.code), " ", skill.title,
+          skill.described_at.length ? [" (described at ", skill.described_at.map((t, i) => [i ? ", " : "", transcriptRef(t)]), ")"] : null))),
+      el("h4", {}, "Qualifications"),
+      el("ul", {}, doc.qualifications.map(q => el("li", {}, el("b", {}, q.title), ": " + q.status))),
+      el("p", { class: "to-add" }, doc.to_add)));
+}
+
 function renderMatches() {
   const match = state.match;
   $("matches").hidden = !match;
   if (!match) return;
   const titles = Object.fromEntries(match.jobs.map(job => [job.id, job.title]));
-  $("jobs").replaceChildren(...match.jobs.map(job => {
-    const hasResume = match.resume && match.resume.job_id === job.id;
-    return el("article", { class: "card" },
-      el("p", {}, el("span", { class: "sample" }, "Representative sample")),
-      el("h3", {}, job.title),
-      el("p", { class: "muted" }, job.setting),
-      el("p", { class: "fit" }, job.fit),
-      el("p", {}, el("b", {}, "Evidenced")),
-      job.matched.length ? el("ul", { class: "units" }, job.matched.map(unit =>
-        el("li", {}, el("span", { class: "code" }, unit.code), " ", unit.title, " (", sourceLinks(unit.sources), ")")))
-        : el("p", { class: "muted" }, "None yet"),
-      el("p", {}, el("b", {}, "Still to evidence")),
-      job.missing.length ? el("ul", { class: "units" }, job.missing.map(unit =>
-        el("li", {}, el("span", { class: "code" }, unit.code), " ", unit.title)))
-        : el("p", { class: "muted" }, "None"),
-      job.note ? el("p", { class: "small muted" }, job.note) : null,
-      hasResume ? el("button", { type: "button", class: "secondary", "aria-expanded": String(state.resumeOpen),
-                                 onclick: () => { state.resumeOpen = !state.resumeOpen; renderMatches(); } },
-                     state.resumeOpen ? "Hide resume" : "Show resume") : null,
-      hasResume && state.resumeOpen ? el("pre", { class: "resume" }, match.resume.text) : null);
-  }));
+  const unique = key => [...new Set(match.jobs.map(job => job[key]).filter(Boolean))].sort();
+  fillFilter($("filter-location"), "location", unique("location"), state.filters.location);
+  fillFilter($("filter-type"), "employment type", unique("employment_type"), state.filters.type);
+  const visible = visibleJobs(match);
+  const selected = selectedJobId(match, visible);
+  $("jobs-shown").textContent = visible.length + " sample jobs shown, best fit first";
+  $("jobs").replaceChildren(...(visible.length ? visible.map(job => renderJobCard(job, job.id === selected))
+                                               : [el("p", { class: "empty" }, "No sample job matches these filters.")]));
+  renderResume(match, selected);
   $("courses").replaceChildren(...match.courses.map(course =>
-    el("article", { class: "card" },
+    el("article", { class: "card", id: "course-" + course.code, tabindex: "-1" },
       el("h3", {}, el("span", { class: "code" }, course.code), " ", course.title),
       el("p", {}, course.qualification),
       el("p", {}, "Would count towards: " + course.for_jobs.map(id => titles[id] || id).join(", ")),
@@ -777,6 +980,8 @@ $("record").addEventListener("click", toggleRecord);
 $("demo").addEventListener("click", useDemoTranscript);
 $("build").addEventListener("click", buildPack);
 $("restart").addEventListener("click", restart);
+$("filter-location").addEventListener("change", event => { state.filters.location = event.target.value; renderMatches(); });
+$("filter-type").addEventListener("change", event => { state.filters.type = event.target.value; renderMatches(); });
 render();
 </script>
 </body>
