@@ -190,6 +190,49 @@ class IntakeApi(Server):
         self.assertEqual(status, 200)
         self.assertRegex(body["resume"]["text"], r"(?m)^- .+ \[transcript \d\d:\d\d\]$")
 
+    def test_match_returns_a_resume_tailored_to_every_job(self):
+        units = [{"code": "SITXFSA005", "sources": [["transcript", "t=02:41"]]},
+                 {"code": "SITHCCC027", "sources": [["transcript", "t=00:12"]]},
+                 {"code": "SITHCCC029", "sources": [["transcript", "t=00:47"]]}]
+        status, body = self.post_json("/api/match", {"occupation": "cookery",
+                                                     "evidenced_units": units,
+                                                     "transcript": DEMO_TRANSCRIPT})
+        self.assertEqual(status, 200)
+        self.assertEqual(set(body["resumes"]), {job["id"] for job in body["jobs"]})
+        self.assertEqual(body["resume"], body["resumes"][body["jobs"][0]["id"]])
+        for job in body["jobs"]:
+            resume = body["resumes"][job["id"]]
+            with self.subTest(job=job["id"]):
+                self.assertEqual(resume["job_id"], job["id"])
+                self.assertIn(job["title"], resume["text"])
+                skills = [s["code"] for s in resume["sections"]["skills"]]
+                matched = [u["code"] for u in job["matched"]]
+                self.assertEqual(set(skills[:len(matched)]), set(matched))
+                self.assertEqual(set(skills), {u["code"] for u in units})
+                self.assertNotIn("%", resume["text"])
+                self.assertNotIn(job["fit"], resume["text"])
+                # 01:30 and 03:20 are cited by no unit, so neither may appear.
+                self.assertNotIn("roster", resume["text"])
+                self.assertNotIn("nobody there issued", resume["text"])
+
+    def test_the_mock_fixture_is_what_the_server_returns_for_the_demo(self):
+        """?mock=1 must show the same board and resumes as the real server."""
+        page = app.INTAKE_PAGE.read_text(encoding="utf-8")
+        block = page.split("const FIXTURE_MATCH = {")[1].split("\n};")[0]
+        def rows(name, closer):
+            body = block.split(f"  {name}: {closer[0]}\n")[1].split(f"\n  {closer[1]},")[0]
+            return [line.strip().rstrip(",") for line in body.splitlines()]
+        fixture = {"jobs": [json.loads(r) for r in rows("jobs", "[]")],
+                   "courses": [json.loads(r) for r in rows("courses", "[]")],
+                   "resumes": json.loads("{" + ",".join(rows("resumes", "{}")) + "}")}
+        units = [{"code": c, "sources": [["transcript", "t=02:41"]]} for c in ("SITXFSA005", "SITXFSA006")]
+        status, body = self.post_json("/api/match", {"occupation": "cookery", "evidenced_units": units,
+                                                     "transcript": DEMO_TRANSCRIPT})
+        self.assertEqual(status, 200)
+        for key in ("jobs", "courses", "resumes"):
+            with self.subTest(key=key):
+                self.assertEqual(fixture[key], body[key])
+
     def test_an_unknown_occupation_is_a_400_without_a_traceback(self):
         for path, data in (("/api/extract", cook(occupation="astronaut")),
                            ("/api/match", {"occupation": "astronaut", "evidenced_units": []})):
