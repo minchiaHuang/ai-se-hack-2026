@@ -27,13 +27,15 @@
 html { font-size: 18px; }
 body {
   margin: 0; background: var(--bg); color: var(--text);
-  font: 1rem/1.5 system-ui, -apple-system, "Segoe UI", "PingFang SC", "Noto Sans CJK SC", sans-serif;
+  font: 1rem/1.5 Inter, system-ui, sans-serif;
 }
-header.top { display: flex; align-items: baseline; gap: 1.25rem; padding: 14px 24px;
+/* Figma header: white bar, logo icon, "Bridge" bold and "Work" regular. */
+header.top { display: flex; align-items: center; gap: 1.25rem; padding: 14px 24px;
              border-bottom: 1px solid var(--line); background: var(--card); }
-.wordmark { font-size: 1.4rem; margin: 0; letter-spacing: -.01em; }
+.wordmark { display: flex; align-items: center; font-size: 1.6rem; margin: 0; letter-spacing: -.01em; }
+.wordmark img { height: 1.6em; width: auto; margin-right: .45rem; }
 .wordmark b { color: var(--text); }
-.wordmark span { color: var(--primary); font-weight: 400; }
+.wordmark span { color: var(--primary); font-weight: 400; margin-left: .15em; }
 .step { color: var(--muted); font-weight: 600; }
 main { max-width: 1280px; margin: 0 auto; padding: 16px 24px 48px; }
 h2 { font-size: 1.2rem; margin: 0 0 .25rem; }
@@ -125,7 +127,7 @@ pre.original { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font: 
 </head>
 <body>
 <header class="top">
-  <p class="wordmark"><b>Bridge</b><span>Work</span></p>
+  <p class="wordmark"><img src="/logo.svg" alt="" onerror="this.hidden = true"><b>Bridge</b><span>Work</span></p>
   <span class="step">Upload a resume</span>
 </header>
 <main>
@@ -193,11 +195,15 @@ pre.original { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font: 
 // request at all: the demo is recorded in it.
 const params = new URLSearchParams(location.search);
 const MOCK = params.get("mock") === "1";
+// ?quiet=1 hides only the mock banner, for the recorded demo; nothing else changes.
+const QUIET = params.get("quiet") === "1";
 
 // Read by /review. sessionStorage keeps the resume to this tab.
 const SECTIONS_KEY = "d7.sections";
 const INTERVIEW_KEY = "d7.interview";
-const asRoute = (route, file) => (location.protocol === "file:" ? file : route) + (MOCK ? "?mock=1" : "");
+// Both flags ride along on every link, so a demo opened quiet stays quiet.
+const FLAGS = [MOCK && "mock=1", QUIET && "quiet=1"].filter(Boolean).join("&");
+const asRoute = (route, file) => (location.protocol === "file:" ? file : route) + (FLAGS ? "?" + FLAGS : "");
 const REVIEW_URL = asRoute("/review", "review.html");
 
 const MAX_TEXT_BYTES = 100 * 1024;
@@ -484,7 +490,7 @@ function toggleEdit(key) {
 }
 
 // ---------------------------------------------------------------- wiring
-$("mock-banner").hidden = !MOCK;
+$("mock-banner").hidden = !MOCK || QUIET;
 $("consent").addEventListener("change", event => { state.consent = event.target.checked; $("why").textContent = ""; });
 $("lang").addEventListener("change", event => { state.language = event.target.value; });
 $("drop").addEventListener("click", chooseFile);

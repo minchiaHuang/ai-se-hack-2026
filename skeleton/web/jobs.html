@@ -11,35 +11,41 @@
    other product's name, marks or wording. Everything is inline so the page
    renders offline from the stdlib server. */
 :root {
-  --bg: #f4f5f7;
+  /* BridgeWork theme from the Figma "Design Theme" frame, the same tokens as
+     review.html. --ink is Figma's --text. */
+  --primary: #1B4B5A;
+  --accent: #E8874A;
+  --success: #4C9A6B;
+  --bg: #F7F5F1;
+  --ink: #2B2B2B;
   --card: #fff;
-  --ink: #111827;
-  --muted: #5b6472;
-  --line: #e3e6ea;
-  --pill: #f1f3f5;
-  --accent: #0f6b62;
-  --teal-top: #0b1315;
-  --teal-bottom: #16505c;
-  --ring: #3fdc9a;
-  --ring-track: rgba(255, 255, 255, .18);
-  --ok: #0f5c2e;
-  --ok-bg: #e3f4e8;
+  --muted: #5b6168;
+  --line: #d9d4cb;
+  --pill: #efebe4;
+  /* The ring sits on a light panel: #4C9A6B on --primary is only 2.8:1, below
+     the 3:1 a graphic needs, and on --bg it is 3.1:1. */
+  --ring: var(--success);
+  --ring-track: var(--line);
+  /* Text on a success tint: --success itself is too light for text (3.1:1). */
+  --ok: #2f6b47;
+  --ok-bg: #e4f0e8;
   --warn: #7a4a00;
   --warn-bg: #fff3d6;
   --gate: #3b1f7a;
   --gate-bg: #efe9fb;
   --hit: #fff1a8;
   --focus: #ffbf00;
-  /* Save and apply only. Ink text on both: white on either fails contrast. */
-  --apply: #E8874A;
-  --applied: #4C9A6B;
+  /* Save and apply only. Dark text on both: white on either fails contrast,
+     and so does --ink on --success (4.1:1). */
+  --apply: var(--accent);
+  --applied: var(--success);
+  --on-fill: #1f1a15;
 }
 * { box-sizing: border-box; }
 html { font-size: 17px; }
 body {
   margin: 0; background: var(--bg); color: var(--ink);
-  font: 1rem/1.45 system-ui, -apple-system, "Segoe UI", "PingFang TC", "PingFang SC",
-        "Noto Sans CJK TC", "Geeza Pro", "Noto Naskh Arabic", sans-serif;
+  font: 1rem/1.45 Inter, system-ui, sans-serif;
 }
 button, select, input { font: inherit; color: inherit; }
 :focus-visible { outline: 4px solid var(--focus); outline-offset: 2px; }
@@ -48,10 +54,10 @@ p { margin: .3rem 0; }
 .muted { color: var(--muted); }
 .small { font-size: .88rem; }
 .code { font-family: ui-monospace, Menlo, Consolas, monospace; font-weight: 700; }
-button.link { padding: 0; border: 0; background: none; color: var(--accent); text-decoration: underline;
+button.link { padding: 0; border: 0; background: none; color: var(--primary); text-decoration: underline;
               font-weight: 600; cursor: pointer; }
-button.secondary { min-height: 40px; padding: .3rem .9rem; border: 2px solid var(--ink); border-radius: 999px;
-                   background: var(--card); font-weight: 700; cursor: pointer; }
+button.secondary { min-height: 40px; padding: .3rem .9rem; border: 2px solid var(--primary); border-radius: 999px;
+                   background: var(--card); color: var(--primary); font-weight: 700; cursor: pointer; }
 [hidden] { display: none !important; }
 .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .offscreen { position: fixed; left: -9999px; top: 0; }
@@ -61,26 +67,29 @@ svg.i { flex: none; width: 1.05em; height: 1.05em; }
 .shell { display: grid; grid-template-columns: 210px minmax(0, 1fr); min-height: 100vh; }
 .sidebar { position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; gap: .3rem;
            padding: 14px 12px; background: var(--card); border-right: 1px solid var(--line); }
-.brand { display: flex; align-items: center; gap: .5rem; padding: .2rem .4rem .9rem; font-weight: 800; font-size: 1.1rem; }
-.brand .mark { width: 30px; height: 30px; border-radius: 8px; background: linear-gradient(160deg, var(--teal-bottom), var(--ring)); }
+/* Figma header wordmark: logo icon, "Bridge" bold and "Work" regular. */
+.brand { display: flex; align-items: center; padding: .2rem .4rem .9rem; font-size: 1.3rem; letter-spacing: -.01em; }
+.brand img { height: 1.5em; width: auto; margin-right: .4rem; }
+.brand b { color: var(--ink); }
+.brand span { color: var(--primary); font-weight: 400; margin-left: .15em; }
 .nav { display: flex; flex-direction: column; gap: .2rem; }
 .nav button, .nav a { display: flex; align-items: center; gap: .6rem; min-height: 44px; padding: 0 .7rem;
                       border: 0; border-radius: 8px; background: none; text-align: left; text-decoration: none;
                       color: var(--ink); font-weight: 500; cursor: pointer; }
 .nav button:hover, .nav a:hover { background: var(--pill); }
-.nav button[aria-current=page] { background: var(--pill); font-weight: 700; }
+.nav button[aria-current=page] { background: var(--pill); color: var(--primary); font-weight: 700; }
 .nav .back { margin-top: .6rem; border-top: 1px solid var(--line); border-radius: 0; padding-top: .3rem; }
 .side-note { margin-top: auto; padding: .7rem; border-radius: 10px; background: var(--pill); font-size: .82rem; color: var(--muted); }
 
 .main { min-width: 0; display: flex; flex-direction: column; }
 .topbar { position: sticky; top: 0; z-index: 5; display: flex; flex-wrap: wrap; align-items: center; gap: .5rem 1.4rem;
           min-height: 64px; padding: .4rem 24px; background: var(--card); border-bottom: 1px solid var(--line); }
-.topbar h1 { margin: 0; font-size: 1.55rem; font-weight: 900; letter-spacing: .02em; }
+.topbar h1 { margin: 0; font-size: 1.55rem; font-weight: 900; letter-spacing: .02em; color: var(--primary); }
 .tabs { display: flex; gap: 1.2rem; }
 .tabs button { display: flex; align-items: center; gap: .4rem; min-height: 44px; padding: 0 .1rem; border: 0;
                border-bottom: 3px solid transparent; background: none; font-weight: 600; cursor: pointer; }
-.tabs button[aria-selected=true] { border-bottom-color: var(--ink); }
-.tabs .badge { min-width: 1.4rem; padding: 0 .35rem; border-radius: 999px; background: var(--ink); color: #fff;
+.tabs button[aria-selected=true] { border-bottom-color: var(--primary); }
+.tabs .badge { min-width: 1.4rem; padding: 0 .35rem; border-radius: 999px; background: var(--primary); color: #fff;
                font-size: .75rem; font-weight: 700; text-align: center; }
 .search { margin-left: auto; display: flex; align-items: center; gap: .45rem; min-width: 260px; min-height: 40px;
           padding: 0 .8rem; border-radius: 10px; background: var(--pill); color: var(--muted); }
@@ -99,7 +108,7 @@ svg.i { flex: none; width: 1.05em; height: 1.05em; }
 .job-card { display: grid; grid-template-columns: minmax(0, 1fr) 11rem; gap: 6px; padding: 6px; border-radius: 14px;
             background: var(--card); box-shadow: 0 0 0 1px var(--line); cursor: pointer; }
 .job-card:hover { box-shadow: 0 0 0 1px var(--line), 0 4px 14px rgba(17, 24, 39, .08); }
-.job-card.selected { box-shadow: 0 0 0 3px var(--accent); }
+.job-card.selected { box-shadow: 0 0 0 3px var(--primary); }
 .job-main { min-width: 0; padding: .7rem .8rem .8rem; }
 .job-top { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: .9rem; align-items: start; }
 .logo { display: grid; place-items: center; width: 64px; height: 64px; border: 1px solid var(--line); border-radius: 10px;
@@ -119,16 +128,15 @@ svg.i { flex: none; width: 1.05em; height: 1.05em; }
    require the mark to link to the ad and to be drawn at no less than
    116x23 px. Do not shrink these two values or drop the link. */
 .adzuna { display: inline-flex; align-items: center; justify-content: center; min-width: 116px; min-height: 23px;
-          margin-top: .6rem; padding: 0 .5rem; border-radius: 6px; background: var(--pill); color: var(--accent);
+          margin-top: .6rem; padding: 0 .5rem; border-radius: 6px; background: var(--pill); color: var(--primary);
           font-size: .8rem; font-weight: 700; text-decoration: underline; }
 .source-line { margin: 0 0 .5rem; font-size: .88rem; color: var(--muted); }
-.source-line a { color: var(--accent); }
+.source-line a { color: var(--primary); }
 
 /* The fit: unit coverage of this job, drawn as a ring. The caption carries the
    count it comes from; there is no label that grades the match or the person. */
 .fit { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .55rem;
-       padding: 1rem .6rem; border-radius: 10px; color: #fff; text-align: center;
-       background: linear-gradient(180deg, var(--teal-top) 0%, #0f2a30 45%, var(--teal-bottom) 100%); }
+       padding: 1rem .6rem; border-radius: 10px; color: var(--primary); text-align: center; background: var(--bg); }
 .ring { position: relative; width: 92px; height: 92px; }
 .ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
 .ring .pct { position: absolute; inset: 0; display: grid; place-items: center; font-size: 1.6rem; font-weight: 800;
@@ -137,7 +145,7 @@ svg.i { flex: none; width: 1.05em; height: 1.05em; }
 .fit .caption { font-size: .82rem; font-weight: 700; letter-spacing: .02em; text-transform: uppercase; }
 /* An ad that names no unit has nothing to divide, so the ring shows a dash
    rather than a 0% that would read as a judgement of the person. */
-.ring .pct.none { font-size: 2rem; color: var(--ring-track); }
+.ring .pct.none { font-size: 2rem; color: var(--muted); }
 
 .profile { position: sticky; top: 64px; align-self: start; max-height: calc(100vh - 64px); overflow: auto;
            padding: 16px 18px 32px; background: var(--card); border-left: 1px solid var(--line); }
@@ -163,11 +171,11 @@ svg.i { flex: none; width: 1.05em; height: 1.05em; }
 .resume-doc .kicker { margin: 0; font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
 .resume-doc h3 { font-size: 1.1rem; margin: .1rem 0 .4rem; }
 .resume-doc h4 { font-size: .9rem; text-transform: uppercase; letter-spacing: .03em; margin: .9rem 0 .25rem;
-                 padding-bottom: .15rem; border-bottom: 2px solid var(--ink); }
+                 padding-bottom: .15rem; color: var(--primary); border-bottom: 2px solid var(--primary); }
 .resume-doc ul { margin: .2rem 0; padding-left: 1.2rem; }
 .resume-doc li { margin: .2rem 0; padding-left: .3rem; }
 /* Screen-only emphasis for what the selected job asks for; print drops it. */
-.resume-doc li.req { border-left: 4px solid var(--accent); }
+.resume-doc li.req { border-left: 4px solid var(--primary); }
 .resume-doc .to-add { margin-top: .9rem; font-style: italic; }
 .status { min-height: 1.3rem; font-weight: 600; }
 
@@ -176,13 +184,13 @@ svg.i { flex: none; width: 1.05em; height: 1.05em; }
 .marks button, .job-actions button, .apply-buttons button { min-height: 40px; padding: .3rem .9rem; border-radius: 999px;
                                                             font-weight: 700; cursor: pointer; }
 .marks button { border: 2px solid var(--line); background: var(--card); }
-.marks button[aria-pressed=true] { border-color: var(--ink); background: var(--pill); }
+.marks button[aria-pressed=true] { border-color: var(--primary); background: var(--pill); }
 .job-actions { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .6rem; }
 button.save { border: 2px solid var(--line); background: var(--card); }
 button.save[aria-pressed=true] { border-color: var(--apply); }
 button.save .star { color: var(--apply); }
-button.apply { border: 2px solid var(--apply); background: var(--apply); color: var(--ink); }
-button.applied { border: 2px solid var(--applied); background: var(--applied); color: var(--ink); cursor: default; }
+button.apply { border: 2px solid var(--apply); background: var(--apply); color: var(--on-fill); }
+button.applied { border: 2px solid var(--applied); background: var(--applied); color: var(--on-fill); cursor: default; }
 .apply-panel { margin-bottom: 1rem; padding: .8rem 1rem; border: 3px solid var(--apply); border-radius: 12px;
                background: var(--card); scroll-margin: 80px; }
 .apply-panel h3 { margin: 0 0 .1rem; font-size: 1.15rem; }
@@ -199,7 +207,7 @@ button.applied { border: 2px solid var(--applied); background: var(--applied); c
 .card h3 { margin: 0 0 .2rem; font-size: 1rem; }
 .card .value { font-size: 1.15rem; font-weight: 700; overflow-wrap: anywhere; }
 .chip { display: inline-block; padding: 0 .5rem; border-radius: 999px; font-size: .82rem; font-weight: 700; border: 2px solid currentColor; }
-.chip.high { color: var(--ok); background: var(--ok-bg); }
+.chip.high { color: var(--ok); background: var(--ok-bg); border-color: var(--success); }
 .chip.low { color: var(--warn); background: var(--warn-bg); }
 .withheld { background: var(--warn-bg); box-shadow: 0 0 0 2px var(--warn); }
 .withheld .value { color: var(--warn); }
@@ -220,7 +228,7 @@ button.applied { border: 2px solid var(--applied); background: var(--applied); c
 .placeholder-line { color: var(--warn); font-weight: 600; font-size: .88rem; }
 .nothing { max-width: 640px; margin: 3rem auto; padding: 1.2rem 1.4rem; border-radius: 14px; background: var(--card);
            box-shadow: 0 0 0 1px var(--line); }
-.nothing a { color: var(--accent); font-weight: 700; }
+.nothing a { color: var(--primary); font-weight: 700; }
 
 /* Which view shows. The top bar's tabs and search belong to the jobs view only. */
 html:not([data-view=jobs]) #view-jobs, html:not([data-view=jobs]) .tabs, html:not([data-view=jobs]) .search { display: none; }
@@ -262,7 +270,8 @@ html:not([data-view=evidence]) #view-evidence, html:not([data-view=source]) #vie
 <body>
 <div class="shell">
   <aside class="sidebar">
-    <div class="brand"><span class="mark" aria-hidden="true"></span>Bridge Work</div>
+    <!-- A missing /logo.svg (or the page opened from disk) hides the image, so the wordmark alone still reads right. -->
+    <div class="brand"><img src="/logo.svg" alt="" onerror="this.hidden = true"><b>Bridge</b><span>Work</span></div>
     <nav class="nav" aria-label="Views">
       <button type="button" data-view="jobs" id="nav-jobs">Jobs</button>
       <button type="button" data-view="evidence" id="nav-evidence">Your evidence</button>
@@ -338,6 +347,13 @@ const params = new URLSearchParams(location.search);
 // Opened from disk the pages link by file name; served, by route.
 const INTAKE_URL = (location.protocol === "file:" ? "intake.html" : "/intake") +
                    (params.get("mock") === "1" ? "?mock=1" : "");
+// ?quiet=1 hides only the mock banner, for the recorded demo; nothing else changes.
+const QUIET = params.get("quiet") === "1";
+// The sidebar's way back is the choice of path, with the demo flags kept so a
+// quiet demo stays quiet. Opened from disk there is no such page, so it falls
+// back to the intake file.
+const FLAGS = [params.get("mock") === "1" && "mock=1", QUIET && "quiet=1"].filter(Boolean).join("&");
+const START_URL = (location.protocol === "file:" ? "intake.html" : "/start/path") + (FLAGS ? "?" + FLAGS : "");
 
 const FIELD_LABELS = {
   anzsco_code: "ANZSCO 2022 occupation",
@@ -1056,8 +1072,8 @@ function renderMatches() {
 }
 
 // ---------------------------------------------------------------- wiring
-$("mock-banner").hidden = !(params.get("mock") === "1" || (session && session.mock));
-$("to-intake").href = INTAKE_URL;
+$("mock-banner").hidden = !(params.get("mock") === "1" || (session && session.mock)) || QUIET;
+$("to-intake").href = START_URL;
 $("nothing-link").href = INTAKE_URL;
 $("nav-jobs").prepend(icon("jobs"));
 $("nav-evidence").prepend(icon("evidence"));
