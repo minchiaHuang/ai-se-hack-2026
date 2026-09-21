@@ -1,0 +1,790 @@
+<!doctype html>
+<html lang="en" data-view="jobs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jobs</title>
+<style>
+/* The job platform the intake hands over to. Layout and colour follow a common
+   job-board pattern (sidebar, tabbed top bar, filter pills, wide cards on grey,
+   a dark panel with a ring on each card, a profile column on the right); no
+   other product's name, marks or wording. Everything is inline so the page
+   renders offline from the stdlib server. */
+:root {
+  --bg: #f4f5f7;
+  --card: #fff;
+  --ink: #111827;
+  --muted: #5b6472;
+  --line: #e3e6ea;
+  --pill: #f1f3f5;
+  --accent: #0f6b62;
+  --teal-top: #0b1315;
+  --teal-bottom: #16505c;
+  --ring: #3fdc9a;
+  --ring-track: rgba(255, 255, 255, .18);
+  --ok: #0f5c2e;
+  --ok-bg: #e3f4e8;
+  --warn: #7a4a00;
+  --warn-bg: #fff3d6;
+  --gate: #3b1f7a;
+  --gate-bg: #efe9fb;
+  --hit: #fff1a8;
+  --focus: #ffbf00;
+}
+* { box-sizing: border-box; }
+html { font-size: 17px; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font: 1rem/1.45 system-ui, -apple-system, "Segoe UI", "PingFang TC", "PingFang SC",
+        "Noto Sans CJK TC", "Geeza Pro", "Noto Naskh Arabic", sans-serif;
+}
+button, select, input { font: inherit; color: inherit; }
+:focus-visible { outline: 4px solid var(--focus); outline-offset: 2px; }
+h2 { font-size: 1.2rem; margin: 0 0 .6rem; }
+p { margin: .3rem 0; }
+.muted { color: var(--muted); }
+.small { font-size: .88rem; }
+.code { font-family: ui-monospace, Menlo, Consolas, monospace; font-weight: 700; }
+button.link { padding: 0; border: 0; background: none; color: var(--accent); text-decoration: underline;
+              font-weight: 600; cursor: pointer; }
+button.secondary { min-height: 40px; padding: .3rem .9rem; border: 2px solid var(--ink); border-radius: 999px;
+                   background: var(--card); font-weight: 700; cursor: pointer; }
+[hidden] { display: none !important; }
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.offscreen { position: fixed; left: -9999px; top: 0; }
+svg.i { flex: none; width: 1.05em; height: 1.05em; }
+
+/* ------------------------------------------------------------ shell */
+.shell { display: grid; grid-template-columns: 210px minmax(0, 1fr); min-height: 100vh; }
+.sidebar { position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; gap: .3rem;
+           padding: 14px 12px; background: var(--card); border-right: 1px solid var(--line); }
+.brand { display: flex; align-items: center; gap: .5rem; padding: .2rem .4rem .9rem; font-weight: 800; font-size: 1.1rem; }
+.brand .mark { width: 30px; height: 30px; border-radius: 8px; background: linear-gradient(160deg, var(--teal-bottom), var(--ring)); }
+.nav { display: flex; flex-direction: column; gap: .2rem; }
+.nav button, .nav a { display: flex; align-items: center; gap: .6rem; min-height: 44px; padding: 0 .7rem;
+                      border: 0; border-radius: 8px; background: none; text-align: left; text-decoration: none;
+                      color: var(--ink); font-weight: 500; cursor: pointer; }
+.nav button:hover, .nav a:hover { background: var(--pill); }
+.nav button[aria-current=page] { background: var(--pill); font-weight: 700; }
+.nav .back { margin-top: .6rem; border-top: 1px solid var(--line); border-radius: 0; padding-top: .3rem; }
+.side-note { margin-top: auto; padding: .7rem; border-radius: 10px; background: var(--pill); font-size: .82rem; color: var(--muted); }
+
+.main { min-width: 0; display: flex; flex-direction: column; }
+.topbar { position: sticky; top: 0; z-index: 5; display: flex; flex-wrap: wrap; align-items: center; gap: .5rem 1.4rem;
+          min-height: 64px; padding: .4rem 24px; background: var(--card); border-bottom: 1px solid var(--line); }
+.topbar h1 { margin: 0; font-size: 1.55rem; font-weight: 900; letter-spacing: .02em; }
+.tabs { display: flex; gap: 1.2rem; }
+.tabs button { display: flex; align-items: center; gap: .4rem; min-height: 44px; padding: 0 .1rem; border: 0;
+               border-bottom: 3px solid transparent; background: none; font-weight: 600; cursor: pointer; }
+.tabs button[aria-selected=true] { border-bottom-color: var(--ink); }
+.tabs .badge { min-width: 1.4rem; padding: 0 .35rem; border-radius: 999px; background: var(--ink); color: #fff;
+               font-size: .75rem; font-weight: 700; text-align: center; }
+.search { margin-left: auto; display: flex; align-items: center; gap: .45rem; min-width: 260px; min-height: 40px;
+          padding: 0 .8rem; border-radius: 10px; background: var(--pill); color: var(--muted); }
+.search:focus-within { outline: 4px solid var(--focus); outline-offset: 2px; }
+.search input { flex: 1; min-width: 0; border: 0; outline: 0; background: none; color: var(--ink); }
+.banner { margin: 12px 24px 0; padding: .5rem .8rem; border: 2px dashed #9ca3af; border-radius: 8px; background: var(--card); }
+
+/* ------------------------------------------------------------ jobs view */
+.board { display: grid; grid-template-columns: minmax(0, 1fr) 380px; flex: 1; }
+.list { min-width: 0; padding: 14px 20px 40px 24px; }
+.pills { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: .5rem; }
+.pills select { min-height: 40px; padding: 0 .7rem; border: 0; border-radius: 8px; background: var(--card);
+                box-shadow: inset 0 0 0 1px var(--line); font-weight: 500; cursor: pointer; }
+.shown { margin: .2rem 0 .7rem; }
+.jobs { display: flex; flex-direction: column; gap: 14px; }
+.job-card { display: grid; grid-template-columns: minmax(0, 1fr) 11rem; gap: 6px; padding: 6px; border-radius: 14px;
+            background: var(--card); box-shadow: 0 0 0 1px var(--line); cursor: pointer; }
+.job-card:hover { box-shadow: 0 0 0 1px var(--line), 0 4px 14px rgba(17, 24, 39, .08); }
+.job-card.selected { box-shadow: 0 0 0 3px var(--accent); }
+.job-main { min-width: 0; padding: .7rem .8rem .8rem; }
+.job-top { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: .9rem; align-items: start; }
+.logo { display: grid; place-items: center; width: 64px; height: 64px; border: 1px solid var(--line); border-radius: 10px;
+        background: #fafafa; color: #c3c8cf; }
+.logo svg { width: 30px; height: 30px; }
+.tags { display: flex; flex-wrap: wrap; gap: .35rem; }
+.tag { padding: .05rem .45rem; border-radius: 6px; background: var(--pill); font-size: .78rem; font-weight: 600; }
+.job-card h3 { margin: .3rem 0 .1rem; font-size: 1.25rem; line-height: 1.25; }
+.job-card h3 button { padding: 0; border: 0; background: none; font: inherit; text-align: left; cursor: pointer; }
+.company { margin: 0; font-size: .95rem; }
+.company .name { font-weight: 600; }
+.facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .25rem 1rem; margin: .7rem 0 0;
+         padding: .6rem 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); font-size: .92rem; }
+.fact { display: flex; align-items: center; gap: .4rem; min-width: 0; margin: 0; }
+
+/* The fit: unit coverage of this job, drawn as a ring. The caption carries the
+   count it comes from; there is no label that grades the match or the person. */
+.fit { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .55rem;
+       padding: 1rem .6rem; border-radius: 10px; color: #fff; text-align: center;
+       background: linear-gradient(180deg, var(--teal-top) 0%, #0f2a30 45%, var(--teal-bottom) 100%); }
+.ring { position: relative; width: 92px; height: 92px; }
+.ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.ring .pct { position: absolute; inset: 0; display: grid; place-items: center; font-size: 1.6rem; font-weight: 800;
+             font-variant-numeric: tabular-nums; }
+.ring .pct small { font-size: .7rem; margin-left: 1px; }
+.fit .caption { font-size: .82rem; font-weight: 700; letter-spacing: .02em; text-transform: uppercase; }
+
+.profile { position: sticky; top: 64px; align-self: start; max-height: calc(100vh - 64px); overflow: auto;
+           padding: 16px 18px 32px; background: var(--card); border-left: 1px solid var(--line); }
+.job-detail h3 { font-size: 1.25rem; margin: .35rem 0 .1rem; }
+.job-detail h4 { font-size: .95rem; margin: .9rem 0 .25rem; }
+.job-detail ul { margin: .2rem 0; padding-left: 1.2rem; }
+.job-detail li { margin: .25rem 0; }
+.job-detail .cited { white-space: nowrap; }
+.fit-line { margin: .5rem 0; padding: .5rem .7rem; border-radius: 8px; background: var(--pill); font-weight: 700; }
+.other-note { padding: .4rem .6rem; background: var(--pill); border-radius: 6px; }
+.resume-panel { margin-top: 1rem; padding-top: .7rem; border-top: 1px solid var(--line); }
+.resume-actions { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; }
+.resume-actions h3 { margin: 0; flex: 1 0 100%; font-size: 1.1rem; }
+.resume-doc { margin-top: .6rem; padding: .8rem 1rem; border: 1px solid var(--line); border-radius: 8px;
+              font-size: .92rem; overflow-wrap: anywhere; }
+.resume-doc .kicker { margin: 0; font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+.resume-doc h3 { font-size: 1.1rem; margin: .1rem 0 .4rem; }
+.resume-doc h4 { font-size: .9rem; text-transform: uppercase; letter-spacing: .03em; margin: .9rem 0 .25rem;
+                 padding-bottom: .15rem; border-bottom: 2px solid var(--ink); }
+.resume-doc ul { margin: .2rem 0; padding-left: 1.2rem; }
+.resume-doc li { margin: .2rem 0; padding-left: .3rem; }
+/* Screen-only emphasis for what the selected job asks for; print drops it. */
+.resume-doc li.req { border-left: 4px solid var(--accent); }
+.resume-doc .to-add { margin-top: .9rem; font-style: italic; }
+.status { min-height: 1.3rem; font-weight: 600; }
+.empty { color: var(--muted); font-style: italic; }
+
+/* ------------------------------------------------------------ evidence and source views */
+.page { max-width: 980px; padding: 18px 24px 48px; }
+.card { margin: .6rem 0; padding: .7rem .9rem; border-radius: 12px; background: var(--card); box-shadow: 0 0 0 1px var(--line); }
+.card h3 { margin: 0 0 .2rem; font-size: 1rem; }
+.card .value { font-size: 1.15rem; font-weight: 700; overflow-wrap: anywhere; }
+.chip { display: inline-block; padding: 0 .5rem; border-radius: 999px; font-size: .82rem; font-weight: 700; border: 2px solid currentColor; }
+.chip.high { color: var(--ok); background: var(--ok-bg); }
+.chip.low { color: var(--warn); background: var(--warn-bg); }
+.withheld { background: var(--warn-bg); box-shadow: 0 0 0 2px var(--warn); }
+.withheld .value { color: var(--warn); }
+.gate { margin: 1rem 0; padding: .8rem 1rem; border: 3px solid var(--gate); border-radius: 12px; background: var(--gate-bg); }
+.gate h3 { margin: 0 0 .3rem; color: var(--gate); font-size: 1.05rem; }
+.gate .text { font-weight: 600; }
+.gate .hit-units { margin-top: .5rem; padding: .4rem .6rem; background: var(--card); border-radius: 6px; }
+.metric { margin-top: 1rem; padding: .6rem .8rem; border-radius: 8px; background: var(--card); box-shadow: 0 0 0 1px var(--line); font-weight: 600; }
+.transcript { list-style: none; margin: 0; padding: 0; border-radius: 12px; background: var(--card); box-shadow: 0 0 0 1px var(--line); }
+.transcript li { display: grid; grid-template-columns: 4rem 1fr; gap: .6rem; padding: .55rem .8rem;
+                 border-bottom: 1px solid var(--line); scroll-margin: 90px; }
+.transcript li:last-child { border-bottom: 0; }
+.transcript li.hit { background: var(--hit); box-shadow: inset 0 0 0 3px #b58900; }
+.ts { font-variant-numeric: tabular-nums; font-weight: 700; color: var(--muted); }
+.said { font-size: 1.1rem; overflow-wrap: anywhere; }
+.said[dir=rtl] { text-align: right; font-size: 1.25rem; }
+.gloss { color: var(--muted); overflow-wrap: anywhere; }
+.placeholder-line { color: var(--warn); font-weight: 600; font-size: .88rem; }
+.nothing { max-width: 640px; margin: 3rem auto; padding: 1.2rem 1.4rem; border-radius: 14px; background: var(--card);
+           box-shadow: 0 0 0 1px var(--line); }
+.nothing a { color: var(--accent); font-weight: 700; }
+
+/* Which view shows. The top bar's tabs and search belong to the jobs view only. */
+html:not([data-view=jobs]) #view-jobs, html:not([data-view=jobs]) .tabs, html:not([data-view=jobs]) .search { display: none; }
+html:not([data-view=evidence]) #view-evidence, html:not([data-view=source]) #view-source { display: none; }
+
+@media (max-width: 1000px) {
+  .shell { grid-template-columns: 1fr; }
+  .sidebar { position: static; height: auto; flex-direction: row; flex-wrap: wrap; align-items: center; }
+  .nav { flex-direction: row; flex-wrap: wrap; }
+  .nav .back { margin-top: 0; border-top: 0; }
+  .side-note { display: none; }
+  .board { grid-template-columns: 1fr; }
+  .profile { position: static; max-height: none; border-left: 0; border-top: 1px solid var(--line); }
+  .search { margin-left: 0; min-width: 0; flex: 1 1 100%; }
+  .job-card { grid-template-columns: minmax(0, 1fr) 8rem; }
+  .facts { grid-template-columns: 1fr; }
+}
+
+/* Printing gives the selected resume alone on A4: no fit, no missing units,
+   nothing from the evidence, since the page may go to an employer. */
+@media print {
+  @page { size: A4; margin: 18mm 16mm; }
+  html { font-size: 11pt; }
+  body { background: #fff; color: #000; }
+  .shell { display: block; }
+  .shell > :not(.main), .main > :not(#view-jobs), #view-jobs > :not(.board), .board > :not(.profile),
+  .profile > :not(.resume-panel), .resume-panel > :not(.resume-doc) { display: none !important; }
+  .board { display: block; }
+  .profile { position: static; max-height: none; overflow: visible; border: 0; padding: 0; }
+  .resume-panel { margin: 0; border: 0; padding: 0; }
+  .resume-doc { margin: 0; padding: 0; border: 0; font-size: 1rem; }
+  .resume-doc li.req { border-left: 0; }
+  .resume-doc button.link { color: #000; text-decoration: none; font-weight: 400; }
+  .resume-doc h4 { break-after: avoid; }
+  .resume-doc li { break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar">
+    <!-- NEEDS DECISION: no product name is settled, so the brand is a plain description. -->
+    <div class="brand"><span class="mark" aria-hidden="true"></span>Work history</div>
+    <nav class="nav" aria-label="Views">
+      <button type="button" data-view="jobs" id="nav-jobs">Jobs</button>
+      <button type="button" data-view="evidence" id="nav-evidence">Your evidence</button>
+      <button type="button" data-view="source" id="nav-source">Your resume</button>
+      <a class="back" id="to-intake" href="/intake">Back to intake</a>
+    </nav>
+    <p class="side-note">Every job here is a representative sample, not a real listing. Fit is shown to the jobseeker and consultant only, never to an employer.</p>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <h1 id="title">JOBS</h1>
+      <div class="tabs" role="tablist" aria-label="Which jobs">
+        <button type="button" role="tab" id="tab-all" data-ours="0">All jobs <span class="badge" id="count-all"></span></button>
+        <button type="button" role="tab" id="tab-ours" data-ours="1">For your evidence <span class="badge" id="count-ours"></span></button>
+      </div>
+      <label class="search" id="search-label"><span class="visually-hidden">Search jobs</span>
+        <input type="search" id="job-search" placeholder="Search by job title or setting" autocomplete="off"></label>
+    </header>
+    <p id="mock-banner" class="banner" hidden>Mock mode: fixture data, no backend. Nothing is recorded or sent.</p>
+
+    <section class="nothing" id="nothing" hidden aria-labelledby="h-nothing">
+      <h2 id="h-nothing">Nothing to show yet</h2>
+      <p>This page shows the jobs for an evidence pack built on the intake, in this browser tab. None has been built here yet, or the tab was closed since.</p>
+      <p><a id="nothing-link" href="/intake">&larr; Go to the intake to start</a></p>
+    </section>
+
+    <div id="view-jobs">
+      <div class="board">
+        <section class="list" aria-labelledby="h-jobs">
+          <h2 id="h-jobs" class="visually-hidden">Jobs</h2>
+          <div class="pills">
+            <label><span class="visually-hidden">Location</span><select id="filter-location"></select></label>
+            <label><span class="visually-hidden">Employment type</span><select id="filter-type"></select></label>
+            <label><span class="visually-hidden">Level</span><select id="filter-level"></select></label>
+          </div>
+          <p class="small muted shown" id="jobs-shown" aria-live="polite"></p>
+          <div class="jobs" id="jobs"></div>
+        </section>
+        <aside class="profile" aria-label="Selected job">
+          <section class="job-detail" id="job-detail" aria-labelledby="h-detail"></section>
+          <section class="resume-panel" id="resume-panel" aria-labelledby="h-resume"></section>
+        </aside>
+      </div>
+    </div>
+
+    <section class="page" id="view-evidence" aria-labelledby="h-evidence">
+      <h2 id="h-evidence" class="visually-hidden">Your evidence</h2>
+      <div id="pack"></div>
+    </section>
+
+    <section class="page" id="view-source" aria-labelledby="h-source">
+      <h2 id="h-source" class="visually-hidden">Your resume</h2>
+      <ol class="transcript" id="transcript"></ol>
+    </section>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+// Written by intake.html just before it navigates here; read once on load.
+// sessionStorage keeps it to this tab, and it is gone when the tab closes.
+const SESSION_KEY = "d7-session";
+const params = new URLSearchParams(location.search);
+// Opened from disk the pages link by file name; served, by route.
+const INTAKE_URL = (location.protocol === "file:" ? "intake.html" : "/intake") +
+                   (params.get("mock") === "1" ? "?mock=1" : "");
+
+const FIELD_LABELS = {
+  anzsco_code: "ANZSCO 2022 occupation",
+  osca_code: "OSCA 2024 occupation",
+  units_evidenced: "Units of competency evidenced",
+  qualification: "Qualification",
+};
+
+function readSession() {
+  try {
+    const session = JSON.parse(sessionStorage.getItem(SESSION_KEY));
+    const ok = session && Array.isArray(session.lines) && session.extract && session.match &&
+               Array.isArray(session.extract.suggestions) && (session.match.all_jobs || session.match.jobs);
+    return ok ? session : null;
+  } catch (err) {
+    // Blocked storage or a damaged value reads as nothing built, never as a crash.
+    return null;
+  }
+}
+
+const session = readSession();
+const state = {
+  source: session ? session.source : null,   // "interview" or "resume"
+  language: session ? session.language : "",
+  lines: session ? session.lines : [],
+  extract: session ? session.extract : null,
+  match: session ? session.match : null,
+  selectedJob: null, // null means the first job listed
+  // "" means any. onlyOurs is the top bar's tab: the occupation's jobs, or all of them.
+  filters: { q: "", location: "", type: "", level: "", onlyOurs: false },
+  view: "jobs",      // "jobs", "evidence" or "source"
+};
+
+const $ = id => document.getElementById(id);
+
+function el(tag, attrs, ...children) {
+  const node = document.createElement(tag);
+  for (const [key, value] of Object.entries(attrs || {})) {
+    if (value === null || value === undefined || value === false) continue;
+    if (key === "class") node.className = value;
+    else if (key.startsWith("on")) node.addEventListener(key.slice(2), value);
+    else node.setAttribute(key, value === true ? "" : value);
+  }
+  // Deep flatten: sourceLinks() returns nested [separator, button] pairs, and a
+  // one-level flat() would stringify them instead of appending the buttons.
+  for (const child of children.flat(Infinity)) {
+    if (child === null || child === undefined || child === false) continue;
+    node.append(child instanceof Node ? child : document.createTextNode(String(child)));
+  }
+  return node;
+}
+
+const SVG = "http://www.w3.org/2000/svg";
+const ICONS = {
+  pin: "M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21zm0-9a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z",
+  clock: "M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zm0 2a7 7 0 1 1 0 14 7 7 0 0 1 0-14zm-1 2v6l5 3 1-1.7-4-2.3V7z",
+  level: "M4 20V13h4v7zm6 0V8h4v12zm6 0V4h4v16z",
+  shift: "M7 2v2H5a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-2V2h-2v2H9V2zM5 9h14v10H5z",
+  search: "M10 3a7 7 0 1 0 4.2 12.6l5.1 5.1 1.4-1.4-5.1-5.1A7 7 0 0 0 10 3zm0 2a5 5 0 1 1 0 10 5 5 0 0 1 0-10z",
+  building: "M4 21V3h11v5h5v13h-7v-4h-2v4zm2-2h3v-4h6v4h3V10h-5V5H6zm2-11h2v2H8zm4 0h2v2h-2zm-4 4h2v2H8zm4 0h2v2h-2z",
+  jobs: "M9 3h6a2 2 0 0 1 2 2v2h3a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h3V5a2 2 0 0 1 2-2zm0 4h6V5H9zM4 9v10h16V9z",
+  evidence: "M12 2l8 3v6c0 5-3.4 9.4-8 11-4.6-1.6-8-6-8-11V5zm0 2.1L6 6.4V11c0 3.9 2.5 7.4 6 8.9 3.5-1.5 6-5 6-8.9V6.4zm-1 10.3l-3-3 1.4-1.4 1.6 1.6 4.6-4.6 1.4 1.4z",
+  source: "M6 2h9l5 5v15H6zm2 2v16h10V8h-4V4zm2 8h6v2h-6zm0 4h6v2h-6z",
+  back: "M11 5l-7 7 7 7 1.4-1.4L7.8 13H20v-2H7.8l4.6-4.6z",
+};
+
+function icon(name) {
+  const svg = document.createElementNS(SVG, "svg");
+  svg.setAttribute("viewBox", "0 0 24 24");
+  svg.setAttribute("aria-hidden", "true");
+  svg.setAttribute("class", "i");
+  const path = document.createElementNS(SVG, "path");
+  path.setAttribute("d", ICONS[name]);
+  path.setAttribute("fill", "currentColor");
+  svg.append(path);
+  return svg;
+}
+
+function sourceWord() {
+  return state.source === "resume" ? "resume" : "interview";
+}
+
+// ---------------------------------------------------------------- views
+function setView(view) {
+  state.view = view;
+  document.documentElement.dataset.view = view;
+  for (const button of document.querySelectorAll(".nav [data-view]")) {
+    if (button.dataset.view === view) button.setAttribute("aria-current", "page");
+    else button.removeAttribute("aria-current");
+  }
+  $("title").textContent = { jobs: "JOBS", evidence: "YOUR EVIDENCE",
+                             source: state.source === "resume" ? "YOUR RESUME" : "YOUR TRANSCRIPT" }[view];
+}
+
+function openView(view) {
+  setView(view);
+  window.scrollTo(0, 0);
+}
+
+// ---------------------------------------------------------------- evidence
+// Units the pack evidences with a citation; withheld items never count.
+function evidencedUnits(extract) {
+  const units = [];
+  for (const item of extract.suggestions) {
+    if (item.field !== "units_evidenced") continue;
+    for (const code of String(item.value).split(/[;,\s]+/).filter(Boolean)) {
+      units.push({ code, sources: item.sources });
+    }
+  }
+  return units;
+}
+
+// "t=02:41" (or a bare "02:41") lights a transcript line; "line=8" a resume line.
+function highlight(locator) {
+  openView("source");
+  const resumeLine = String(locator).startsWith("line=");
+  const t = String(locator).replace(/^(t|line)=/, "");
+  document.querySelectorAll(".transcript li.hit").forEach(li => li.classList.remove("hit"));
+  const line = document.querySelector('.transcript li[' + (resumeLine ? "data-line" : "data-t") + '="' + CSS.escape(t) + '"]');
+  if (!line) return;
+  line.classList.add("hit");
+  line.scrollIntoView({ behavior: "smooth", block: "center" });
+  line.focus({ preventScroll: true });
+}
+
+function sourceLinks(sources) {
+  return (sources || []).map(([label, locator], i) => {
+    const sep = i ? ", " : "";
+    if (label === "transcript") {
+      const t = String(locator).replace(/^t=/, "");
+      return [sep, el("button", { type: "button", class: "link", onclick: () => highlight(locator),
+                                   "aria-label": "Show transcript line at " + t }, t)];
+    }
+    if (label === "resume") {
+      const n = String(locator).replace(/^line=/, "");
+      return [sep, el("button", { type: "button", class: "link", onclick: () => highlight(locator),
+                                   "aria-label": "Show resume line " + n }, "resume line " + n)];
+    }
+    return [sep, label + " " + locator];
+  });
+}
+
+function chip(confidence, withheld) {
+  return el("span", { class: "chip " + (withheld ? "low" : "high") },
+            "confidence " + Number(confidence).toFixed(2));
+}
+
+function citedAt() {
+  return state.source === "resume" ? "Written at: " : "Said at: ";
+}
+
+function renderGate(gate, extract) {
+  if (!gate) return null;
+  // Point at the gate's units already evidenced, with the line that shows each.
+  const evidenced = evidencedUnits(extract).filter(unit => gate.text && gate.text.includes(unit.code));
+  const kind = String(gate.kind || "").replace(/_/g, " ");
+  return el("section", { class: "gate", "aria-labelledby": "h-gate" },
+    el("h3", { id: "h-gate" }, "Gate: what the law requires" + (kind ? " (" + kind + ")" : "")),
+    el("p", { class: "text" }, gate.text),
+    evidenced.length ? el("p", { class: "hit-units" },
+      el("b", {}, "Already evidenced in this " + sourceWord() + ": "),
+      evidenced.map((unit, i) => [i ? "; " : "", el("span", { class: "code" }, unit.code), " (", sourceLinks(unit.sources), ")"])) : null,
+    gate.refugee_note ? el("p", {}, el("b", {}, "Why it matters here: "), gate.refugee_note) : null,
+    gate.source ? el("p", { class: "small" }, "Source: ", el("a", { href: gate.source, target: "_blank", rel: "noopener" }, gate.source)) : null);
+}
+
+function renderPack() {
+  const extract = state.extract;
+  const items = extract.suggestions.map(item =>
+    el("div", { class: "card" },
+      el("h3", {}, FIELD_LABELS[item.field] || item.field),
+      el("p", { class: "value" }, item.value),
+      el("p", {}, chip(item.confidence, false)),
+      el("p", {}, item.reason),
+      el("p", { class: "small" }, citedAt(), sourceLinks(item.sources))));
+  const withheld = (extract.needs_human || []).map(item =>
+    el("div", { class: "card withheld" },
+      el("h3", {}, FIELD_LABELS[item.field] || item.field),
+      el("p", { class: "value" }, "Withheld: a person decides"),
+      el("p", {}, chip(item.confidence, true), " too low to show a value"),
+      el("p", {}, item.reason),
+      el("p", { class: "small" }, citedAt(), sourceLinks(item.sources))));
+  const gaps = (extract.gaps || []).length ? el("div", { class: "card withheld" },
+      el("h3", {}, "Not answered yet: ask about these"),
+      el("ul", {}, extract.gaps.map(field => el("li", {}, FIELD_LABELS[field] || field)))) : null;
+  $("pack").replaceChildren(...items, ...withheld,
+    ...[gaps, renderGate(extract.gate, extract)].filter(Boolean),
+    el("p", { class: "metric" }, extract.metric_name + ": " + extract.metric_value));
+}
+
+function renderTranscript() {
+  const list = $("transcript");
+  const rtl = state.language === "ar";
+  if (state.source === "resume") {
+    list.replaceChildren(...state.lines.map(line =>
+      el("li", { "data-line": String(line.line), tabindex: "-1" },
+        el("span", { class: "ts" }, String(line.line)),
+        el("div", { class: "said", lang: state.language, dir: rtl ? "rtl" : "ltr" }, line.text))));
+    return;
+  }
+  list.replaceChildren(...state.lines.map(line =>
+    el("li", { "data-t": line.t, tabindex: "-1" },
+      el("span", { class: "ts" }, line.t),
+      el("div", {},
+        el("div", { class: "said", lang: state.language, dir: rtl ? "rtl" : "ltr" }, line.text),
+        line.en ? el("div", { class: "gloss", lang: "en", dir: "ltr" }, line.en)
+                : el("div", { class: "gloss" }, "(no English gloss)"),
+        line.placeholder ? el("div", { class: "placeholder-line" }, "Offline placeholder, not what was said") : null))));
+}
+
+// ---------------------------------------------------------------- jobs
+// The whole board: every job, the occupation's first. A server older than
+// "all_jobs" still gives a board of the occupation's jobs.
+function boardJobs(match) {
+  return match.all_jobs || match.jobs.map(job => Object.assign({ for_occupation: true }, job));
+}
+
+function visibleJobs(match) {
+  const f = state.filters;
+  const q = f.q.trim().toLowerCase();
+  return boardJobs(match).filter(job =>
+    (!q || (job.title + " " + employerLine(job)).toLowerCase().includes(q)) &&
+    (!f.location || job.location === f.location) &&
+    (!f.type || job.employment_type === f.type) &&
+    (!f.level || job.level === f.level) &&
+    (!f.onlyOurs || job.for_occupation));
+}
+
+// A job hidden by the search or filters cannot stay selected, or the panel
+// would describe a card that is no longer on screen.
+function selectedJobId(visible) {
+  const ids = visible.map(job => job.id);
+  return ids.includes(state.selectedJob) ? state.selectedJob : (ids[0] || null);
+}
+
+function selectJob(id) {
+  state.selectedJob = id;
+  renderMatches();
+  // The clicked title was replaced by the re-render; keep keyboard focus on its successor.
+  const button = document.querySelector('.job-card[data-id="' + CSS.escape(id) + '"] h3 button');
+  if (button) button.focus({ preventScroll: true });
+}
+
+// The name the search reads and the company line shows. Sample jobs name a
+// setting, never an employer; a real listing's company goes here.
+function employerLine(job) {
+  return job.company || job.setting;
+}
+
+// The one place the line under a job title is drawn: who is hiring, then which
+// occupation the job is for.
+function renderCompany(job) {
+  return el("p", { class: "company" }, el("span", { class: "name" }, employerLine(job)),
+    job.occupation_label ? el("span", { class: "muted" }, " / " + job.occupation_label) : null);
+}
+
+// Unit coverage of this job: the share of the units it requires that the evidence
+// covers. It is worked out here from the server's count, so the percentage and
+// its caption can never disagree. It describes the job, not the person.
+function coverage(job) {
+  const required = job.matched.length + job.missing.length;
+  return { evidenced: job.matched.length, required,
+           percent: required ? Math.round(100 * job.matched.length / required) : 0 };
+}
+
+// The one place the fit is drawn, on a card ("card") or in the side panel
+// ("panel"): a ring with the percentage, and the count it comes from beneath.
+// No label grades it: no "good" or "strong" match.
+function renderFit(job, where) {
+  const { evidenced, required, percent } = coverage(job);
+  const caption = evidenced + " of " + required + " units evidenced";
+  if (where === "panel") return el("p", { class: "fit-line" }, percent + "% unit coverage: " + caption);
+  const radius = 40, circumference = 2 * Math.PI * radius;
+  const svg = document.createElementNS(SVG, "svg");
+  svg.setAttribute("viewBox", "0 0 92 92");
+  svg.setAttribute("aria-hidden", "true");
+  for (const [stroke, dash] of [["var(--ring-track)", null], ["var(--ring)", circumference * (1 - percent / 100)]]) {
+    const circle = document.createElementNS(SVG, "circle");
+    for (const [key, value] of Object.entries({ cx: 46, cy: 46, r: radius, fill: "none", stroke, "stroke-width": 6 })) {
+      circle.setAttribute(key, value);
+    }
+    if (dash !== null) {
+      circle.setAttribute("stroke-linecap", "round");
+      circle.setAttribute("stroke-dasharray", String(circumference));
+      circle.setAttribute("stroke-dashoffset", String(dash));
+      // A round cap on an empty arc would still draw a dot and read as some coverage.
+      if (!evidenced) circle.setAttribute("stroke", "none");
+    }
+    svg.append(circle);
+  }
+  return el("div", { class: "fit", role: "img", "aria-label": percent + " percent unit coverage, " + caption },
+    el("div", { class: "ring" }, svg, el("span", { class: "pct" }, el("span", {}, String(percent), el("small", {}, "%")))),
+    el("span", { class: "caption" }, caption));
+}
+
+function fact(name, text, label) {
+  return text ? el("p", { class: "fact" }, icon(name), el("span", { class: "visually-hidden" }, label + ": "), text) : null;
+}
+
+function renderJobCard(job, selected) {
+  return el("article", { class: "job-card" + (selected ? " selected" : ""), "data-id": job.id,
+                         onclick: () => selectJob(job.id) },
+    el("div", { class: "job-main" },
+      el("div", { class: "job-top" },
+        el("div", { class: "logo" }, icon("building")),
+        el("div", {},
+          el("div", { class: "tags" },
+            el("span", { class: "tag" }, job.note || "Representative sample, not a real listing"),
+            job.for_occupation ? null : el("span", { class: "tag" }, "Another occupation")),
+          el("h3", {}, el("button", { type: "button", "aria-pressed": String(selected) }, job.title)),
+          renderCompany(job))),
+      el("div", { class: "facts" },
+        fact("pin", job.location, "Location"), fact("clock", job.employment_type, "Employment type"),
+        fact("shift", job.shift, "Hours"), fact("level", job.level, "Level"))),
+    renderFit(job, "card"));
+}
+
+// What a unit cites, as {locator, short}: "t=02:41" shows as "02:41", "line=8" as "line 8".
+function citedRefs(sources) {
+  return (sources || []).filter(([label]) => label === "transcript" || label === "resume")
+    .map(([label, locator]) => ({ locator,
+      short: label === "resume" ? "line " + String(locator).replace(/^line=/, "")
+                                : String(locator).replace(/^t=/, "") }));
+}
+
+function citeButtons(unit) {
+  return citedRefs(unit.sources).map((ref, i) => [i ? ", " : "",
+    el("button", { type: "button", class: "link", onclick: () => highlight(ref.locator),
+                   "aria-label": (state.source === "resume" ? "Show resume " : "Show transcript line at ") + ref.short },
+       ref.short)]);
+}
+
+function renderJobDetail(match, job) {
+  const panel = $("job-detail");
+  if (!job) {
+    panel.replaceChildren(el("h3", { id: "h-detail" }, "No job selected"),
+                          el("p", { class: "empty" }, "No sample job matches this search and these filters."));
+    return;
+  }
+  const courses = Object.fromEntries((match.all_courses || match.courses).map(c => [c.code, c]));
+  // Through el() so a part left out as null is skipped, not written as "null".
+  panel.replaceChildren(...el("div", {},
+    el("span", { class: "tag" }, job.note || "Representative sample, not a real listing"),
+    el("h3", { id: "h-detail" }, job.title),
+    renderCompany(job),
+    el("p", { class: "muted small" }, [job.location, job.employment_type, job.shift, job.level].filter(Boolean).join(" · ")),
+    renderFit(job, "panel"),
+    job.for_occupation ? null : el("p", { class: "other-note small" },
+      "This job is for a " + job.occupation_label + ". It asks for units from another qualification, and nothing in this " +
+      sourceWord() + " evidences them. It is listed so no job is hidden, not as a match."),
+    el("h4", {}, "Evidenced in this " + sourceWord()),
+    job.matched.length ? el("ul", {}, job.matched.map(unit =>
+      el("li", {}, el("span", { class: "code" }, unit.code), " ", unit.title, " ",
+         el("span", { class: "cited" }, "(", citeButtons(unit), ")"))))
+      : el("p", { class: "muted small" }, "None of this job's units yet."),
+    el("h4", {}, "Still to evidence: gap training for this job"),
+    job.missing.length ? el("ul", {}, job.missing.map(unit => {
+      const course = courses[unit.code];
+      return el("li", {}, el("span", { class: "code" }, unit.code), " ", unit.title,
+        course ? el("div", { class: "small muted" }, course.qualification + ". " + course.note) : null);
+    })) : el("p", { class: "muted small" }, "None: every unit this job asks for is evidenced.")).childNodes);
+}
+
+function transcriptRef(t) {
+  return el("button", { type: "button", class: "link", onclick: () => highlight(t),
+                        "aria-label": "Show transcript line at " + t }, "[transcript " + t + "]");
+}
+
+function resumeRef(n, text) {
+  return el("button", { type: "button", class: "link", onclick: () => highlight("line=" + n),
+                        "aria-label": "Show resume line " + n }, text);
+}
+
+async function copyResume(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+  } catch (err) {
+    // The async clipboard needs a secure context and permission; fall back to a selection copy.
+    const area = el("textarea", { class: "offscreen", readonly: true });
+    area.value = text;
+    document.body.append(area);
+    area.select();
+    const copied = document.execCommand("copy");
+    area.remove();
+    if (!copied) { $("resume-status").textContent = "Could not copy; select the text and copy it by hand."; return; }
+  }
+  $("resume-status").textContent = "Copied as plain text.";
+}
+
+function renderResume(match, job) {
+  const panel = $("resume-panel");
+  const resume = job && match.resumes ? match.resumes[job.id] : null;
+  if (!resume) {
+    panel.replaceChildren(el("h3", { id: "h-resume" }, "Draft resume for this job"),
+      el("p", { class: "empty" }, !job ? "No sample job selected, so no resume yet." :
+        "No draft for this job: none of the units it asks for is evidenced, so a resume for it would claim nothing it needs."));
+    return;
+  }
+  const doc = resume.sections;
+  // Drafted from the resume the person brought: it cites that resume's lines.
+  const fromResume = doc.source === "resume";
+  panel.replaceChildren(
+    el("div", { class: "resume-actions" },
+      el("h3", { id: "h-resume" }, "Draft resume for this job"),
+      el("button", { type: "button", class: "secondary", onclick: () => copyResume(resume.text) }, "Copy"),
+      el("button", { type: "button", class: "secondary", onclick: () => window.print() }, "Print")),
+    el("p", { class: "status small", id: "resume-status", role: "status", "aria-live": "polite" }),
+    el("p", { class: "small muted" }, "Tailored to ", el("b", {}, doc.job.title),
+       " by order alone: the units it asks for, and the lines that evidence them, come first (bar on the left). Nothing is added. The jobseeker checks it before it goes anywhere."),
+    el("article", { class: "resume-doc", lang: "en" },
+      el("p", { class: "kicker" }, "Draft resume"),
+      el("h3", {}, "For: " + doc.job.title + ", " + doc.job.setting + (doc.job.location ? ", " + doc.job.location : "")),
+      el("h4", {}, "Work experience"),
+      el("p", { class: "small muted" }, fromResume ? "From the jobseeker's own resume" : "The jobseeker's own account, translated"),
+      doc.experience.length ? el("ul", {}, doc.experience.map(line =>
+        el("li", { class: line.for_this_job ? "req" : null }, line.en, " ",
+           fromResume ? resumeRef(line.line, "[resume line " + line.line + "]") : transcriptRef(line.t))))
+        : el("p", { class: "muted" }, fromResume
+            ? "No resume line is quoted: only English lines are quoted in this English draft."
+            : "No transcript line is cited yet."),
+      el("h4", {}, "Skills mapped to Australian units of competency"),
+      el("ul", {}, doc.skills.map(skill =>
+        el("li", { class: skill.for_this_job ? "req" : null },
+          el("span", { class: "code" }, skill.code), " ", skill.title,
+          !skill.described_at.length ? null : fromResume
+            ? [" (resume ", skill.described_at.map((n, i) => [i ? ", " : "", resumeRef(n, "line " + n)]), ")"]
+            : [" (described at ", skill.described_at.map((t, i) => [i ? ", " : "", transcriptRef(t)]), ")"]))),
+      el("h4", {}, "Qualifications"),
+      el("ul", {}, doc.qualifications.map(q => el("li", {}, el("b", {}, q.title), ": " + q.status))),
+      el("p", { class: "to-add" }, doc.to_add)));
+}
+
+function fillFilter(select, label, values, current) {
+  select.replaceChildren(el("option", { value: "" }, "Any " + label),
+    ...values.map(value => el("option", { value, selected: value === current }, value)));
+}
+
+function renderMatches() {
+  const match = state.match;
+  const board = boardJobs(match);
+  const unique = key => [...new Set(board.map(job => job[key]).filter(Boolean))].sort();
+  fillFilter($("filter-location"), "location", unique("location"), state.filters.location);
+  fillFilter($("filter-type"), "employment type", unique("employment_type"), state.filters.type);
+  fillFilter($("filter-level"), "level", unique("level"), state.filters.level);
+  const ours = board.filter(job => job.for_occupation).length;
+  $("count-ours").textContent = String(ours);
+  $("count-all").textContent = String(board.length);
+  $("tab-ours").setAttribute("aria-selected", String(state.filters.onlyOurs));
+  $("tab-all").setAttribute("aria-selected", String(!state.filters.onlyOurs));
+  const visible = visibleJobs(match);
+  const selectedId = selectedJobId(visible);
+  const selected = visible.find(job => job.id === selectedId) || null;
+  $("jobs-shown").textContent = visible.length + " of " + board.length + " sample jobs shown. " +
+    ours + " are for your evidence and come first, best evidenced first. Coverage counts units evidenced in this " +
+    sourceWord() + " against the units a job requires; it describes the job, not the person.";
+  $("jobs").replaceChildren(...(visible.length ? visible.map(job => renderJobCard(job, job.id === selectedId))
+                                               : [el("p", { class: "empty" }, "No sample job matches this search and these filters.")]));
+  renderJobDetail(match, selected);
+  renderResume(match, selected);
+}
+
+// ---------------------------------------------------------------- wiring
+$("mock-banner").hidden = !(params.get("mock") === "1" || (session && session.mock));
+$("to-intake").href = INTAKE_URL;
+$("nothing-link").href = INTAKE_URL;
+$("nav-jobs").prepend(icon("jobs"));
+$("nav-evidence").prepend(icon("evidence"));
+$("nav-source").prepend(icon("source"));
+$("to-intake").prepend(icon("back"));
+$("search-label").prepend(icon("search"));
+
+if (!session) {
+  // Nothing built in this tab: say so and point back, instead of an empty board.
+  for (const id of ["view-jobs", "view-evidence", "view-source"]) $(id).remove();
+  document.querySelector(".tabs").remove();
+  $("search-label").remove();
+  for (const button of document.querySelectorAll(".nav [data-view]")) button.remove();
+  $("nothing").hidden = false;
+} else {
+  $("nav-source").lastChild.textContent = state.source === "resume" ? "Your resume" : "Your transcript";
+  $("h-source").textContent = state.source === "resume" ? "Your resume" : "Your transcript";
+  for (const button of document.querySelectorAll(".nav [data-view]")) {
+    button.addEventListener("click", () => openView(button.dataset.view));
+  }
+  for (const tab of document.querySelectorAll(".tabs [role=tab]")) {
+    tab.addEventListener("click", () => { state.filters.onlyOurs = tab.dataset.ours === "1"; renderMatches(); });
+  }
+  $("filter-location").addEventListener("change", event => { state.filters.location = event.target.value; renderMatches(); });
+  $("filter-type").addEventListener("change", event => { state.filters.type = event.target.value; renderMatches(); });
+  $("filter-level").addEventListener("change", event => { state.filters.level = event.target.value; renderMatches(); });
+  $("job-search").addEventListener("input", event => { state.filters.q = event.target.value; renderMatches(); });
+  setView("jobs");
+  renderPack();
+  renderTranscript();
+  renderMatches();
+}
+</script>
+</body>
+</html>

@@ -97,10 +97,42 @@ class Server(unittest.TestCase):
 
 
 class HttpRoundTrip(Server):
-    def test_index_serves(self):
+    def raw_get(self, path):
+        """(status, headers) without following a redirect."""
+        conn = HTTPConnection("127.0.0.1", self.port, timeout=5)
+        try:
+            conn.request("GET", path)
+            response = conn.getresponse()
+            response.read()
+            return response.status, response.headers
+        finally:
+            conn.close()
+
+    def test_the_root_redirects_to_the_intake(self):
+        status, headers = self.raw_get("/")
+        self.assertEqual(status, 302)
+        self.assertEqual(headers["Location"], "/intake")
+
+    def test_the_root_keeps_its_query_so_mock_mode_survives(self):
+        status, headers = self.raw_get("/?mock=1")
+        self.assertEqual(status, 302)
+        self.assertEqual(headers["Location"], "/intake?mock=1")
+
+    def test_the_root_lands_on_the_start_screen(self):
         status, body = self.get("/")
         self.assertEqual(status, 200)
+        self.assertIn("How would you like to start?", body)
+
+    def test_the_scenario_list_serves_at_scenarios(self):
+        status, body = self.get("/scenarios")
+        self.assertEqual(status, 200)
         self.assertIn("Direction skeleton", body)
+        self.assertIn("/run?s=d2", body)
+
+    def test_a_scenario_links_back_to_the_list(self):
+        status, body = self.get("/run?s=d2")
+        self.assertEqual(status, 200)
+        self.assertIn('href="/scenarios"', body)
 
     def test_a_scenario_serves(self):
         status, body = self.get("/run?s=d2")
@@ -123,6 +155,22 @@ class HttpRoundTrip(Server):
             self.assertEqual(response.status, 200)
             self.assertEqual(response.headers["Content-Type"], "text/html; charset=utf-8")
             self.assertIn("/api/extract", response.read().decode("utf-8"))
+
+    def test_the_jobs_page_serves(self):
+        status, body = self.get("/jobs")
+        self.assertEqual(status, 200)
+        # It reads the pack the intake left in sessionStorage; it calls no endpoint.
+        self.assertIn("d7-session", body)
+        self.assertNotIn("/api/extract", body)
+
+    def test_the_jobs_page_grades_no_one_and_borrows_no_branding(self):
+        """The ring is unit coverage of the job. Nothing on the page grades the
+        match or the person, and nothing carries another product's wording."""
+        _, body = self.get("/jobs")
+        for word in ("GOOD MATCH", "STRONG MATCH", "Jobright", "jobright", "Orion",
+                     "Turbo", "Autofill", "applicants", "Apply"):
+            with self.subTest(word=word):
+                self.assertNotIn(word, body)
 
 
 class IntakeApi(Server):

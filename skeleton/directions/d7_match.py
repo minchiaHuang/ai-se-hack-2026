@@ -4,9 +4,13 @@ A plain module, not a pipeline direction: it runs after a human has accepted
 the evidence pack, so it only ever sees units that already point at a line of
 the transcript.
 
-The fit is a count of evidenced units, never a percentage or a score, because
-it describes a job against the evidence, not the person. It is never shown to
-an employer, which is why resume_for() leaves it out.
+The fit this module returns is a count of evidenced units and nothing else:
+"N of M required units evidenced". The only percentage allowed anywhere, the
+page's coverage ring included, is evidenced required units divided by required
+units, worked out from those same two counts. A similarity or match score, or
+a "good match" / "strong match" style label about the person, is still
+forbidden: the fit describes a job against the evidence, not the person. It is
+never shown to an employer, which is why resume_for() leaves it out.
 """
 import json
 from pathlib import Path
