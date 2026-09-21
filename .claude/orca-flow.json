@@ -5,8 +5,11 @@
 
   "worker": {
     "model": "opus",
-    "checks": [],
-    "test_command": null,
+    "checks": [
+      "find bin -name '*.sh' -print0 | xargs -0 -n1 bash -n",
+      "python3 -m compileall -q skeleton tests"
+    ],
+    "test_command": "python3 -m unittest {files}",
     "test_slots": 1,
     "full_check_command": "bash bin/verify.sh",
     "migrations_dir": null,
