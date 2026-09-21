@@ -6,7 +6,9 @@
 方向 7 的一輪研究已完成（三個 agent 平行），框架、交接文件第 8 節、spec 皆已落檔。
 **現場優先原則仍凌駕一切。**
 
-最後驗證：2026-09-22（`bash bin/verify.sh` → GREEN，含 317 個骨架測試，於 `bda90cc`）
+最後驗證：2026-09-22（`bash bin/verify.sh` → GREEN，含 327 個骨架測試，於 `b7ed5e3`）
+
+- PR #35 d7-occupation（`b7ed5e3`）：`/review` 不再寫死廚師。`POST /api/occupation` 由模型從三個職業中選一個或回 `none`，顧問可在選單改；不支援的職業不推職缺並說明原因。實測：廚師→cookery、IT→none、焊工→welding、長照→aged_care。
 
 - 2026-09-22 在 Orca 內建瀏覽器把整條流程點過一遍（`?mock=1&quiet=1`，首頁 → `/start` → `/start/path` → 電話面試 → `/review` → `/jobs` → 職缺頁 → Apply；另走上傳路徑）。
   PR #33（`0c7dc30`）：`/jobs` 一張卡都沒畫出來（#31 合併時雇主配色函式呼叫自己），已修。
@@ -22,7 +24,7 @@
   2026-09-22 用真實通話實測：12 段回答全部分對題、中文原話一字不改。
 - ⚠️ **demo 後要做**：刪 ElevenLabs key、輪換 Twilio Auth Token（兩者都曾出現在 session 紀錄）。
 - `/jobs` 採用 #31 的 Figma Matched Jobs 版面（Tommy 2026-09-22 決定），保留 #29 的雇主配色。
-- ⚠️ **待做**：職業在 `/review` 寫死為 `cookery`，講 IT 等不支援職業仍推廚師職缺（計畫：自動判斷，不支援就明說）。
+- ⚠️ **待做**：職業判斷已由 PR #35 完成。
 
 **2026-09-22 清晨，`feat/d7-figma-jobs-template`（PR #31，已合入）**：`/jobs` 改成 Figma「Matched Jobs」版面（左邊配對職缺卡、右邊 Why this matched，每個單元附上佐證它的那一行原文，並標明是廣告寫的還是職稱推定的；Apply 顯示審閱頁確認過的履歷），拿掉側欄、分頁、篩選、收藏，佐證包收進右欄「See full evidence pack →」；履歷改成 Figma「Template 50」版型（`skeleton/web/resume-template.{css,js}`，`/review` 與 `/jobs` 共用）。`/review` 交給 `/jobs` 的 session 多帶 `name`、`sections`、`via`。未做：`/intake` 路徑進 `/jobs` 的 Apply 只顯示純文字草稿（沒有 sections），沒有實際點過。之後依 Tommy 意見再簡化成 SEEK 式：卡片只剩職稱、公司、地點、工作類型、薪資、兩行摘要、一個「NN% skills match」；右欄是 Apply、白話技能清單、About the job；單元代碼、原句、佐證包收進「Show evidence details」折疊區。再依 Tommy 給的 SEEK grad 截圖改成單欄卡片：每張卡片自帶 Apply／Why a match／View ad，在卡片內展開；之後再改：列表右側留白，每個職缺有自己的頁面 `/jobs?job=<id>`（Match summary、About the job、折疊的佐證細節與完整佐證包、右側 Apply 與職缺資訊）。
 
