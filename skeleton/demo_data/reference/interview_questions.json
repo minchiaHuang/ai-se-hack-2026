@@ -5,7 +5,7 @@
      "en": "Tell me a little about yourself, and what work you hope to find here.",
      "zh": "请简单介绍一下你自己，还有你希望在这里找什么工作。"},
     {"id": "education", "section": "Education",
-     "en": "Where did you study, and what did you study there?",
+     "en": "Where did you go to school, and what did you learn there?",
      "zh": "你在哪里读书？学的是什么？"},
     {"id": "employment", "section": "Employment",
      "en": "What was your last job, and what did you do each day?",
