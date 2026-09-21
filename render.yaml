@@ -3,10 +3,17 @@
 # Connect this repo once at https://dashboard.render.com/blueprints and Render
 # reads this file, so there is nothing to fill in by hand in the dashboard.
 #
-# No API keys are set here on purpose. Without them every page still runs and
-# says on screen what it could not do, and the homepage's "Live demo" button
-# opens the flow against fixtures. Putting the ElevenLabs or Anthropic key on a
-# public URL would let anyone spend it.
+# The two ElevenLabs values are declared but not set here: "sync: false" means
+# Render asks for the value in its own dashboard and keeps it there, so no key
+# is ever committed to this public repo.
+#
+# The trade-off, decided deliberately: /api/speak and the agent's talk link are
+# public endpoints, so anyone who finds them can spend the ElevenLabs
+# allowance. The key is due to be deleted after the demo, and deleting it takes
+# the spoken questions with it. The pages then say so rather than break.
+#
+# ANTHROPIC_API_KEY stays unset: mapping and translation run their offline
+# paths, and the demo flow uses fixtures.
 services:
   - type: web
     name: bridgework
@@ -22,3 +29,9 @@ services:
       # Without this Python buffers stdout and the logs stay empty until it dies.
       - key: PYTHONUNBUFFERED
         value: "1"
+      # Reads the questions aloud. Value goes in the Render dashboard.
+      - key: ELEVENLABS_API_KEY
+        sync: false
+      # The AI interviewer the jobseeker calls from their own phone.
+      - key: ELEVENLABS_AGENT_ID
+        sync: false

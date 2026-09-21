@@ -499,6 +499,8 @@ async function toggleRecord() {
 // The call runs at ElevenLabs; this page only polls its transcript. The poll is
 // slow on purpose: a turn takes several seconds to say anyway.
 const CALL_POLL_MS = 3000;
+// How long the demo shows "Ringing…" before the scripted transcript starts.
+const MOCK_RING_MS = 1800;
 const CALL_STATUS = { "initiated": "Ringing…", "in-progress": "On the call. What is said appears below.",
                       "processing": "The call has ended. Sorting the answers…" };
 
@@ -523,6 +525,15 @@ function callFinished(answers) {
 }
 
 function mockCall() {
+  // The link is already on screen, put there by startCall exactly as the real
+  // call does it: the point of this step is that the jobseeker opens it on
+  // their own phone. Ring for a beat so the screen reads as a call being
+  // placed, then play the scripted transcript.
+  $("call-status").textContent = CALL_STATUS["initiated"];
+  state.mockTimer = setTimeout(mockTranscript, MOCK_RING_MS);
+}
+
+function mockTranscript() {
   const turns = [];
   FIXTURE_QUESTIONS.questions.forEach((question, n) => {
     turns.push({ role: "agent", text: question.zh }, { role: "user", text: MOCK_ANSWERS[n].answer_zh });
@@ -591,7 +602,6 @@ async function startCall() {
   clearOffline();
   $("start").hidden = true;
   $("call-panel").hidden = false;
-  if (MOCK) return mockCall();
   // A minute of slack for a phone and laptop whose clocks disagree.
   const since = Math.floor(Date.now() / 1000) - 60;
   try {
@@ -603,11 +613,16 @@ async function startCall() {
     $("talk-url").textContent = body.url;
     $("talk-link").hidden = false;
   } catch (err) {
-    showError("The phone interview could not start: " + err.message);
-    $("call-panel").hidden = true;
-    $("start").hidden = false;
-    return;
+    // The demo has a transcript of its own, so a missing agent costs it only
+    // the link; the real call has nothing to fall back to and has to stop.
+    if (!MOCK) {
+      showError("The phone interview could not start: " + err.message);
+      $("call-panel").hidden = true;
+      $("start").hidden = false;
+      return;
+    }
   }
+  if (MOCK) return mockCall();
   waitForTalk(since);
 }
 
