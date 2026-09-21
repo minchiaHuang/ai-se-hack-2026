@@ -42,7 +42,6 @@ header.top { display: flex; align-items: center; gap: 1.25rem; padding: 12px 24p
 .wordmark b { color: #111; font-weight: 700; }
 .wordmark span { color: var(--primary-light); font-weight: 400; }
 .step { color: var(--muted); font-weight: 500; font-size: .85rem; }
-.progress { margin-left: auto; color: var(--muted); font-weight: 500; font-size: .85rem; white-space: nowrap; }
 main { max-width: 1280px; margin: 0 auto; padding: 16px 0 48px; }
 h2 { font-size: 1.2rem; margin: 0 0 .25rem; }
 p { margin: .3rem 0; }
@@ -79,10 +78,14 @@ button:disabled { background: #d1d5db; border-color: #9ca3af; color: #333; curso
 .turns li.agent { background: var(--bg); color: var(--muted); }
 .turns .who { display: block; font-size: .75rem; font-weight: 700; color: var(--accent); }
 
+/* Figma's interview frame has no header bar and runs edge to edge. */
+body.interviewing header.top { display: none; }
+body.interviewing main { max-width: none; padding-top: 46px; }
+
 /* Figma: "Current Question" in accent, then the question in primary, English on
    the left and Mandarin right-aligned on the right, both the same size and weight. */
 .question { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 48px; align-items: start;
-            padding: 20px 47px 0 60px; margin-bottom: 36px; }
+            padding: 0 47px 0 60px; margin-bottom: 36px; }
 .label { color: var(--accent); font-weight: 700; font-size: 20px; line-height: 1.2; margin: 0 0 14px; }
 .q-en, .q-zh { color: var(--primary); font-size: 30px; font-weight: 700; line-height: 1.25; margin: 0; }
 .q-zh { text-align: right; margin-top: 38px; } /* level with the English, under the label */
@@ -106,16 +109,14 @@ button:disabled { background: #d1d5db; border-color: #9ca3af; color: #333; curso
                  color: var(--soft); font-size: 20px; font-weight: 600; line-height: 1.5; }
 .card.zh textarea { line-height: 2; }
 .card textarea:focus { outline: 2px solid rgba(27, 75, 90, .3); outline-offset: 2px; color: var(--text); }
-.card .hint { color: var(--soft); font-size: .75rem; }
 .centre { display: flex; flex-direction: column; align-items: center; padding: 46px 16px 0; }
 
 /* The voice orb: Figma's gradient ellipse, still when idle, breathing and glowing
-   while the question plays (teal) or while recording (accent). */
-.voice { width: 240px; height: 240px; border-radius: 50%; display: grid; place-items: center; position: relative;
+   while the question plays (teal) or while recording (accent). Tapping it reads
+   the question again. */
+.voice { width: 240px; height: 240px; min-height: 0; padding: 0; border: 0; border-radius: 50%;
          background: linear-gradient(210deg, var(--primary) 13%, #2BCDFF 95%);
          box-shadow: 0 4px 4px rgba(0, 0, 0, .25); }
-.voice .core { color: rgba(255, 255, 255, .85); font-size: .8rem; font-weight: 600; letter-spacing: .08em;
-               text-transform: uppercase; margin-top: 150px; }
 .voice.speaking { animation: breathe 1.6s ease-in-out infinite, glow-teal 1.6s ease-in-out infinite; }
 .voice.recording { animation: breathe 1.2s ease-in-out infinite, glow-accent 1.2s ease-in-out infinite; }
 @keyframes breathe { 50% { transform: scale(1.05); } }
@@ -156,7 +157,6 @@ button:disabled { background: #d1d5db; border-color: #9ca3af; color: #333; curso
     <p class="wordmark"><b>Bridge</b><span>Work</span></p>
   </div>
   <span class="step">Interview</span>
-  <span id="progress" class="progress" aria-live="polite"></span>
 </header>
 <main>
   <p id="mock-banner" class="banner mock" hidden>Mock mode: scripted answers from a fictional cook, no backend. Nothing is recorded or sent.</p>
@@ -198,7 +198,7 @@ button:disabled { background: #d1d5db; border-color: #9ca3af; color: #333; curso
   <section id="interview" hidden>
     <div id="question" class="question">
       <div>
-        <p class="label">Current Question · <span id="section"></span></p>
+        <p class="label">Current Question</p>
         <p id="q-en" class="q-en"></p>
       </div>
       <p id="q-zh" class="q-zh" lang="zh-Hans"></p>
@@ -208,14 +208,13 @@ button:disabled { background: #d1d5db; border-color: #9ca3af; color: #333; curso
       <div class="card en">
         <label for="answer-en">Translated contents</label>
         <textarea id="answer-en" lang="en"></textarea>
-        <span class="hint">English draft. Correct it with the jobseeker before moving on.</span>
       </div>
 
       <div class="centre">
-        <div id="voice" class="voice" aria-hidden="true"><div class="core" id="voice-label">Ready</div></div>
+        <button id="voice" class="voice" title="Play the question again" aria-label="Play the question again"></button>
         <div class="buttons">
-          <button id="play" class="round" title="Play the question again" aria-label="Play the question again"></button>
           <button id="record" class="round" title="Record the answer" aria-label="Record the answer"></button>
+          <button id="stop" class="round" title="Stop recording" aria-label="Stop recording"></button>
         </div>
         <button id="next" class="next">Next &rarr;</button>
         <p id="status" class="status" aria-live="polite"></p>
@@ -224,7 +223,6 @@ button:disabled { background: #d1d5db; border-color: #9ca3af; color: #333; curso
       <div class="card zh">
         <label for="answer-zh" lang="zh-Hans">原文</label>
         <textarea id="answer-zh" lang="zh-Hans"></textarea>
-        <span class="hint">What was said, as transcribed. Several recordings are added one after another.</span>
       </div>
     </div>
   </section>
@@ -259,12 +257,11 @@ const FIXTURE_QUESTIONS = {"questions": [{"id": "profile", "section": "Profile",
 // (fictional cook Li Wei), the same answers review.html's MOCK_INTERVIEW carries.
 const MOCK_ANSWERS = [{"id": "profile", "answer_zh": "我叫李伟，做了六年厨师，一直是餐厅的主厨。我最自豪的是每天能给一百五十个客人做饭，从来没有出过食品安全问题。我希望在这里继续在厨房工作。", "answer_en": "My name is Li Wei. I have worked as a cook for six years, always as the head cook of a restaurant. What I am most proud of is cooking for 150 guests a day without ever having a food safety problem. I hope to keep working in a kitchen here."}, {"id": "education", "answer_zh": "我在成都的一所职业技术学校学烹饪，二零一二年到二零一四年读了两年。在那里学了中餐的基本功，还有厨房卫生。", "answer_en": "I studied cooking at a vocational school in Chengdu, for two years from 2012 to 2014. There I learned the basics of Chinese cooking, and kitchen hygiene."}, {"id": "employment", "answer_zh": "我最近的工作是在成都一家叫蓉香楼的餐厅当主厨，从二零一六年做到二零二二年，一共六年。每天早上从头熬高汤、做汤和酱汁，准备羊肉、牛肉和鸡肉的菜。生的和熟的食物分开放，每个班次都记录冷库的温度。", "answer_en": "My most recent job was head cook at a restaurant called Rongxiang Lou in Chengdu, from 2016 to 2022, six years in total. Every morning I made stocks, soups and sauces from scratch, and prepared lamb, beef and chicken dishes. I kept raw and cooked food apart, and recorded the cool-room temperature every shift."}, {"id": "volunteer", "answer_zh": "有。去年开始每个星期六在社区中心的食物分发站帮忙，大概做了一年。我负责整理捐来的食物，检查保质期，然后帮忙给大家做热饭。", "answer_en": "Yes. Since last year I have helped every Saturday at the food distribution point at the community centre, for about a year. I sort donated food, check the use-by dates, and help cook hot meals for people."}, {"id": "skills", "answer_zh": "我会用商用厨房的设备，像蒸烤箱、大炒锅和切片机。会说普通话和四川话，英语还在学。", "answer_en": "I can use commercial kitchen equipment, such as combi ovens, large woks and slicers. I speak Mandarin and Sichuanese, and I am still learning English."}, {"id": "certificates", "answer_zh": "我有中国的中式烹调师证书。在澳大利亚还没有考任何证书。", "answer_en": "I have a Chinese cook certificate for Chinese cuisine from China. I have not taken any certificate in Australia yet."}];
 
-// Figma's play and stop glyphs (frame 10:83, nodes 38:5 and 38:15). Figma has no
-// record glyph; the dot is drawn in the same grey so the pair reads as one set.
+// Figma's play and stop glyphs (frame 10:83, nodes 38:5 and 38:15): play starts
+// recording the answer, stop ends it.
 const ICONS = {
   play: '<svg viewBox="0 0 29.4 29.4" aria-hidden="true"><path d="M27.5625 14.7C27.5633 15.0119 27.4833 15.3188 27.3303 15.5906C27.1774 15.8625 26.9567 16.0902 26.6897 16.2515L10.143 26.3738C9.86403 26.5447 9.54451 26.6379 9.21745 26.644C8.89039 26.65 8.56764 26.5687 8.28253 26.4083C8.00014 26.2504 7.7649 26.0201 7.60101 25.7412C7.43711 25.4623 7.35047 25.1447 7.35 24.8212V4.5788C7.35047 4.25526 7.43711 3.9377 7.60101 3.65875C7.7649 3.3798 8.00014 3.14954 8.28253 2.99165C8.56764 2.83127 8.89039 2.74991 9.21745 2.75597C9.54451 2.76202 9.86403 2.85528 10.143 3.02611L26.6897 13.1484C26.9567 13.3098 27.1774 13.5374 27.3303 13.8093C27.4833 14.0812 27.5633 14.388 27.5625 14.7Z" fill="black" fill-opacity="0.5"/></svg>',
   stop: '<svg viewBox="0 0 29.4 29.4" aria-hidden="true"><path d="M24.8062 6.34741V23.0526C24.8056 23.5175 24.6207 23.9632 24.2919 24.2919C23.9632 24.6207 23.5175 24.8056 23.0526 24.8062H6.34741C5.8825 24.8056 5.4368 24.6207 5.10806 24.2919C4.77931 23.9632 4.59436 23.5175 4.59375 23.0526V6.34741C4.59436 5.8825 4.77931 5.4368 5.10806 5.10806C5.4368 4.77931 5.8825 4.59436 6.34741 4.59375H23.0526C23.5175 4.59436 23.9632 4.77931 24.2919 5.10806C24.6207 5.4368 24.8056 5.8825 24.8062 6.34741Z" fill="black" fill-opacity="0.5"/></svg>',
-  record: '<svg viewBox="0 0 29.4 29.4" aria-hidden="true"><circle cx="14.7" cy="14.7" r="10.5" fill="black" fill-opacity="0.5"/></svg>',
 };
 
 // ---------------------------------------------------------------- state
@@ -391,7 +388,7 @@ async function speak() {
   } catch (err) {
     // A browser that blocks autoplay still lets the play button work.
     state.audio = null; state.speaking = false; render();
-    setStatus("Press ▶ to hear the question.");
+    setStatus("Tap the circle to hear the question.");
   }
 }
 
@@ -619,7 +616,6 @@ async function startCall() {
 // ---------------------------------------------------------------- moving on
 function showQuestion() {
   const question = current();
-  $("section").textContent = question.section;
   $("q-en").textContent = question.en;
   $("q-zh").textContent = question.zh;
   $("question").classList.toggle("long", question.en.length > 60);
@@ -678,23 +674,18 @@ function render() {
   const total = state.questions.length;
   const recording = !!state.recorder;
   const question = current();
-  $("progress").textContent = $("interview").hidden || !total ? "" : "Question " + (state.index + 1) + " of " + total;
   $("begin").disabled = !state.consent;
   $("call").disabled = !state.consent;
 
   const voice = $("voice");
   voice.classList.toggle("speaking", state.speaking && !recording);
   voice.classList.toggle("recording", recording);
-  $("voice-label").textContent = recording ? "Listening" : state.speaking ? "Speaking" : state.busy ? "Working" : "Ready";
 
   const record = $("record");
   record.classList.toggle("on", recording);
-  record.innerHTML = recording ? ICONS.stop : ICONS.record;
-  record.setAttribute("aria-label", recording ? "Stop recording" : "Record the answer");
-  record.title = record.getAttribute("aria-label");
   // Mock has one scripted answer per question; a second take would repeat it.
-  record.disabled = state.busy || (MOCK && question && state.mockAnswered[question.id] && !recording);
-  $("play").disabled = state.busy || recording;
+  record.disabled = state.busy || recording || (MOCK && question && state.mockAnswered[question.id]);
+  $("stop").disabled = !recording;
   // Never blocked by a service being down; only by work still in flight.
   $("next").disabled = state.busy || recording;
   $("next").innerHTML = state.index === total - 1 ? "Finish and review &rarr;" : "Next &rarr;";
@@ -702,16 +693,19 @@ function render() {
 
 // ---------------------------------------------------------------- start
 $("mock-banner").hidden = !MOCK || QUIET;
-$("play").innerHTML = ICONS.play;
+$("record").innerHTML = ICONS.play;
+$("stop").innerHTML = ICONS.stop;
 $("consent").addEventListener("change", event => { state.consent = event.target.checked; render(); });
 $("begin").addEventListener("click", () => {
   if (!state.consent) return;
   $("start").hidden = true;
   $("interview").hidden = false;
+  document.body.classList.add("interviewing");
   showQuestion();
 });
-$("play").addEventListener("click", speak);
-$("record").addEventListener("click", toggleRecord);
+$("voice").addEventListener("click", () => { if (!state.busy && !state.recorder) speak(); });
+$("record").addEventListener("click", () => { if (!state.recorder) toggleRecord(); });
+$("stop").addEventListener("click", () => { if (state.recorder) toggleRecord(); });
 $("next").addEventListener("click", next);
 $("call").addEventListener("click", startCall);
 $("back").href = (location.protocol === "file:" ? "path.html" : "/start/path") + (FLAGS ? "?" + FLAGS : "");
