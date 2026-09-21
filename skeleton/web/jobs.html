@@ -55,9 +55,10 @@ button.link:hover { text-decoration: underline; }
 .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
 /* Figma header: white bar, logo icon, "Bridge" bold and "Work" regular. */
-header.top { display: flex; align-items: center; padding: 14px 24px; border-bottom: 1px solid var(--line); background: var(--card); }
-.wordmark { display: flex; align-items: center; font-size: 1.6rem; letter-spacing: -.01em; color: inherit; text-decoration: none; }
-.wordmark img { height: 1.6em; width: auto; margin-right: .45rem; }
+header.top { height: 80px; padding: 0 40px; display: flex; align-items: center; border-bottom: 1px solid var(--line); background: var(--card); }
+@media (max-width: 760px) { header.top { height: 68px; padding: 0 16px; } .wordmark { font-size: 24px; } .wordmark img { height: 40px; } }
+.wordmark { display: flex; align-items: center; font-size: 28px; letter-spacing: -.01em; color: inherit; text-decoration: none; }
+.wordmark img { height: 50px; width: auto; margin-right: .45rem; }
 .wordmark b { color: var(--ink); }
 .wordmark span { color: var(--primary); font-weight: 400; margin-left: .15em; }
 main { max-width: 1240px; margin: 0 auto; padding: 26px 24px 48px; }

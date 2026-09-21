@@ -27,17 +27,20 @@ body {
 [hidden] { display: none !important; }
 
 .brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; }
-.brand img { width: 83px; height: 76px; }
-.wordmark { font-size: 40px; line-height: 1; letter-spacing: -.01em; white-space: nowrap; }
+.brand img { width: 55px; height: 50px; }
+.wordmark { font-size: 28px; line-height: 1; letter-spacing: -.01em; white-space: nowrap; }
 .wordmark b { color: #000; font-weight: 700; }
 .wordmark span {
   font-weight: 300; margin-left: 4px; color: #1f7f9c;
   background: linear-gradient(#2bcdff, #1b4b5a); -webkit-background-clip: text; background-clip: text;
   -webkit-text-fill-color: transparent;
 }
-header.top { height: 122px; padding: 0 43px; display: flex; align-items: center; background: var(--card); }
+header.top {
+  height: 80px; padding: 0 40px; display: flex; align-items: center;
+  background: var(--card); border-bottom: 1px solid var(--line);
+}
 
-.banner { margin: 0; padding: .5rem 43px; background: var(--card); border: 2px dashed var(--line); }
+.banner { margin: 0; padding: .5rem 40px; background: var(--card); border: 2px dashed var(--line); }
 
 main { max-width: 740px; margin: 0 auto; padding: 77px 0 96px; }
 h1 { color: var(--primary); font-size: 40px; font-weight: 700; margin: 0 0 22px; }
@@ -62,9 +65,9 @@ button {
 }
 
 @media (max-width: 760px) {
-  header.top { height: 76px; padding: 0 16px; }
-  .brand img { width: 55px; height: 50px; }
-  .wordmark { font-size: 28px; }
+  header.top { height: 68px; padding: 0 16px; }
+  .brand img { width: 44px; height: 40px; }
+  .wordmark { font-size: 24px; }
   .banner { padding: .5rem 16px; }
   main { padding: 40px 16px 64px; }
   h1 { font-size: 30px; }
