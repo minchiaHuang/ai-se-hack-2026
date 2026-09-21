@@ -97,16 +97,6 @@
           "code": "SITHCCC043",
           "quote": "experienced Cook to join the team",
           "basis": "stated"
-        },
-        {
-          "code": "SITXFSA005",
-          "quote": "nutritious meals and snacks",
-          "basis": "stated"
-        },
-        {
-          "code": "SITXFSA006",
-          "quote": "nutritious meals and snacks",
-          "basis": "stated"
         }
       ],
       "mapped_by": "claude-sonnet-5"
