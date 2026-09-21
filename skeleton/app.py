@@ -16,6 +16,7 @@ from urllib.parse import parse_qs, urlparse
 if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+from skeleton.core import registry
 from skeleton.core.model import CANNED, StubModel
 from skeleton.core.pipeline import run
 from skeleton.core.schema import AggregationError
@@ -96,6 +97,51 @@ def render_result(scenario_key):
     parts.append(f'<div class="metric">{html.escape(result.metric_name)}: <b>{html.escape(str(value))}</b></div>')
     parts.append(back)
     return "".join(parts)
+
+
+def extract(payload):
+    """Run the pipeline and return JSON-safe data. Refusals come back as data."""
+    occupation_key = payload.get("occupation")
+    try:
+        result = run(d7_credentials, payload, model_for_occupation(occupation_key))
+    except REFUSALS as refused:
+        return {"refused": str(refused)}
+    return {
+        "suggestions": [
+            {"field": s.field, "value": s.displayed_value(), "reason": s.reason,
+             "confidence": s.confidence,
+             "sources": [[x.label, x.locator] for x in s.sources]}
+            for s in result.suggestions
+        ],
+        "needs_human": [
+            {"field": s.field, "reason": s.reason, "confidence": s.confidence,
+             "sources": [[x.label, x.locator] for x in s.sources]}
+            for s in result.needs_human
+        ],
+        "gaps": list(result.gaps),
+        # The gate is reference data about the occupation, looked up here and
+        # never asked of the model, so it cannot render as a guess or a blank.
+        "gate": registry.occupation(occupation_key)["gate"],
+        # NEEDS DECISION: not in the locked /api/extract contract; added so the
+        # page can show "superseded MEM31922" beside the qualification. Offline
+        # on purpose: reachable stays False and never claims currency.
+        "qualification_source": registry.source_check(occupation_key),
+        "metric_name": result.metric_name,
+        "metric_value": result.metric_value,
+    }
+
+
+def model_for_occupation(occupation_key):
+    """Pick the stub's canned answer by occupation, so a welder is not handed
+    the cook's evidence pack. An occupation with no canned file gets nothing,
+    which the pipeline reports as gaps rather than borrowing another trade's
+    evidence. The live model replaces this."""
+    if occupation_key == "cookery":
+        return model_for("d7")
+    scenario_key = f"d7_{occupation_key}"
+    if (CANNED / f"{scenario_key}.json").exists():
+        return model_for(scenario_key)
+    return StubModel({d7_credentials.KEY: []})
 
 
 PAGE = """<!doctype html><meta charset=utf-8><title>Direction skeleton</title>
