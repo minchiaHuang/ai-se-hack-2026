@@ -144,6 +144,12 @@ class CallResult(unittest.TestCase):
                                          {"role": "user", "text": TURNS[1]["message"]}])
         self.assertEqual(get.url, phone.CONVERSATION_URL.format(id="conv_1"))
 
+    def test_silence_is_not_a_turn(self):
+        turns = [{"role": "agent", "message": "你好"}, {"role": "user", "message": "..."},
+                 {"role": "user", "message": " … "}, {"role": "user", "message": None}]
+        body = phone.call_result("conv_1", get=conversation("in-progress", turns), api_key="key")
+        self.assertEqual(body["turns"], [{"role": "agent", "text": "你好"}])
+
     def test_a_finished_call_is_split_into_the_seven_answers_verbatim(self):
         post = model_says([
             {"turn": 1, "id": "profile", "en": "My name is Li Wei, a cook for six years."},

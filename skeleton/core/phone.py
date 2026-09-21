@@ -183,8 +183,10 @@ def latest_conversation(since, get=None, api_key=None, agent_id=None):
 
 
 def _turns(transcript):
-    return [{"role": t.get("role"), "text": (t.get("message") or "").strip()}
-            for t in transcript or [] if (t.get("message") or "").strip()]
+    """Spoken turns only: ElevenLabs writes "..." for a silence."""
+    turns = [{"role": t.get("role"), "text": (t.get("message") or "").strip()}
+             for t in transcript or []]
+    return [t for t in turns if t["text"].strip(".… ")]
 
 
 def _split(turns, post, key):
