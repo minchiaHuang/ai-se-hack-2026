@@ -114,10 +114,16 @@ SEDI 是 900+ 份意向書只選出 56 家。錢是真的，但可觸及的規�
 > 我們做的是「這一家 WISE 這一次申報要交什麼」。**
 
 第二個可能被問到的碰撞是 **ReadyTech Job Ready**（DES 與 Workforce Australia 提供者專用，
-已做成效申報預測與證據文件管理）。答案：
-**那套是為 work-first 的就業服務體系設計的，而聯邦就業服務經費「largely not been available
-to WISEs」——WISE 基本上不在那個體系裡，所以那套服務不到他們。**
-⚠️ 要預期追問「那為什麼不是 ReadyTech 順手做」，目前沒有已驗證的答案。
+已做成效申報預測與證據文件管理）。答案（**2026-09-21 下午修正過，不要用舊版**）：
+**WISE 拿到的聯邦就業經費走的是專案型撥款（WorkFoundations、EPRI），
+不是 Workforce Australia／DES 的服務提供者合約，所以他們不是 ReadyTech 那套系統的使用者。**
+
+⚠️ **舊版說法已部分過期，不要再照抄**：原本引用 2023 年國會委員會的
+「聯邦就業服務經費 largely not been available to WISEs」。
+到 2026 年，DEWR 已透過 WorkFoundations 直接撥款給 16 家社企（協議 2025-07），
+EPRI 亦然（2026-05 延長一年、770 萬澳幣）。錢有進來了，只是走的不是同一條管道。
+
+⚠️ 「那為什麼不是 ReadyTech 順手做」仍然沒有已驗證的答案。
 
 ### 如果評審問「已經有人做了，為什麼還要做」
 
@@ -137,20 +143,89 @@ to WISEs」——WISE 基本上不在那個體系裡，所以那套服務不到�
    以及「申報準備工時」這個組織自己量得出來的數字。
    這三件事就算被大廠做掉，也仍然是該被做對的事。
 
-## 量化證據缺口 —— 尚未補上
+## 量化證據缺口 —— 2026-09-21 下午已讀全文，部分補上
 
-原研究指出找不到任何 WISE 專屬的督導工時、員工流動率或到職成本數字。本輪找到一份主題完全吻合的報告：
+《Understanding the Impact Costs of Work Integration Social Enterprises》（CSI Swinburne／
+Social Enterprise Australia／Westpac Foundation，2023-11）**全文 52 頁已讀完**。
+原始摘要見 `docs/research-brief-2026-09-21.md` 第 5 節方向 6，**不要重抓**。
 
-**《Understanding the Impact Costs of Work Integration Social Enterprises》**
-CSI Swinburne 研究、Social Enterprise Australia 委託、Westpac Foundation 資助，2023-11-30
-https://www.socialenterpriseaustralia.org.au/wise-impact-costs-report
+**先講不能說的**：報告執行摘要**明文拒絕揭露** Impact Cost 百分比
+（樣本僅 5 家、不可一般化，要等下一階段）。
+**「WISE 比一般企業多負擔幾 %」這個數字仍然不存在，不得宣稱、不得估算。**
 
-⚠️ **登陸頁沒有任何數字，全文在 Google Drive，尚未開啟。**
-在讀到全文之前，**「有記載但未量化」仍然成立，不得引用任何數字**。
-這是開賽前最該人工開啟的一份文件。
+**可以引用的（全部出自該報告；性質是 5 家 WISE 的從業者自述估計，不是統計，
+引用時必須把這個限制一起講出來）**：
+
+| 數字 | 來源 |
+|---|---|
+| 第一線主管投入在受支持員工的時間是一般職場的 **2–3 倍** | WISE #3 |
+| 一般組織 L&D 約佔薪資 **3.5%**；WISE 約投入 **25% 工作時數**於發展性活動 | WISE #3 |
+| 領導層 **20–50%** 時間花在支持性對話 | WISE #5 |
+| 通才 HR 職位因社會目的**多出 40–50%** 時間負擔 | WISE #1 |
+| 缺勤率首月約 **30%**、後期約 **15%**，對照一般企業約 **10%** | WISE #3 |
+| 員工成本佔各家 Impact Cost 的 **54%／69%／82%／84%／86%** | 五家皆有 |
+| 樣本 FTE **4／4／13／19／26**，年收入 **0.2–4.0 百萬澳幣** | 表 1 |
+
+⭐ **最該用的一句**：報告把「為了滿足資助方申報需求而做的、比一般組織更細的影響力衡量」
+**列為一項 Impact Cost**（WISE #1 原話：「The reporting is different. If you're just producing
+financial reports, that's pretty easy but to look at environmental and social outcomes,
+that does take more.」）——**這是目前最硬的一句「申報工作本身有成本」的證據。**
+
+⭐ **對產品設計影響最大的一條**：使用者是 **4–26 人、年收入數百萬澳幣**的小組織。
+沒有資料團隊，買不起企業軟體。任何需要導入期或設定成本的方案都會失敗。
 
 ⚠️ 另提醒（交接文件 §4.4）：NDS 2024 職場普查的「50% 流動率、每名新進 2,130–3,320 澳幣」
 是**支薪支持人員**，不是 WISE 的受支持員工，**不得混用**。
+
+## ⚠️ 第二輪競品（2026-09-21 下午）—— 會改變說法，上場前必讀
+
+**① White Box Enterprises：這個功能已經有人在做，只是用人做的**
+
+- **PBO3**（DSS，2022-07～**2026-03**，最終量測延至 2026-09-30）：White Box 當**聚合者**，
+  統籌 **17 家**就業型社企，社企在受僱者滿 6／12／18 個月依成效收款。
+  成效：**12 個月留任率 69%，DES 為 26%**（Taylor Fry 精算）
+- **WorkFoundations**（DEWR，1,000 萬澳幣、16 家機構、協議 2025-07）：White Box 同樣當全國聚合者，
+  2026-03 起與 8 家社企合作，明文追蹤**留任、支持成本、參與者成效**
+  —— ⛔ **這正是方向 6 原本要做的三件事，要正面承認**
+
+- ⚠️ **最不利的證據**：CSI 評估報告原話——聚合者模式「reduces transaction costs of PBOs，
+  部分社企形容 PBO3 第二年是 **BAU**」，對比「traditional PBOs 對服務提供者是
+  **high administrative burden**」。
+  **在 PBO3 裡，申報負擔對社企不痛，因為 White Box 扛掉了。**
+  「WISE 被申報壓垮」對這 17 家**不成立**。被問到要直接承認。
+
+- **同一段的有利面**：負擔是真的（沒有聚合者的傳統 PBO 確實「high administrative burden」），
+  只是被人力吸收；而這個中介一次只服務 **8–17 家**，CSI 自己把它定位為
+  「potential pathway for **scaling and replication**」。
+  → **定位改成：White Box 不是要打倒的競品，是最可能的客戶或夥伴。**
+  問題從「WISE 痛不痛」改成「**這個由人扛的協調功能，怎麼從 17 家擴到幾百家**」
+
+**② Seedkit：免費、政府出資、大學託管——和方向 3 的 Amplify 同一個模式** https://seedkit.com.au/
+
+- CSI Swinburne ＋ 墨爾本大學 MSEI 開發，維州政府 **100 萬澳幣**，**2023-11 上線**，
+  Minderoo 支持。**免費**、自助式：選指標 → 輸入資料 → 儀表板與可下載報告
+- **差異仍成立，但只剩薄薄一層**：Seedkit 做的是**自選指標的通用報告**，
+  站上**沒有任何針對特定資助方申報格式的範本或匯出**。
+  方向 6 的楔子——「把營運紀錄對映到**這一份**資助方要的格式」——仍未被填
+- ⚠️ 兩個警訊：(a) 網站最新消息停在 **2025-07**；
+  (b) 這是**和 Amplify 同一個研究網絡、同一種「免費＋學術背書」模式**，而 Amplify 因無人採用關閉
+- ⚠️ SEA 的「shared data system」技術底座就是 Seedkit，
+  所以「部門統計 vs 單一 WISE 申報」的切分仍成立，但邊界比原本寫的更近
+
+**③ demo 該用哪一份格式：用 Social Traders 認證，不要用 Outcomes Fund**
+
+- Social Traders 認證收集**逾 200 個資料點**（含影響力活動與**對應的交付成本**），
+  對齊最近一個完整財政年度；未滿兩年者**每年**、滿兩年者**每三年**重新認證
+  → **強制、週期性、格式穩定**，比參數還在共同設計的 Outcomes Fund 更適合當 demo 目標
+- 可觸及規模（**優先用這個，不要用 SECNA 的「almost 7,000 家」倡議估計**）：
+  Social Traders 認證社企中 **53%** 以就業／訓練為主要影響模式，即 **294 家**，
+  共直接僱用 **14,013 名**受支持員工（Pace 2023）
+- 一家 WISE 同時面對的格式不只一份：Social Traders 認證、PBO3 的 6／12／18 個月里程碑、
+  WorkFoundations、EPRI、SEDI 核銷、各州社會採購——**「多格式」本身就是問題陳述**
+
+**④ 那個「開發中的工具」**：Impact Costs 報告結尾寫
+「A tool to assist WISEs to implement this framework is now under development」（2023-11）。
+2026-09-21 遍尋不著上線跡象。⚠️ 這是 **NOT FOUND，不是「確定沒做」**。
 
 ## demo 資料來源與誠實邊界
 
