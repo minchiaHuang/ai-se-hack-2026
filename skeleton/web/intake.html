@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-view="intake">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -80,120 +80,13 @@ input[type=radio], input[type=checkbox] { width: 26px; height: 26px; accent-colo
 .transcript { list-style: none; margin: 0; padding: 0; }
 .transcript li {
   display: grid; grid-template-columns: 4.2rem 1fr; gap: .6rem; padding: .55rem .5rem;
-  border-bottom: 1px solid var(--line); border-radius: 6px; scroll-margin: 80px;
+  border-bottom: 1px solid var(--line); border-radius: 6px;
 }
-.transcript li.hit { background: #fff1a8; box-shadow: inset 0 0 0 3px #b58900; }
 .ts { font-variant-numeric: tabular-nums; font-weight: 700; color: var(--muted); }
 .said { font-size: 1.15rem; overflow-wrap: anywhere; }
 .said[dir=rtl] { text-align: right; font-size: 1.3rem; }
 .gloss { color: var(--muted); overflow-wrap: anywhere; }
 .placeholder-line { color: var(--warn); font-weight: 600; font-size: .9rem; }
-.empty { color: var(--muted); font-style: italic; padding: .5rem 0; }
-
-.card { border: 2px solid var(--line); border-radius: 8px; padding: .6rem .8rem; margin: .5rem 0; }
-.card .value { font-size: 1.15rem; font-weight: 700; overflow-wrap: anywhere; }
-.chip { display: inline-block; padding: 0 .5rem; border-radius: 999px; font-size: .85rem; font-weight: 700;
-        border: 2px solid currentColor; white-space: nowrap; }
-.chip.high { color: var(--ok); background: var(--ok-bg); }
-.chip.low { color: var(--warn); background: var(--warn-bg); }
-.withheld { border-color: var(--warn); background: var(--warn-bg); }
-.withheld .value { color: var(--warn); }
-.cites { font-size: .9rem; }
-.gate { border: 4px solid var(--gate); background: var(--gate-bg); border-radius: 10px; padding: .8rem 1rem; margin: 1rem 0; }
-.gate h2 { margin-top: 0; color: var(--gate); }
-.gate .text { font-size: 1.1rem; font-weight: 600; }
-.gate .hit-units { margin-top: .5rem; padding: .4rem .6rem; background: var(--paper); border-radius: 6px; }
-.metric { margin-top: 1rem; padding: .6rem .8rem; background: var(--panel); border-radius: 6px; font-weight: 600; }
-
-.sample { display: inline-block; font-size: .8rem; font-weight: 700; text-transform: uppercase; letter-spacing: .03em;
-          padding: 0 .4rem; border: 2px solid var(--muted); color: var(--muted); border-radius: 4px; }
-.code { font-family: ui-monospace, Menlo, Consolas, monospace; font-weight: 700; }
-
-/* Once the pack is built the page becomes a job platform: an app bar with
-   three views, a search and filter row, a scrolling list of wide cards, and a
-   sticky column with the selected job and its resume. Where job boards put a
-   percentage ring and a "good match" label, this board puts the count and
-   nothing else: the fit describes the job's units, never a rating of the person. */
-html[data-view=jobs], html[data-view=evidence], html[data-view=source] { font-size: 17px; }
-.app-bar { position: sticky; top: 0; z-index: 5; display: flex; flex-wrap: wrap; align-items: center; gap: .4rem 1.2rem;
-           margin: -16px -20px 0; padding: .4rem 20px; background: var(--paper); border-bottom: 2px solid var(--line); }
-.app-bar .brand { font-weight: 800; font-size: 1.15rem; margin-right: .4rem; }
-.tabs { display: flex; gap: .25rem; }
-.tabs button { min-height: 44px; border: 0; border-bottom: 4px solid transparent; border-radius: 0; background: none;
-               color: var(--ink); padding: .3rem .8rem; }
-.tabs button[aria-selected=true] { border-bottom-color: var(--accent); color: var(--accent); }
-.app-bar .back { margin-left: auto; }
-.search-row { display: flex; gap: .6rem; margin: 1rem 0 .6rem; }
-.search { flex: 1; display: flex; align-items: center; gap: .5rem; padding: 0 .8rem; min-height: 52px;
-          border: 2px solid var(--line); border-radius: 10px; background: var(--paper); }
-.search:focus-within { outline: 4px solid var(--focus); outline-offset: 2px; }
-.search svg { flex: none; width: 1.2em; height: 1.2em; color: var(--muted); }
-.search input { flex: 1; min-width: 0; border: 0; outline: 0; background: none; color: var(--ink); font-size: 1.05rem; }
-.board-filters { display: flex; flex-wrap: wrap; gap: .5rem .8rem; align-items: center; margin: 0 0 .8rem; }
-.board-filters select { min-height: 44px; padding: .2rem .5rem; border: 2px solid var(--line); border-radius: 999px;
-                        background: var(--panel); color: var(--ink); font-weight: 600; }
-.board-filters .toggle { display: flex; align-items: center; gap: .45rem; min-height: 44px; padding: 0 .8rem;
-                         border: 2px solid var(--line); border-radius: 999px; font-weight: 600; cursor: pointer; }
-.board-filters .toggle input { width: 22px; height: 22px; }
-.match-layout { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 20px; align-items: start; }
-.list-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: .2rem 1rem; }
-.list-head h2 { margin: 0; }
-.jobs { display: flex; flex-direction: column; gap: 12px; min-width: 0; margin-top: .5rem; }
-.job-card { display: grid; grid-template-columns: minmax(0, 1fr) 9rem; border: 2px solid var(--line);
-            border-radius: 12px; overflow: hidden; cursor: pointer; flex: none; }
-.job-card:hover { border-color: var(--accent); }
-.job-card.selected { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent); }
-.job-body { padding: .7rem .9rem; min-width: 0; }
-.job-card h3 { font-size: 1.3rem; margin: .35rem 0 0; line-height: 1.25; }
-.job-card h3 button { min-height: 0; padding: 0; border: 0; background: none; color: inherit; font: inherit; text-align: left; }
-.job-card .setting { color: var(--muted); margin: .1rem 0 .4rem; }
-.other-occ { display: inline-block; margin-left: .4rem; font-size: .8rem; font-weight: 700; color: var(--muted); }
-.facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .15rem 1rem; margin: 0;
-         padding: .4rem 0 0; border-top: 1px solid var(--line); font-size: .9rem; }
-.fact { display: flex; align-items: center; gap: .4rem; min-width: 0; margin: 0; }
-.fact svg { flex: none; width: 1em; height: 1em; }
-.count { display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;
-         padding: .8rem .5rem; background: #0b2545; color: #fff; }
-.count.none { background: var(--panel); color: var(--muted); }
-.count .n { font-size: 1.9rem; font-weight: 800; line-height: 1.1; font-variant-numeric: tabular-nums; }
-.count .caption { font-size: .8rem; font-weight: 600; margin-top: .3rem; }
-
-.detail-panel { position: sticky; top: 76px; min-width: 0; max-height: calc(100vh - 88px); overflow: auto;
-                border: 2px solid var(--accent); border-radius: 10px; padding: .7rem .9rem; }
-.job-detail h3 { font-size: 1.3rem; margin: .35rem 0 0; }
-.job-detail h4 { font-size: .95rem; margin: .8rem 0 .25rem; }
-.job-detail .fit-line { font-size: 1.1rem; font-weight: 800; margin: .4rem 0; }
-.job-detail ul { margin: .2rem 0; padding-left: 1.2rem; }
-.job-detail li { margin: .25rem 0; }
-.job-detail .cited { white-space: nowrap; }
-.job-detail .other-note { padding: .4rem .6rem; background: var(--panel); border-radius: 6px; }
-.resume-panel { margin-top: 1rem; padding-top: .6rem; border-top: 2px solid var(--line); min-width: 0; }
-.resume-actions { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; }
-/* The heading takes its own row so Copy and Print stay together beneath it. */
-.resume-actions h3 { margin: 0; flex: 1 0 100%; }
-.resume-doc { margin-top: .6rem; padding: .8rem 1rem; background: var(--paper); border: 1px solid var(--line);
-              border-radius: 6px; font-size: .95rem; overflow-wrap: anywhere; }
-.resume-doc .kicker { font-size: .8rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin: 0; }
-.resume-doc h3 { font-size: 1.2rem; margin: .1rem 0 .4rem; }
-.resume-doc h4 { font-size: .95rem; text-transform: uppercase; letter-spacing: .03em; margin: .9rem 0 .25rem;
-                 padding-bottom: .15rem; border-bottom: 2px solid var(--ink); }
-.resume-doc ul { margin: .2rem 0; padding-left: 1.2rem; }
-.resume-doc li { margin: .2rem 0; padding-left: .3rem; }
-/* Screen-only emphasis for what the selected job asks for; print drops it. */
-.resume-doc li.req { border-left: 4px solid var(--accent); }
-.offscreen { position: fixed; left: -9999px; top: 0; }
-.resume-doc .to-add { margin-top: .9rem; font-style: italic; }
-
-/* Which parts of the page each view shows. The intake keeps its own layout;
-   "Your evidence" and "Your transcript" are its two columns, one at a time. */
-html:not([data-view=intake]) .intake-only { display: none !important; }
-html[data-view=intake] #app-bar, html:not([data-view=jobs]) #matches { display: none !important; }
-html[data-view=jobs] .columns { display: none; }
-/* An empty status line holds its height on the intake so buttons do not jump;
-   off the intake it would only push the view down. */
-html:not([data-view=intake]) .status:empty { display: none; }
-html[data-view=evidence] .columns, html[data-view=source] .columns { grid-template-columns: minmax(0, 1fr); }
-html[data-view=evidence] #col-source, html[data-view=source] #col-pack { display: none; }
 
 /* The start screen: two ways in, the interview first and larger because most
    people this serves have no documents to bring. */
@@ -207,13 +100,27 @@ html[data-view=evidence] #col-source, html[data-view=source] #col-pack { display
 .path-bar { display: flex; flex-wrap: wrap; gap: .4rem 1rem; align-items: baseline; margin: .25rem 0 0; }
 .resume-input { margin-top: 1rem; }
 .resume-input > label { display: block; font-weight: 700; margin-bottom: .25rem; }
-.resume-input textarea { display: block; width: 100%; min-height: 7.5rem; padding: .5rem .6rem; font: inherit; font-size: .95rem;
+.resume-input textarea { display: block; width: 100%; min-height: 6rem; padding: .5rem .6rem; font: inherit; font-size: .95rem;
                          border: 2px solid var(--line); border-radius: 8px; background: var(--paper); color: var(--ink); resize: vertical; }
 .resume-input textarea:disabled { background: var(--panel); }
 .resume-input .controls { margin-top: .5rem; }
 .file-pick { display: inline-flex; align-items: center; min-height: 48px; padding: .4rem 1rem; border-radius: 8px; cursor: pointer;
              border: 2px solid var(--accent); color: var(--accent); font-weight: 600; }
 .file-pick:focus-within { outline: 4px solid var(--focus); outline-offset: 2px; }
+.resume-card { max-width: 900px; margin-top: .6rem; padding: .8rem 1.1rem .9rem; border: 2px solid var(--line); border-radius: 12px; }
+.resume-card h2 { margin-top: 0; }
+.resume-meta { display: flex; flex-wrap: wrap; gap: .6rem 1.5rem; align-items: center; }
+.consent-line { flex: 1 1 22rem; display: flex; gap: .6rem; align-items: flex-start; cursor: pointer; }
+.consent-line input { flex: none; margin-top: .15rem; }
+.lang-pick { display: flex; align-items: center; gap: .5rem; font-weight: 600; }
+.lang-pick select { min-height: 44px; padding: .2rem .5rem; border: 2px solid var(--line); border-radius: 8px;
+                    background: var(--paper); color: var(--ink); }
+.resume-card .resume-input { margin-top: .75rem; }
+.resume-card > .controls { margin-top: .6rem; }
+.progress { margin: .75rem 0; padding: .6rem 1rem .6rem 2.2rem; background: var(--panel); border-radius: 8px; font-weight: 600; }
+.progress li { color: var(--muted); }
+.progress li.now { color: var(--ink); }
+.progress li.done { color: var(--ok); }
 .file-pick.disabled { border-color: #9ca3af; color: #333; background: #d1d5db; cursor: not-allowed; }
 
 .refusal { margin: 2rem auto; max-width: 900px; border: 4px solid var(--stop); background: var(--stop-bg);
@@ -225,48 +132,15 @@ html[data-view=evidence] #col-source, html[data-view=source] #col-pack { display
 .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
 @media (max-width: 900px) {
-  .setup, .columns, .match-layout, .entries { grid-template-columns: 1fr; }
-  .detail-panel { position: static; max-height: none; }
-  .job-card { grid-template-columns: minmax(0, 1fr) 7rem; }
-  .facts { grid-template-columns: 1fr; }
-}
-
-/* Printing gives the selected resume alone on A4: nothing from the interview
-   screen, no fit, no missing units, since the page may go to an employer. */
-@media print {
-  @page { size: A4; margin: 18mm 16mm; }
-  html { font-size: 11pt; }
-  body { background: #fff; color: #000; }
-  main { max-width: none; padding: 0; }
-  main > :not(#session), #session > :not(#matches), #matches > :not(.match-layout),
-  .match-layout > :not(.detail-panel), .detail-panel > :not(.resume-panel),
-  .resume-panel > :not(.resume-doc) { display: none !important; }
-  .match-layout { display: block; }
-  .detail-panel { position: static; max-height: none; overflow: visible; border: 0; padding: 0; }
-  .resume-panel { margin: 0; border: 0; padding: 0; }
-  .resume-doc { margin: 0; padding: 0; border: 0; font-size: 1rem; }
-  .resume-doc li.req { border-left: 0; }
-  .resume-doc button.link { color: #000; text-decoration: none; font-weight: 400; }
-  .resume-doc h4 { break-after: avoid; }
-  .resume-doc li { break-inside: avoid; }
+  .setup, .columns, .entries { grid-template-columns: 1fr; }
 }
 </style>
 </head>
 <body>
 <main>
-  <nav class="app-bar" id="app-bar" aria-label="Views">
-    <!-- NEEDS DECISION: no product name is settled, so the bar uses the page's title. -->
-    <span class="brand">Work history intake</span>
-    <div class="tabs" role="tablist">
-      <button type="button" role="tab" id="tab-jobs" data-view="jobs" aria-controls="matches">Jobs</button>
-      <button type="button" role="tab" id="tab-evidence" data-view="evidence" aria-controls="col-pack">Your evidence</button>
-      <button type="button" role="tab" id="tab-source" data-view="source" aria-controls="col-source">Your transcript</button>
-    </div>
-    <button type="button" class="link back" id="to-intake">&larr; Back to the intake</button>
-  </nav>
   <header>
-    <h1 class="intake-only">Work history intake</h1>
-    <p class="muted intake-only">A consultant and a jobseeker, one screen. Work experience nobody can verify, whether spoken or written down, mapped to Australian occupations and units; every item points back to the line it came from.</p>
+    <h1>Work history intake</h1>
+    <p class="muted">A consultant and a jobseeker, one screen. Work experience nobody can verify, whether spoken or written down, mapped to Australian occupations and units; every item points back to the line it came from.</p>
     <p id="mock-banner" class="banner mock" hidden>Mock mode: fixture data, no backend. Nothing is recorded or sent.</p>
   </header>
 
@@ -294,9 +168,10 @@ html[data-view=evidence] #col-source, html[data-view=source] #col-pack { display
   </section>
 
   <div id="session" hidden>
-    <p class="path-bar intake-only"><button type="button" class="link" id="back">&larr; Back to start</button>
+    <p class="path-bar"><button type="button" class="link" id="back">&larr; Back to start</button>
       <span class="muted" id="path-label"></span></p>
-    <div class="setup intake-only">
+    <div id="interview-entry">
+    <div class="setup">
       <fieldset id="lang-interview">
         <legend>1. Jobseeker's language</legend>
         <div class="langs" id="langs">
@@ -307,90 +182,74 @@ html[data-view=evidence] #col-source, html[data-view=source] #col-pack { display
         </div>
         <p class="small muted" id="lang-note">Changing language clears the session.</p>
       </fieldset>
-      <fieldset id="lang-resume" hidden>
-        <legend>1. Language the resume is written in</legend>
-        <div class="langs" id="rlangs">
-          <label><input type="radio" name="rlang" value="en" checked> English</label>
-          <label><input type="radio" name="rlang" value="zh"> <span lang="zh">中文</span> (Chinese)</label>
-          <label><input type="radio" name="rlang" value="ar"> <span lang="ar" dir="rtl">العربية</span> (Arabic)</label>
-          <label><input type="radio" name="rlang" value="fa"> <span lang="fa" dir="rtl">فارسی</span> (Farsi)</label>
-        </div>
-        <p class="small muted">Changing language clears the evidence pack.</p>
-      </fieldset>
       <fieldset class="consent">
         <legend>2. Consent</legend>
         <label>
           <input type="checkbox" id="consent">
-          <span id="consent-interview">The jobseeker agrees that what they say is recorded, transcribed by a speech service, and turned into the evidence pack below.</span>
-          <span id="consent-resume" hidden>The jobseeker agrees that the resume they bring is read and turned into the evidence pack below.</span>
+          <span>The jobseeker agrees that what they say is recorded, transcribed by a speech service, and turned into the evidence pack below.</span>
         </label>
       </fieldset>
     </div>
 
-    <p class="prompt intake-only" id="prompt-interview"><b>Consultant:</b> Ask about work and study. Do not ask how they came to Australia.</p>
-    <p class="prompt intake-only" id="prompt-resume" hidden><b>Consultant:</b> Only work and study are read from the resume. Anything about how the person came to Australia is never extracted.</p>
+    <p class="prompt" id="prompt-interview"><b>Consultant:</b> Ask about work and study. Do not ask how they came to Australia.</p>
 
-    <div class="resume-input intake-only" id="resume-input" hidden>
-      <label for="resume-text">Your resume, as plain text</label>
-      <textarea id="resume-text" maxlength="100000" spellcheck="false"
-                placeholder="Paste the resume here, one entry per line."></textarea>
-      <div class="controls">
-        <label class="file-pick" id="file-pick">Upload a .txt file
-          <input type="file" id="resume-file" class="visually-hidden" accept=".txt,text/plain"></label>
-        <button type="button" id="sample" class="secondary"></button>
-        <span class="small muted">Plain text only, up to 100 KB. The sample is a fictional cook's resume.</span>
-      </div>
-    </div>
-
-    <div class="controls intake-only">
+    <div class="controls">
       <button type="button" id="record"></button>
       <button type="button" id="demo" class="secondary"></button>
       <button type="button" id="build"></button>
       <button type="button" id="see-jobs" hidden>See the jobs &rarr;</button>
       <span class="why" id="why" aria-live="polite"></span>
     </div>
-    <p class="small muted intake-only">Occupation frame: <span id="occupation-label"></span></p>
+    </div>
+
+    <!-- The resume way in is one card and one button: consent and language first,
+         because nothing is read until the jobseeker agrees, then the resume, then
+         "Find jobs", which lands on the Jobs view with the evidence already in its tabs. -->
+    <section class="resume-card" id="resume-card" aria-labelledby="h-resume-card" hidden>
+      <h2 id="h-resume-card">Your resume</h2>
+      <p class="small muted">Only work and study are read. Anything about how the person came to Australia is never extracted.</p>
+      <div class="resume-meta">
+        <label class="consent-line"><input type="checkbox" id="rconsent">
+          <span>The jobseeker agrees that the resume they bring is read and matched to Australian jobs.</span></label>
+        <label class="lang-pick">Written in
+          <!-- Farsi is listed only to show the refusal: the demo reads en, zh and ar. -->
+          <select id="rlang">
+            <option value="en">English</option>
+            <option value="zh" lang="zh">中文 (Chinese)</option>
+            <option value="ar" lang="ar">العربية (Arabic)</option>
+            <option value="fa" lang="fa">فارسی (Farsi)</option>
+          </select></label>
+      </div>
+      <div class="resume-input">
+        <label for="resume-text" class="visually-hidden">Your resume, as plain text</label>
+        <textarea id="resume-text" maxlength="100000" spellcheck="false"
+                  placeholder="Paste the resume here, one entry per line."></textarea>
+        <div class="controls">
+          <label class="file-pick" id="file-pick">Upload a .txt file
+            <input type="file" id="resume-file" class="visually-hidden" accept=".txt,text/plain"></label>
+          <button type="button" id="sample" class="secondary">Use sample resume</button>
+          <span class="small muted">Plain text, up to 100 KB. The sample is a fictional cook's resume.</span>
+        </div>
+      </div>
+      <div class="controls">
+        <button type="button" id="find">Find jobs</button>
+        <button type="button" id="rsee-jobs" class="secondary" hidden>See the jobs &rarr;</button>
+        <span class="why" id="rwhy" aria-live="polite"></span>
+      </div>
+    </section>
+
+    <p class="small muted">Occupation frame: <span id="occupation-label"></span></p>
+    <!-- Filled only while a build runs, so the wait shows what is happening. -->
+    <ol class="progress" id="progress" aria-live="polite" hidden></ol>
     <div id="offline" class="banner offline" role="status" hidden>Offline: the speech service could not be reached. Lines marked below are placeholder text, not what was said.</div>
     <div id="error" class="banner error" role="alert" hidden></div>
     <p class="status" id="status" role="status" aria-live="polite"></p>
 
-    <div class="columns">
-      <section class="col" id="col-source" aria-labelledby="h-transcript">
-        <h2 id="h-transcript">3. What was said</h2>
-        <ol class="transcript" id="transcript"></ol>
-        <p class="empty" id="transcript-empty">No lines yet.</p>
-      </section>
-      <section class="col" id="col-pack" aria-labelledby="h-pack">
-        <h2 id="h-pack">4. Evidence pack</h2>
-        <div id="pack"><p class="empty">Build the evidence pack once there is something to work from.</p></div>
-      </section>
-    </div>
-
-    <section id="matches" hidden aria-labelledby="h-jobs">
-      <div class="search-row">
-        <label class="search" id="search-label"><span class="visually-hidden">Search jobs</span>
-          <input type="search" id="job-search" placeholder="Search by job title or setting" autocomplete="off"></label>
-      </div>
-      <div class="board-filters" id="board-filters">
-        <label><span class="visually-hidden">Location</span><select id="filter-location"></select></label>
-        <label><span class="visually-hidden">Employment type</span><select id="filter-type"></select></label>
-        <label><span class="visually-hidden">Level</span><select id="filter-level"></select></label>
-        <label class="toggle"><input type="checkbox" id="only-ours"> Show only jobs for your evidence</label>
-      </div>
-      <div class="match-layout">
-        <div class="jobs-col">
-          <div class="list-head">
-            <h2 id="h-jobs">Jobs</h2>
-            <p class="small muted" id="jobs-shown" aria-live="polite"></p>
-          </div>
-          <p class="small muted" id="jobs-hint"></p>
-          <div class="jobs" id="jobs"></div>
-        </div>
-        <aside class="detail-panel" id="detail-panel" aria-label="Selected job">
-          <section class="job-detail" id="job-detail" aria-labelledby="h-detail"></section>
-          <section class="resume-panel" id="resume-panel" aria-labelledby="h-resume"></section>
-        </aside>
-      </div>
+    <!-- Only the interview shows its lines here, as they are recorded; the evidence
+         and the jobs are on /jobs once the pack is built. -->
+    <section class="col" id="col-source" aria-labelledby="h-transcript" hidden>
+      <h2 id="h-transcript">3. What was said</h2>
+      <ol class="transcript" id="transcript"></ol>
     </section>
   </div>
 </main>
@@ -419,13 +278,6 @@ const MAX_RESUME_BYTES = 100 * 1024;
 // selector, so the page is fixed to the demo's frame. Change here if a picker is wanted.
 const OCCUPATION = "cookery";
 const OCCUPATION_LABEL = "Commercial cook";
-
-const FIELD_LABELS = {
-  anzsco_code: "ANZSCO 2022 occupation",
-  osca_code: "OSCA 2024 occupation",
-  units_evidenced: "Units of competency evidenced",
-  qualification: "Qualification",
-};
 
 // ---------------------------------------------------------------- fixtures
 // Mandarin lines drafted for the mock; Tommy to check them word for word.
@@ -646,13 +498,16 @@ const state = {
   extract: null,
   match: null,
   busy: false,
+  leaving: false, // true once the browser is on its way to the jobs page
   recorder: null,
   startedAt: null, // first segment start, for real-mode timestamps
-  selectedJob: null, // null means the best-fit job, the first one listed
-  // "" means any; onlyOurs hides the jobs of other occupations.
-  filters: { q: "", location: "", type: "", level: "", onlyOurs: false },
-  view: "intake",  // "intake", or once a pack is built "jobs", "evidence" or "source"
 };
+
+// Where the built pack is handed over. sessionStorage keeps it to this tab, and
+// the jobs page says so plainly when it finds nothing there.
+const SESSION_KEY = "d7-session";
+// Opened from disk the pages link by file name; served, by route.
+const JOBS_URL = (location.protocol === "file:" ? "jobs.html" : "/jobs") + (MOCK ? "?mock=1" : "");
 
 const $ = id => document.getElementById(id);
 
@@ -701,7 +556,6 @@ function refusedBy(body) {
 
 function showRefusal(reason) {
   stopRecorder(true);
-  setView("intake");
   $("refusal-reason").textContent = reason;
   $("refusal").hidden = false;
   $("session").hidden = true;
@@ -715,35 +569,13 @@ function showError(message) {
 
 function setStatus(message) { $("status").textContent = message || ""; }
 
-// The intake is one view; once a pack is built the page is a job platform with
-// three: the jobs, the evidence pack, and the transcript or resume it cites.
-function setView(view) {
-  state.view = view;
-  document.documentElement.dataset.view = view;
-  for (const tab of document.querySelectorAll(".tabs [role=tab]")) {
-    tab.setAttribute("aria-selected", String(tab.dataset.view === view));
-  }
-}
-
-function openView(view) {
-  setView(view);
-  render();
-  window.scrollTo(0, 0);
-}
-
 // ---------------------------------------------------------------- actions
 function resetSession() {
   stopRecorder(true);
   state.lines = [];
   state.extract = null;
-  state.match = null;
   state.startedAt = null;
-  state.selectedJob = null;
-  state.filters = { q: "", location: "", type: "", level: "", onlyOurs: false };
-  $("job-search").value = "";
-  $("only-ours").checked = false;
   mockNext.zh = 0; mockNext.ar = 0;
-  setView("intake");
   // The resume's text stays in its box; only what was built from it is dropped.
   if (state.source === "resume") state.lines = resumeLines($("resume-text").value);
   $("offline").hidden = true;
@@ -773,38 +605,48 @@ function enterPath(source) {
   $("resume-text").value = "";
   $("resume-file").value = "";
   resetSession();
-  state.consent = false;
-  $("consent").checked = false;
+  clearConsent();
   const resume = source === "resume";
-  const first = resume ? 'input[name=rlang][value=en]' : 'input[name=lang][value=zh]';
   state.language = resume ? "en" : "zh";
-  document.querySelector(first).checked = true;
-  $("lang-interview").hidden = resume;
-  $("lang-resume").hidden = !resume;
-  $("consent-interview").hidden = resume;
-  $("consent-resume").hidden = !resume;
-  $("prompt-interview").hidden = resume;
-  $("prompt-resume").hidden = !resume;
-  $("resume-input").hidden = !resume;
-  $("record").hidden = resume;
-  $("demo").hidden = resume;
+  $("rlang").value = "en";
+  document.querySelector("input[name=lang][value=zh]").checked = true;
+  $("interview-entry").hidden = resume;
+  $("resume-card").hidden = !resume;
   $("path-label").textContent = resume ? "I have a resume" : "Tell us about your work (interview)";
-  $("h-transcript").textContent = resume ? "3. Your resume" : "3. What was said";
-  $("jobs-hint").textContent = "Fit counts units evidenced in this " + (resume ? "resume" : "interview") +
-    " against the units a job requires. It describes the job, not the person, and is not shown to employers.";
-  $("tab-source").textContent = resume ? "Your resume" : "Your transcript";
   $("start").hidden = true;
   $("refusal").hidden = true;
   $("session").hidden = false;
   render();
-  document.querySelector(first).focus();
+  (resume ? $("rconsent") : document.querySelector("input[name=lang][value=zh]")).focus();
+}
+
+// Both paths share one consent flag, each with its own box on its own screen.
+function clearConsent() {
+  state.consent = false;
+  $("consent").checked = false;
+  $("rconsent").checked = false;
+}
+
+function setConsent(checked) {
+  state.consent = checked;
+  // Withdrawing consent stops a live segment without sending it.
+  if (!state.consent) stopRecorder(true);
+  render();
+}
+
+// A button pressed before consent says why in place instead of doing nothing,
+// and hands focus to the box that unblocks it.
+function needConsent(why, box) {
+  if (state.consent) return false;
+  $(why).textContent = "Tick consent first: nothing is read or sent until the jobseeker agrees.";
+  $(box).focus();
+  return true;
 }
 
 function showStart() {
   state.source = null;
   resetSession();
-  state.consent = false;
-  $("consent").checked = false;
+  clearConsent();
   $("refusal").hidden = true;
   $("session").hidden = true;
   $("start").hidden = false;
@@ -826,7 +668,6 @@ function resumeLines(text) {
 function resumeChanged() {
   state.lines = resumeLines($("resume-text").value);
   state.extract = null;
-  state.match = null;
   showError("");
   render();
 }
@@ -859,10 +700,21 @@ function readResumeFile(file) {
   reader.readAsText(file);
 }
 
+// One click from the start screen's resume card to the Jobs view: fill, build, land.
 async function useSampleResume() {
-  if (!state.consent) return;
+  if (needConsent("rwhy", "rconsent")) return;
   $("resume-text").value = SAMPLE_RESUME.join("\n");
   resumeChanged();
+  await buildPack();
+}
+
+async function findJobs() {
+  if (needConsent("rwhy", "rconsent")) return;
+  if (!state.lines.length) {
+    $("rwhy").textContent = "Paste a resume, upload a .txt file, or use the sample first.";
+    $("resume-text").focus();
+    return;
+  }
   await buildPack();
 }
 
@@ -877,7 +729,6 @@ function appendLine(body, t) {
   if (body.offline) $("offline").hidden = false;
   // A new line makes the old pack stale; rebuilding is the consultant's call.
   state.extract = null;
-  state.match = null;
 }
 
 async function transcribe(blob, t) {
@@ -940,7 +791,7 @@ function stopRecorder(discard) {
 }
 
 async function useDemoTranscript() {
-  if (!state.consent) return;
+  if (needConsent("why", "consent")) return;
   resetSession();
   state.lines = FIXTURE_TRANSCRIPTS[state.language].map(line => Object.assign({ placeholder: false }, line));
   render();
@@ -964,7 +815,7 @@ async function buildPack() {
   if (!state.consent || !state.lines.length) return;
   state.busy = true; render();
   showError("");
-  setStatus("Building the evidence pack…");
+  setProgress(0);
   try {
     // The resume goes through the same two calls, marked as a resume so every item
     // cites a resume line. An English resume is its own English gloss.
@@ -976,405 +827,92 @@ async function buildPack() {
       occupation: OCCUPATION, language: state.language, consent: state.consent }, lines) });
     if (refusedBy(extract)) return;
     state.extract = extract;
-    setStatus("Matching against sample jobs…");
+    setProgress(2);
     render();
     const match = await call("/api/match", { json: Object.assign({
       occupation: OCCUPATION, evidenced_units: evidencedUnits(extract) }, lines) });
     if (refusedBy(match)) return;
-    state.match = match;
-    state.selectedJob = null;
-    setStatus("");
-    setView("jobs");
-    window.scrollTo(0, 0);
+    handOff(match);
   } catch (err) {
     showError("Could not build the evidence pack: " + err.message + ". The transcript is kept; try again.");
-    setStatus("");
   } finally {
+    // The progress list stays up while the browser leaves for the jobs page.
+    if (!state.leaving) setProgress(null);
     state.busy = false; render();
   }
 }
 
-// "t=02:41" (or a bare "02:41") lights a transcript line; "line=8" a resume line.
-function highlight(locator) {
-  // Off the intake, the cited line lives in its own tab: go there first.
-  if (state.view !== "intake" && state.view !== "source") setView("source");
-  const resumeLine = String(locator).startsWith("line=");
-  const t = String(locator).replace(/^(t|line)=/, "");
-  document.querySelectorAll(".transcript li.hit").forEach(li => li.classList.remove("hit"));
-  const line = document.querySelector('.transcript li[' + (resumeLine ? "data-line" : "data-t") + '="' + CSS.escape(t) + '"]');
-  if (!line) {
-    setStatus(resumeLine ? "No resume line " + t + "." : "No transcript line at " + t + ".");
+// The jobs, the evidence and the lines it cites are carried to /jobs, which is
+// a page of its own: one URL a judge can open, and a board the intake never
+// redraws. Nothing is sent anywhere; sessionStorage is this tab alone.
+function handOff(match) {
+  const carried = { source: state.source, language: state.language, lines: state.lines,
+                    extract: state.extract, match, mock: MOCK };
+  try {
+    sessionStorage.setItem(SESSION_KEY, JSON.stringify(carried));
+  } catch (err) {
+    showError("Could not open the jobs page: this browser is blocking session storage for this site. " +
+              "Nothing was lost; allow site data and press the button again.");
     return;
   }
-  line.classList.add("hit");
-  line.scrollIntoView({ behavior: "smooth", block: "center" });
-  line.focus({ preventScroll: true });
+  state.leaving = true;
+  location.assign(JOBS_URL);
+}
+
+// The wait between the button and the Jobs view, step by step. The extract call
+// does the reading and the mapping, so both show as running until it answers.
+function setProgress(step) {
+  const list = $("progress");
+  list.hidden = step === null;
+  if (step === null) return list.replaceChildren();
+  const steps = [state.source === "resume" ? "Reading your resume" : "Reading what was said",
+                 "Mapping to Australian units", "Matching jobs"];
+  const running = step === 0 ? [0, 1] : [step];
+  list.replaceChildren(...steps.map((text, i) => {
+    const now = running.includes(i);
+    return el("li", { class: now ? "now" : i < step ? "done" : null }, text + (now ? "…" : i < step ? " ✓" : ""));
+  }));
 }
 
 // ---------------------------------------------------------------- render
-function sourceLinks(sources) {
-  return (sources || []).map(([label, locator], i) => {
-    const sep = i ? ", " : "";
-    if (label === "transcript") {
-      const t = String(locator).replace(/^t=/, "");
-      return [sep, el("button", { type: "button", class: "link", onclick: () => highlight(locator),
-                                   "aria-label": "Show transcript line at " + t }, t)];
-    }
-    if (label === "resume") {
-      const n = String(locator).replace(/^line=/, "");
-      return [sep, el("button", { type: "button", class: "link", onclick: () => highlight(locator),
-                                   "aria-label": "Show resume line " + n }, "resume line " + n)];
-    }
-    return [sep, label + " " + locator];
-  });
-}
-
-function chip(confidence, withheld) {
-  return el("span", { class: "chip " + (withheld ? "low" : "high") },
-            "confidence " + Number(confidence).toFixed(2));
-}
-
-function citedAt() {
-  return state.source === "resume" ? "Written at: " : "Said at: ";
-}
-
+// Only the interview draws lines here, as they are recorded. The resume is in
+// its own box, and both are shown again on /jobs once the pack is built.
 function renderTranscript() {
-  const list = $("transcript");
-  list.replaceChildren();
   const rtl = state.language === "ar";
-  if (state.source === "resume") {
-    for (const line of state.lines) {
-      list.append(el("li", { "data-line": String(line.line), tabindex: "-1" },
-        el("span", { class: "ts" }, String(line.line)),
-        el("div", { class: "said", lang: state.language, dir: rtl ? "rtl" : "ltr" }, line.text)));
-    }
-    $("transcript-empty").textContent = "No resume yet. Paste one, upload a .txt file, or use the sample.";
-    $("transcript-empty").hidden = state.lines.length > 0;
-    return;
-  }
-  $("transcript-empty").textContent = "No lines yet.";
-  for (const line of state.lines) {
-    list.append(el("li", { "data-t": line.t, tabindex: "-1" },
+  $("transcript").replaceChildren(...state.lines.map(line =>
+    el("li", { "data-t": line.t },
       el("span", { class: "ts" }, line.t),
       el("div", {},
         el("div", { class: "said", lang: state.language, dir: rtl ? "rtl" : "ltr" }, line.text),
         line.en ? el("div", { class: "gloss", lang: "en", dir: "ltr" }, line.en)
                 : el("div", { class: "gloss" }, "(no English gloss)"),
-        line.placeholder ? el("div", { class: "placeholder-line" }, "Offline placeholder, not what was said") : null)));
-  }
-  $("transcript-empty").hidden = state.lines.length > 0;
-}
-
-function renderGate(gate, extract) {
-  if (!gate) return null;
-  // Point at the gate's units the interview already evidences, so the consultant
-  // sees that the statutory certificate is within reach, with the line that shows it.
-  const evidenced = evidencedUnits(extract).filter(unit => gate.text && gate.text.includes(unit.code));
-  const kind = String(gate.kind || "").replace(/_/g, " ");
-  return el("section", { class: "gate", "aria-labelledby": "h-gate" },
-    el("h2", { id: "h-gate" }, "Gate: what the law requires" + (kind ? " (" + kind + ")" : "")),
-    el("p", { class: "text" }, gate.text),
-    evidenced.length ? el("p", { class: "hit-units" },
-      el("b", {}, "Already evidenced in this " + (state.source === "resume" ? "resume" : "interview") + ": "),
-      evidenced.map((unit, i) => [i ? "; " : "", el("span", { class: "code" }, unit.code), " (", sourceLinks(unit.sources), ")"])) : null,
-    gate.refugee_note ? el("p", {}, el("b", {}, "Why it matters here: "), gate.refugee_note) : null,
-    gate.source ? el("p", { class: "small" }, "Source: ", el("a", { href: gate.source, target: "_blank", rel: "noopener" }, gate.source)) : null);
-}
-
-function renderPack() {
-  const pack = $("pack");
-  const extract = state.extract;
-  if (!extract) {
-    pack.replaceChildren(el("p", { class: "empty" },
-      state.lines.length ? (state.source === "resume" ? "Press “Build evidence pack” to map the resume." :
-                                                        "Press “Build evidence pack” to map what was said.") :
-                           "Build the evidence pack once there is something to work from."));
-    return;
-  }
-  const items = extract.suggestions.map(item =>
-    el("div", { class: "card" },
-      el("h3", {}, FIELD_LABELS[item.field] || item.field),
-      el("p", { class: "value" }, item.value),
-      el("p", {}, chip(item.confidence, false)),
-      el("p", {}, item.reason),
-      el("p", { class: "cites" }, citedAt(), sourceLinks(item.sources))));
-  const withheld = extract.needs_human.map(item =>
-    el("div", { class: "card withheld" },
-      el("h3", {}, FIELD_LABELS[item.field] || item.field),
-      el("p", { class: "value" }, "Withheld: a person decides"),
-      el("p", {}, chip(item.confidence, true), " too low to show a value"),
-      el("p", {}, item.reason),
-      el("p", { class: "cites" }, citedAt(), sourceLinks(item.sources))));
-  const gaps = (extract.gaps || []).length ? el("div", { class: "card withheld" },
-      el("h3", {}, "Not answered yet: ask about these"),
-      el("ul", {}, extract.gaps.map(field => el("li", {}, FIELD_LABELS[field] || field)))) : null;
-  pack.replaceChildren(
-    ...items,
-    ...withheld,
-    gaps,
-    renderGate(extract.gate, extract),
-    el("p", { class: "metric" }, extract.metric_name + ": " + extract.metric_value));
-}
-
-function selectJob(id) {
-  state.selectedJob = id;
-  renderMatches();
-  // The clicked title was replaced by the re-render; keep keyboard focus on its successor.
-  const button = document.querySelector('.job-card[data-id="' + CSS.escape(id) + '"] h3 button');
-  if (button) button.focus({ preventScroll: true });
-}
-
-// The whole board: every job, the occupation's first. A server older than
-// "all_jobs" still gives a board of the occupation's jobs.
-function boardJobs(match) {
-  return match.all_jobs || match.jobs.map(job => Object.assign({ for_occupation: true }, job));
-}
-
-function visibleJobs(match) {
-  const f = state.filters;
-  const q = f.q.trim().toLowerCase();
-  return boardJobs(match).filter(job =>
-    (!q || (job.title + " " + employerLine(job)).toLowerCase().includes(q)) &&
-    (!f.location || job.location === f.location) &&
-    (!f.type || job.employment_type === f.type) &&
-    (!f.level || job.level === f.level) &&
-    (!f.onlyOurs || job.for_occupation));
-}
-
-// A job hidden by the search or filters cannot stay selected, or the panel
-// would describe a card that is no longer on screen.
-function selectedJobId(match, visible) {
-  const ids = visible.map(job => job.id);
-  return ids.includes(state.selectedJob) ? state.selectedJob : (ids[0] || null);
-}
-
-// What a unit cites, as {locator, short}: "t=02:41" shows as "02:41", "line=8" as "line 8".
-function citedRefs(sources) {
-  return (sources || []).filter(([label]) => label === "transcript" || label === "resume")
-    .map(([label, locator]) => ({ locator,
-      short: label === "resume" ? "line " + String(locator).replace(/^line=/, "")
-                                : String(locator).replace(/^t=/, "") }));
-}
-
-const ICONS = {
-  pin: "M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21zm0-9a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z",
-  clock: "M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zm0 2a7 7 0 1 1 0 14 7 7 0 0 1 0-14zm-1 2v6l5 3 1-1.7-4-2.3V7z",
-  level: "M4 20V13h4v7zm6 0V8h4v12zm6 0V4h4v16z",
-  shift: "M7 2v2H5a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-2V2h-2v2H9V2zM5 9h14v10H5z",
-  search: "M10 3a7 7 0 1 0 4.2 12.6l5.1 5.1 1.4-1.4-5.1-5.1A7 7 0 0 0 10 3zm0 2a5 5 0 1 1 0 10 5 5 0 0 1 0-10z",
-};
-
-function icon(name) {
-  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  svg.setAttribute("viewBox", "0 0 24 24");
-  svg.setAttribute("aria-hidden", "true");
-  const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-  path.setAttribute("d", ICONS[name]);
-  path.setAttribute("fill", "currentColor");
-  svg.append(path);
-  return svg;
-}
-
-function fact(name, text, label) {
-  return text ? el("p", { class: "fact" }, icon(name), el("span", { class: "visually-hidden" }, label + ": "), text) : null;
-}
-
-// The one place the line under a job title comes from. Jobs are representative
-// samples, so it is the setting, never an employer's name.
-function employerLine(job) {
-  return job.setting;
-}
-
-// The one place the fit is drawn, on a card ("card") or in the side panel
-// ("panel"). It is the count and nothing else: no percentage, ring, bar or label.
-function renderFit(job, where) {
-  // "2 of 4 required units evidenced" -> the big "2 of 4" and its caption.
-  const [, count, caption] = /^(\d+ of \d+) (.*)$/.exec(job.fit) || [null, job.fit, ""];
-  if (where === "panel") return el("p", { class: "fit-line" }, job.fit);
-  return el("div", { class: "count" + (job.matched.length ? "" : " none") },
-    el("span", { class: "n" }, count),
-    el("span", { class: "caption" }, caption));
-}
-
-function sourceWord() {
-  return state.source === "resume" ? "resume" : "interview";
-}
-
-function renderJobCard(job, selected) {
-  return el("article", { class: "job-card" + (selected ? " selected" : ""), "data-id": job.id,
-                         onclick: () => selectJob(job.id) },
-    el("div", { class: "job-body" },
-      el("span", { class: "sample" }, job.note || "Representative sample, not a real listing"),
-      job.for_occupation ? null : el("span", { class: "other-occ" }, "For: " + job.occupation_label),
-      el("h3", {}, el("button", { type: "button", "aria-pressed": String(selected) }, job.title)),
-      el("p", { class: "setting" }, employerLine(job)),
-      el("div", { class: "facts" },
-        fact("pin", job.location, "Location"), fact("clock", job.employment_type, "Employment type"),
-        fact("shift", job.shift, "Hours"), fact("level", job.level, "Level"))),
-    renderFit(job, "card"));
-}
-
-function citeButtons(unit) {
-  return citedRefs(unit.sources).map((ref, i) => [i ? ", " : "",
-    el("button", { type: "button", class: "link", onclick: () => highlight(ref.locator),
-                   "aria-label": (state.source === "resume" ? "Show resume " : "Show transcript line at ") + ref.short },
-       ref.short)]);
-}
-
-function renderJobDetail(match, job) {
-  const panel = $("job-detail");
-  if (!job) {
-    panel.replaceChildren(el("h3", { id: "h-detail" }, "No job selected"),
-                          el("p", { class: "empty" }, "No sample job matches this search and these filters."));
-    return;
-  }
-  const courses = Object.fromEntries((match.all_courses || match.courses).map(c => [c.code, c]));
-  // Through el() so a part left out as null is skipped, not written as "null".
-  panel.replaceChildren(...el("div", {},
-    el("span", { class: "sample" }, job.note || "Representative sample, not a real listing"),
-    el("h3", { id: "h-detail" }, job.title),
-    el("p", { class: "muted" }, [employerLine(job), job.location, job.employment_type, job.level].filter(Boolean).join(" · ")),
-    renderFit(job, "panel"),
-    job.for_occupation ? null : el("p", { class: "other-note small" },
-      "This job is for a " + job.occupation_label + ". It asks for units from another qualification, and nothing in this " +
-      sourceWord() + " evidences them. It is listed so no job is hidden, not as a match."),
-    el("h4", {}, "Evidenced in this " + sourceWord()),
-    job.matched.length ? el("ul", {}, job.matched.map(unit =>
-      el("li", {}, el("span", { class: "code" }, unit.code), " ", unit.title, " ",
-         el("span", { class: "cited" }, "(", citeButtons(unit), ")"))))
-      : el("p", { class: "muted small" }, "None of this job's units yet."),
-    el("h4", {}, "Still to evidence: gap training for this job"),
-    job.missing.length ? el("ul", {}, job.missing.map(unit => {
-      const course = courses[unit.code];
-      return el("li", {}, el("span", { class: "code" }, unit.code), " ", unit.title,
-        course ? el("div", { class: "small muted" }, course.qualification + ". " + course.note) : null);
-    })) : el("p", { class: "muted small" }, "None: every unit this job asks for is evidenced.")).childNodes);
-}
-
-function fillFilter(select, label, values, current) {
-  select.replaceChildren(el("option", { value: "" }, "Any " + label),
-    ...values.map(value => el("option", { value, selected: value === current }, value)));
-}
-
-function transcriptRef(t) {
-  return el("button", { type: "button", class: "link", onclick: () => highlight(t),
-                        "aria-label": "Show transcript line at " + t }, "[transcript " + t + "]");
-}
-
-function resumeRef(n, text) {
-  return el("button", { type: "button", class: "link", onclick: () => highlight("line=" + n),
-                        "aria-label": "Show resume line " + n }, text);
-}
-
-async function copyResume(text) {
-  try {
-    await navigator.clipboard.writeText(text);
-  } catch (err) {
-    // The async clipboard needs a secure context and permission; fall back to a selection copy.
-    const area = el("textarea", { class: "offscreen", readonly: true });
-    area.value = text;
-    document.body.append(area);
-    area.select();
-    const copied = document.execCommand("copy");
-    area.remove();
-    if (!copied) { $("resume-status").textContent = "Could not copy; select the text and copy it by hand."; return; }
-  }
-  $("resume-status").textContent = "Copied as plain text.";
-}
-
-function renderResume(match, job) {
-  const panel = $("resume-panel");
-  const resume = job && match.resumes ? match.resumes[job.id] : null;
-  if (!resume) {
-    panel.replaceChildren(el("h3", { id: "h-resume" }, "Draft resume for this job"),
-      el("p", { class: "empty" }, !job ? "No sample job selected, so no resume yet." :
-        "No draft for this job: none of the units it asks for is evidenced, so a resume for it would claim nothing it needs."));
-    return;
-  }
-  const doc = resume.sections;
-  // Drafted from the resume the person brought: it cites that resume's lines.
-  const fromResume = doc.source === "resume";
-  panel.replaceChildren(
-    el("div", { class: "resume-actions" },
-      el("h3", { id: "h-resume" }, "Draft resume for this job"),
-      el("button", { type: "button", class: "secondary", onclick: () => copyResume(resume.text) }, "Copy"),
-      el("button", { type: "button", class: "secondary", onclick: () => window.print() }, "Print")),
-    el("p", { class: "status small", id: "resume-status", role: "status", "aria-live": "polite" }),
-    el("p", { class: "small muted" }, "Tailored to ", el("b", {}, doc.job.title),
-       " by order alone: the units it asks for, and the lines that evidence them, come first (blue bar). Nothing is added. The jobseeker checks it before it goes anywhere."),
-    el("article", { class: "resume-doc", lang: "en" },
-      el("p", { class: "kicker" }, "Draft resume"),
-      el("h3", {}, "For: " + doc.job.title + ", " + doc.job.setting + (doc.job.location ? ", " + doc.job.location : "")),
-      el("h4", {}, "Work experience"),
-      el("p", { class: "small muted" }, fromResume ? "From the jobseeker's own resume" : "The jobseeker's own account, translated"),
-      doc.experience.length ? el("ul", {}, doc.experience.map(line =>
-        el("li", { class: line.for_this_job ? "req" : null }, line.en, " ",
-           fromResume ? resumeRef(line.line, "[resume line " + line.line + "]") : transcriptRef(line.t))))
-        : el("p", { class: "muted" }, fromResume
-            ? "No resume line is quoted: only English lines are quoted in this English draft."
-            : "No transcript line is cited yet."),
-      el("h4", {}, "Skills mapped to Australian units of competency"),
-      el("ul", {}, doc.skills.map(skill =>
-        el("li", { class: skill.for_this_job ? "req" : null },
-          el("span", { class: "code" }, skill.code), " ", skill.title,
-          !skill.described_at.length ? null : fromResume
-            ? [" (resume ", skill.described_at.map((n, i) => [i ? ", " : "", resumeRef(n, "line " + n)]), ")"]
-            : [" (described at ", skill.described_at.map((t, i) => [i ? ", " : "", transcriptRef(t)]), ")"]))),
-      el("h4", {}, "Qualifications"),
-      el("ul", {}, doc.qualifications.map(q => el("li", {}, el("b", {}, q.title), ": " + q.status))),
-      el("p", { class: "to-add" }, doc.to_add)));
-}
-
-function renderMatches() {
-  const match = state.match;
-  $("matches").hidden = !match;
-  if (!match) return;
-  const board = boardJobs(match);
-  const unique = key => [...new Set(board.map(job => job[key]).filter(Boolean))].sort();
-  fillFilter($("filter-location"), "location", unique("location"), state.filters.location);
-  fillFilter($("filter-type"), "employment type", unique("employment_type"), state.filters.type);
-  fillFilter($("filter-level"), "level", unique("level"), state.filters.level);
-  const visible = visibleJobs(match);
-  const selectedId = selectedJobId(match, visible);
-  const selected = visible.find(job => job.id === selectedId) || null;
-  const ours = board.filter(job => job.for_occupation).length;
-  $("jobs-shown").textContent = visible.length + " of " + board.length + " sample jobs shown. " +
-    ours + " are for your evidence and come first, best evidenced first.";
-  $("jobs").replaceChildren(...(visible.length ? visible.map(job => renderJobCard(job, job.id === selectedId))
-                                               : [el("p", { class: "empty" }, "No sample job matches this search and these filters.")]));
-  renderJobDetail(match, selected);
-  renderResume(match, selected);
+        line.placeholder ? el("div", { class: "placeholder-line" }, "Offline placeholder, not what was said") : null))));
 }
 
 function renderResumeInput() {
   const blocked = !state.consent || state.busy;
-  $("sample").textContent = state.consent ? "Use sample resume" : "Use sample resume (needs consent)";
-  $("sample").disabled = blocked;
+  $("sample").disabled = state.busy;
+  $("find").disabled = state.busy;
   $("resume-text").disabled = blocked;
   $("resume-file").disabled = blocked;
   $("file-pick").classList.toggle("disabled", blocked);
-  const build = $("build");
-  build.textContent = !state.consent ? "Build evidence pack (needs consent)" :
-                      state.lines.length ? "Build evidence pack" : "Build evidence pack (no resume yet)";
-  build.disabled = blocked || !state.lines.length;
-  $("why").textContent = state.consent ? "" : "Tick consent first: nothing is read or sent until the jobseeker agrees.";
+  if (state.consent) $("rwhy").textContent = "";
 }
 
 function render() {
-  $("see-jobs").hidden = !state.match;
+  // No empty numbered section before there is content: the interview's lines
+  // appear once the first one has been transcribed.
+  $("col-source").hidden = state.source === "resume" || !state.lines.length;
   const recording = !!state.recorder;
   const record = $("record"), demo = $("demo"), build = $("build");
   if (state.source === "resume") {
     renderResumeInput();
-    renderTranscript();
-    renderPack();
-    renderMatches();
     return;
   }
   // Disabled buttons say why in their own label, not only in a tooltip.
   if (!state.consent) {
     record.textContent = "Record (needs consent)";
-    demo.textContent = "Use demo transcript (needs consent)";
+    demo.textContent = "Use demo transcript";
     build.textContent = "Build evidence pack (needs consent)";
     $("why").textContent = "Tick consent first: nothing is recorded or sent until the jobseeker agrees.";
   } else {
@@ -1385,45 +923,30 @@ function render() {
   }
   record.classList.toggle("recording", recording);
   record.disabled = !state.consent || (state.busy && !recording);
-  demo.disabled = !state.consent || state.busy || recording;
+  // Pressable without consent so it can say why (see needConsent).
+  demo.disabled = state.busy || recording;
   build.disabled = !state.consent || state.busy || recording || !state.lines.length;
   renderTranscript();
-  renderPack();
-  renderMatches();
 }
 
 // ---------------------------------------------------------------- wiring
 $("mock-banner").hidden = !MOCK;
 $("occupation-label").textContent = OCCUPATION_LABEL;
 $("langs").addEventListener("change", event => chooseLanguage(event.target.value));
-$("rlangs").addEventListener("change", event => chooseLanguage(event.target.value));
+$("rlang").addEventListener("change", event => chooseLanguage(event.target.value));
 $("enter-interview").addEventListener("click", () => enterPath("interview"));
 $("enter-resume").addEventListener("click", () => enterPath("resume"));
 $("back").addEventListener("click", showStart);
 $("resume-text").addEventListener("input", resumeChanged);
 $("resume-file").addEventListener("change", event => readResumeFile(event.target.files[0]));
 $("sample").addEventListener("click", useSampleResume);
-$("consent").addEventListener("change", event => {
-  state.consent = event.target.checked;
-  // Withdrawing consent stops a live segment without sending it.
-  if (!state.consent) stopRecorder(true);
-  render();
-});
+$("find").addEventListener("click", findJobs);
+$("consent").addEventListener("change", event => setConsent(event.target.checked));
+$("rconsent").addEventListener("change", event => setConsent(event.target.checked));
 $("record").addEventListener("click", toggleRecord);
 $("demo").addEventListener("click", useDemoTranscript);
 $("build").addEventListener("click", buildPack);
 $("restart").addEventListener("click", restart);
-$("filter-location").addEventListener("change", event => { state.filters.location = event.target.value; renderMatches(); });
-$("filter-type").addEventListener("change", event => { state.filters.type = event.target.value; renderMatches(); });
-$("filter-level").addEventListener("change", event => { state.filters.level = event.target.value; renderMatches(); });
-$("only-ours").addEventListener("change", event => { state.filters.onlyOurs = event.target.checked; renderMatches(); });
-$("job-search").addEventListener("input", event => { state.filters.q = event.target.value; renderMatches(); });
-$("search-label").prepend(icon("search"));
-$("see-jobs").addEventListener("click", () => openView("jobs"));
-$("to-intake").addEventListener("click", () => openView("intake"));
-for (const tab of document.querySelectorAll(".tabs [role=tab]")) {
-  tab.addEventListener("click", () => openView(tab.dataset.view));
-}
 </script>
 </body>
 </html>

@@ -32,7 +32,10 @@ REFUSALS = (AggregationError, RedLineError, UnsupportedLanguageError)
 SCENARIOS = json.loads(
     (Path(__file__).resolve().parent / "demo_data" / "payloads.json").read_text(encoding="utf-8")
 )
-INTAKE_PAGE = Path(__file__).resolve().parent / "web" / "intake.html"
+WEB = Path(__file__).resolve().parent / "web"
+INTAKE_PAGE = WEB / "intake.html"
+# The board the intake hands over to, carrying the pack in sessionStorage.
+JOBS_PAGE = WEB / "jobs.html"
 
 # A request past these is refused before it is read: a few minutes of webm
 # speech is well under 25 MB, and no JSON the page sends comes near 1 MB.
@@ -73,7 +76,7 @@ def render_index():
 def render_result(scenario_key):
     direction = direction_for(scenario_key)
     payload = SCENARIOS[scenario_key]
-    back = '<p><a href="/">&larr; back</a></p>'
+    back = '<p><a href="/scenarios">&larr; back</a></p>'
     head = f'<h1>{html.escape(direction.NAME)}</h1><p class="note">{html.escape(payload["label"])}</p>'
 
     try:
@@ -258,8 +261,18 @@ table{{border-collapse:collapse;width:100%}} td{{border-top:1px solid #ddd;paddi
 class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         parsed = urlparse(self.path)
+        if parsed.path == "/":
+            # The root opens the product; the scenario list is a developer page.
+            # The query is kept so /?mock=1 still lands in mock mode.
+            self.send_response(302)
+            self.send_header("Location", "/intake" + (f"?{parsed.query}" if parsed.query else ""))
+            self.send_header("Content-Length", "0")
+            self.end_headers()
+            return
         if parsed.path == "/intake":
             return self._send(200, "text/html; charset=utf-8", INTAKE_PAGE.read_bytes())
+        if parsed.path == "/jobs":
+            return self._send(200, "text/html; charset=utf-8", JOBS_PAGE.read_bytes())
         scenario = parse_qs(parsed.query).get("s", [None])[0]
         if parsed.path == "/run" and scenario in SCENARIOS:
             body = render_result(scenario)
@@ -336,5 +349,5 @@ if __name__ == "__main__":
     if "--check" in sys.argv:
         check()
     else:
-        print("http://127.0.0.1:8000  (intake page: http://127.0.0.1:8000/intake)")
+        print("http://127.0.0.1:8000  (scenarios: http://127.0.0.1:8000/scenarios)")
         ThreadingHTTPServer(("127.0.0.1", 8000), Handler).serve_forever()
