@@ -66,6 +66,7 @@ button:disabled { background: #d1d5db; border-color: #9ca3af; color: #333; curso
 
 .start { max-width: 640px; margin: 8vh auto; background: var(--card); border-radius: 12px;
          box-shadow: var(--shadow); padding: 28px 32px; }
+#start { min-height: 700px; }
 .start h2 { color: var(--primary); }
 .consent { display: flex; gap: .55rem; align-items: flex-start; margin: 1rem 0; cursor: pointer; }
 .consent input { width: 22px; height: 22px; flex: none; margin-top: .15rem; accent-color: var(--primary); }
@@ -89,7 +90,8 @@ body.interviewing main { max-width: none; padding-top: 46px; }
             padding: 0 47px 0 60px; margin-bottom: 36px; }
 .label { color: var(--accent); font-weight: 700; font-size: 20px; line-height: 1.2; margin: 0 0 14px; }
 .q-en, .q-zh { color: var(--primary); font-size: 30px; font-weight: 700; line-height: 1.25; margin: 0; }
-.q-zh { text-align: right; margin-top: 38px; } /* level with the English, under the label */
+.q-zh { text-align: right; }
+.question-spacer { visibility: hidden; }
 /* Most of the team's questions are far longer than the Figma sample; at 30px they
    would push the cards below the fold. */
 .question.long .q-en, .question.long .q-zh { font-size: 22px; line-height: 1.35; }
@@ -143,11 +145,13 @@ body.interviewing main { max-width: none; padding-top: 46px; }
 @media (max-width: 900px) {
   .question, .stage { grid-template-columns: 1fr; gap: 16px; }
   .question { padding: 12px 16px 0; }
-  .q-zh { text-align: left; margin-top: 0; }
+  .q-zh { text-align: left; }
+  .question-spacer { display: none; }
   .centre { order: -1; padding-top: 0; }
   .card, .card.zh { min-height: 0; padding: 24px; }
   .card textarea { min-height: 140px; }
 }
+@media (max-width: 760px) { #start { min-height: 0; } }
 </style>
 </head>
 <body>
@@ -201,7 +205,10 @@ body.interviewing main { max-width: none; padding-top: 46px; }
         <p class="label">Current Question</p>
         <p id="q-en" class="q-en"></p>
       </div>
-      <p id="q-zh" class="q-zh" lang="zh-Hans"></p>
+      <div>
+        <p class="label question-spacer" aria-hidden="true">Current Question</p>
+        <p id="q-zh" class="q-zh" lang="zh-Hans"></p>
+      </div>
     </div>
 
     <div class="stage">
