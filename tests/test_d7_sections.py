@@ -115,6 +115,68 @@ class Draft(unittest.TestCase):
             d7_sections.draft({"answers": "text"}, post=answering(GOOD), api_key="k")
 
 
+RESUME_ZH = "李伟\n工作经历\n主厨｜蓉香楼｜成都｜2016年–2022年"
+
+
+class Polish(unittest.TestCase):
+    """A resume the person already has, in any language: POST /api/resume-polish."""
+
+    def test_a_valid_answer_comes_back_as_the_contract(self):
+        body = d7_sections.polish({"text": RESUME_ZH, "language": "zh"},
+                                  post=answering(GOOD), api_key="k")
+        self.assertEqual(body, {"sections": GOOD})
+
+    def test_the_request_carries_the_text_the_language_and_the_rules(self):
+        sent = {}
+        d7_sections.polish({"text": RESUME_ZH, "language": "zh"},
+                           post=answering(GOOD, sent), api_key="k")
+        self.assertEqual(sent["headers"]["x-api-key"], "k")
+        system = sent["payload"]["system"]
+        self.assertIn("Translate into plain Australian English", system)
+        self.assertIn("Never invent", system)
+        self.assertIn("Do not add praise", system)
+        self.assertIn("how the person came to Australia", system)
+        content = sent["payload"]["messages"][0]["content"]
+        self.assertIn("Language: zh", content)
+        self.assertIn("蓉香楼", content)
+
+    def test_missing_and_wrong_typed_sections_are_cleaned_like_draft(self):
+        body = d7_sections.polish({"text": RESUME_ZH, "language": "zh"},
+                                  post=answering({"profile": "Cook.", "skills": ["Woks", 3]}),
+                                  api_key="k")
+        sections = body["sections"]
+        self.assertEqual(sections["skills"], ["Woks"])
+        self.assertEqual(sections["contacts"], {"phone": "", "email": ""})
+        for name in ("education", "employment", "volunteer", "certificates"):
+            self.assertEqual(sections[name], [], name)
+
+    def test_without_a_key_it_reports_offline_and_writes_nothing(self):
+        body = d7_sections.polish({"text": RESUME_ZH, "language": "zh"},
+                                  post=answering(GOOD), api_key="")
+        self.assertTrue(body["offline"])
+        self.assertTrue(body["reason"])
+        self.assertNotIn("sections", body)
+
+    def test_a_network_failure_reports_offline(self):
+        def broken(*args):
+            raise OSError("venue wifi")
+        body = d7_sections.polish({"text": RESUME_ZH, "language": "zh"}, post=broken, api_key="k")
+        self.assertTrue(body["offline"])
+
+    def test_an_unsupported_language_is_refused_before_anything_is_sent(self):
+        def must_not_post(*args):
+            raise AssertionError("posted a language nobody can check")
+        body = d7_sections.polish({"text": "رزومه", "language": "fa"},
+                                  post=must_not_post, api_key="k")
+        self.assertIn("fa", body["refused"])
+
+    def test_empty_or_oversized_text_is_refused(self):
+        for text in ("", "  ", None, "x" * (d7_sections.MAX_POLISH_CHARS + 1)):
+            with self.subTest(text=str(text)[:5]), self.assertRaises(ValueError):
+                d7_sections.polish({"text": text, "language": "zh"}, post=answering(GOOD),
+                                   api_key="k")
+
+
 class Route(unittest.TestCase):
     """The page's two requests, over real HTTP, with no API key."""
 
@@ -135,8 +197,8 @@ class Route(unittest.TestCase):
         cls.thread.join(timeout=5)
         cls.env.stop()
 
-    def post(self, data):
-        request = Request(f"http://127.0.0.1:{self.port}/api/resume-sections",
+    def post(self, data, path="/api/resume-sections"):
+        request = Request(f"http://127.0.0.1:{self.port}{path}",
                           data=json.dumps(data).encode("utf-8"), method="POST",
                           headers={"Content-Type": "application/json"})
         try:
@@ -155,14 +217,29 @@ class Route(unittest.TestCase):
         self.assertEqual(status, 200)
         self.assertTrue(body["offline"])
 
+    def test_the_upload_page_is_served(self):
+        with urlopen(f"http://127.0.0.1:{self.port}/upload", timeout=5) as response:
+            self.assertEqual(response.status, 200)
+            self.assertIn("Add the client's resume", response.read().decode("utf-8"))
+
+    def test_polish_offline_is_a_200_with_a_reason(self):
+        status, body = self.post({"text": RESUME_ZH, "language": "zh"}, "/api/resume-polish")
+        self.assertEqual(status, 200)
+        self.assertTrue(body["offline"])
+
+    def test_polish_without_text_is_a_400(self):
+        status, body = self.post({"language": "zh"}, "/api/resume-polish")
+        self.assertEqual(status, 400)
+        self.assertIn("text", body["error"])
+
     def test_bad_answers_are_a_400(self):
         status, body = self.post({"answers": [1, 2]})
         self.assertEqual(status, 400)
         self.assertIn("answers", body["error"])
 
 
-def constant(name):
-    page = app.REVIEW_PAGE.read_text(encoding="utf-8")
+def constant(name, page=app.REVIEW_PAGE):
+    page = page.read_text(encoding="utf-8")
     return json.loads(page.split(f"const {name} = ")[1].split(";\n")[0])
 
 
@@ -200,6 +277,10 @@ class MockFixtures(unittest.TestCase):
             with self.subTest(id=answer["id"]):
                 self.assertEqual(answer["question_en"], questions[answer["id"]]["en"])
                 self.assertEqual(answer["question_zh"], questions[answer["id"]]["zh"])
+
+    def test_the_upload_mock_lands_on_the_same_sections_as_the_interview_mock(self):
+        # Same sections, same lines, so the /jobs match fixtures stay valid for both paths.
+        self.assertEqual(constant("FIXTURE_SECTIONS", app.UPLOAD_PAGE), constant("FIXTURE_SECTIONS"))
 
     def test_the_mock_lines_are_built_from_the_mock_sections(self):
         self.assertEqual(resume_lines(constant("FIXTURE_SECTIONS")), constant("FIXTURE_REVIEW_LINES"))

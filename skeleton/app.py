@@ -42,6 +42,8 @@ JOBS_PAGE = WEB / "jobs.html"
 REVIEW_PAGE = WEB / "review.html"
 # The spoken interview that hands its answers to /review.
 INTERVIEW_PAGE = WEB / "interview.html"
+# The other way into /review: a resume the person already has, translated.
+UPLOAD_PAGE = WEB / "upload.html"
 
 # A request past these is refused before it is read: a few minutes of webm
 # speech is well under 25 MB, and no JSON the page sends comes near 1 MB.
@@ -324,6 +326,13 @@ def resume_sections(payload):
         raise BadRequest(str(bad)) from None
 
 
+def resume_polish(payload):
+    try:
+        return d7_sections.polish(payload)
+    except ValueError as bad:
+        raise BadRequest(str(bad)) from None
+
+
 PAGE = """<!doctype html><meta charset=utf-8><title>Direction skeleton</title>
 <style>
 body{{font:15px/1.5 system-ui,sans-serif;max-width:760px;margin:2rem auto;padding:0 1rem}}
@@ -356,6 +365,8 @@ class Handler(BaseHTTPRequestHandler):
             return self._send(200, "text/html; charset=utf-8", REVIEW_PAGE.read_bytes())
         if parsed.path == "/interview":
             return self._send(200, "text/html; charset=utf-8", INTERVIEW_PAGE.read_bytes())
+        if parsed.path == "/upload":
+            return self._send(200, "text/html; charset=utf-8", UPLOAD_PAGE.read_bytes())
         if parsed.path == "/api/interview/questions":
             return self._json(200, interview.questions())
         scenario = parse_qs(parsed.query).get("s", [None])[0]
@@ -381,6 +392,8 @@ class Handler(BaseHTTPRequestHandler):
                 body = match(self._read_json())
             elif parsed.path == "/api/resume-sections":
                 body = resume_sections(self._read_json())
+            elif parsed.path == "/api/resume-polish":
+                body = resume_polish(self._read_json())
             elif parsed.path == "/api/translate":
                 body = translate(self._read_json())
             elif parsed.path == "/api/speak":

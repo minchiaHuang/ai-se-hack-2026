@@ -151,7 +151,7 @@ details.said dd { margin: 0; }
 
     <aside class="panel" aria-labelledby="h-panel">
       <h2 id="h-panel">Caseworker Review</h2>
-      <p class="muted small">Drafted from the interview answers. Check each section with the jobseeker and edit anything that is wrong or missing.</p>
+      <p class="muted small" id="panel-note">Drafted from the interview answers. Check each section with the jobseeker and edit anything that is wrong or missing.</p>
       <ul class="cards" id="cards"></ul>
       <label class="consent">
         <input type="checkbox" id="consent">
@@ -163,8 +163,9 @@ details.said dd { margin: 0; }
       </div>
       <p class="status" id="status" role="status"></p>
       <details class="said">
-        <summary>What was said in the interview</summary>
+        <summary id="said-summary">What was said in the interview</summary>
         <dl id="answers"></dl>
+        <pre id="original" hidden style="white-space: pre-wrap; font: inherit; margin: .4rem 0 0;"></pre>
       </details>
     </aside>
   </div>
@@ -180,6 +181,8 @@ const MOCK = params.get("mock") === "1";
 
 // Handed over by /interview. sessionStorage keeps it to this tab.
 const INTERVIEW_KEY = "d7.interview";
+// Handed over by /upload: sections already translated and edited there.
+const UPLOAD_KEY = "d7.sections";
 // Handed on to /jobs: the same key and shape intake.html writes.
 const SESSION_KEY = "d7-session";
 const asRoute = (route, file) => (location.protocol === "file:" ? file : route) + (MOCK ? "?mock=1" : "");
@@ -271,6 +274,7 @@ function mockMatch(evidenced) {
 // ---------------------------------------------------------------- state
 const state = {
   interview: null,  // {language, answers: [{id, section, question_en, question_zh, answer_zh, answer_en}]}
+  upload: null,     // {source: "upload", language, sections, original} from /upload, else null
   sections: null,   // the contract's sections, as edited by the caseworker
   name: "",         // page-only: the contract carries no name
   editing: null,    // the key of the card open for editing
@@ -338,6 +342,14 @@ function readInterview() {
   return MOCK ? clone(MOCK_INTERVIEW) : null;
 }
 
+function readUpload() {
+  try {
+    const stored = JSON.parse(sessionStorage.getItem(UPLOAD_KEY) || "null");
+    if (stored && stored.source === "upload" && stored.sections && typeof stored.original === "string") return stored;
+  } catch (err) { /* unreadable: fall back to the interview */ }
+  return null;
+}
+
 async function draftAll() {
   const body = await call("/api/resume-sections", { answers: state.interview.answers });
   if (body && body.offline) return { offline: body.reason || "The resume service is offline." };
@@ -346,6 +358,19 @@ async function draftAll() {
 }
 
 async function start() {
+  // An uploaded resume arrives drafted: no /api/resume-sections call, and the
+  // original text stands where the interview answers would.
+  state.upload = readUpload();
+  if (state.upload) {
+    state.sections = clone(state.upload.sections);
+    $("panel-note").textContent = "Translated from the resume the jobseeker brought. Check each section with them " +
+                                  "and edit anything that is wrong or missing.";
+    if (MOCK && !state.name) state.name = MOCK_NAME;
+    $("loading").hidden = true;
+    $("review").hidden = false;
+    render();
+    return;
+  }
   state.interview = readInterview();
   if (!state.interview) {
     $("loading").hidden = true;
@@ -577,6 +602,14 @@ function toggleEdit(key) {
 }
 
 function renderAnswers() {
+  if (state.upload) {
+    $("said-summary").textContent = "The original resume";
+    $("original").textContent = state.upload.original;
+    $("original").lang = state.upload.language;
+    $("original").dir = state.upload.language === "ar" ? "rtl" : "ltr";
+    $("original").hidden = false;
+    return;
+  }
   $("answers").replaceChildren(...state.interview.answers.flatMap(a => [
     el("dt", {}, a.section || a.id),
     el("dd", {}, a.answer_en || "(no English translation)"),
@@ -590,6 +623,9 @@ function render() {
   renderCards();
   renderAnswers();
   $("regenerate").textContent = "Regenerate Section: " + LABEL[state.selected];
+  // NEEDS DECISION: redrafting redrafts from interview answers, which an
+  // uploaded resume has none of, so the button is hidden on that path.
+  $("regenerate").hidden = !!state.upload;
   $("regenerate").disabled = state.busy;
   $("confirm").disabled = state.busy;
 }
