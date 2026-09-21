@@ -40,7 +40,6 @@ header.top {
   background: var(--card); border-bottom: 1px solid var(--line);
 }
 
-.banner { margin: 0; padding: .5rem 40px; background: var(--card); border: 2px dashed var(--line); }
 
 main { padding: 90px 24px 72px; text-align: center; }
 h1 { color: var(--primary); font-size: 30px; font-weight: 700; margin: 0 0 8px; }
@@ -63,7 +62,6 @@ h1 { color: var(--primary); font-size: 30px; font-weight: 700; margin: 0 0 8px; 
   header.top { height: 68px; padding: 0 16px; }
   .brand img { width: 44px; height: 40px; }
   .wordmark { font-size: 24px; }
-  .banner { padding: .5rem 16px; }
   main { padding: 40px 16px 56px; }
   h1 { font-size: 26px; }
   .sub { margin-bottom: 28px; }
@@ -76,7 +74,6 @@ h1 { color: var(--primary); font-size: 30px; font-weight: 700; margin: 0 0 8px; 
 <header class="top">
   <a class="brand" href="/" data-route><img src="/logo.svg" alt=""><span class="wordmark"><b>Bridge</b><span>Work</span></span></a>
 </header>
-<p id="mock-banner" class="banner" hidden>Mock mode: fixture data for a fictional cook, no backend. Nothing is recorded or sent.</p>
 
 <main>
   <h1>How would you like to build this Resume?</h1>
@@ -113,10 +110,8 @@ const params = new URLSearchParams(location.search);
 const MOCK = params.get("mock") === "1";
 const carried = new URLSearchParams();
 if (MOCK) carried.set("mock", "1");
-if (MOCK && params.get("quiet") === "1") carried.set("quiet", "1");
 const suffix = carried.toString() ? "?" + carried : "";
 document.querySelectorAll("a[data-route]").forEach(a => { a.href = a.getAttribute("href") + suffix; });
-document.getElementById("mock-banner").hidden = !MOCK || params.get("quiet") === "1";
 </script>
 </body>
 </html>

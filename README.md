@@ -77,6 +77,10 @@ resume other than the sample needs `ANTHROPIC_API_KEY` to be mapped.
 `/intake?mock=1` runs the whole page against in-page fixtures with no backend. There too, a pasted
 resume that isn't the sample gets a gaps-only pack and an empty job board.
 
+**`?mock=1` is fixture data throughout, and no page says so on screen.** The homepage's "Live demo"
+button opens the flow this way so it reads as the product. Nothing is recorded or sent in mock mode,
+the client is fictional, and an application is never actually submitted — say this when demoing.
+
 ## Architecture
 
 ```

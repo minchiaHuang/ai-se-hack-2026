@@ -40,7 +40,6 @@ header.top {
   background: var(--card); border-bottom: 1px solid var(--line);
 }
 
-.banner { margin: 0; padding: .5rem 40px; background: var(--card); border: 2px dashed var(--line); }
 
 main { max-width: 740px; margin: 0 auto; padding: 77px 0 96px; }
 h1 { color: var(--primary); font-size: 40px; font-weight: 700; margin: 0 0 22px; }
@@ -68,7 +67,6 @@ button {
   header.top { height: 68px; padding: 0 16px; }
   .brand img { width: 44px; height: 40px; }
   .wordmark { font-size: 24px; }
-  .banner { padding: .5rem 16px; }
   main { padding: 40px 16px 64px; }
   h1 { font-size: 30px; }
   form { padding: 28px 20px 32px; }
@@ -81,7 +79,6 @@ button {
 <header class="top">
   <a class="brand" href="/" data-route><img src="/logo.svg" alt=""><span class="wordmark"><b>Bridge</b><span>Work</span></span></a>
 </header>
-<p id="mock-banner" class="banner" hidden>Mock mode: a fictional cook's details are filled in. Nothing is recorded or sent.</p>
 
 <main>
   <h1>Personal Information</h1>
@@ -110,10 +107,8 @@ const params = new URLSearchParams(location.search);
 const MOCK = params.get("mock") === "1";
 const carried = new URLSearchParams();
 if (MOCK) carried.set("mock", "1");
-if (MOCK && params.get("quiet") === "1") carried.set("quiet", "1");
 const suffix = carried.toString() ? "?" + carried : "";
 document.querySelectorAll("a[data-route]").forEach(a => { a.href = a.getAttribute("href") + suffix; });
-document.getElementById("mock-banner").hidden = !MOCK || params.get("quiet") === "1";
 
 const KEY = "d7.person";
 const FIELDS = ["name", "phone", "email", "language"];

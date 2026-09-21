@@ -204,7 +204,6 @@ main { max-width: 1240px; margin: 0 auto; padding: 26px 24px 48px; }
   <a class="wordmark" id="home" href="/"><img src="/logo.svg" alt="" onerror="this.hidden = true"><b>Bridge</b><span>Work</span></a>
 </header>
 <main>
-  <p id="mock-banner" class="banner" hidden>Mock mode: fixture data, no backend. Nothing is recorded or sent.</p>
 
   <section class="nothing" id="nothing" hidden aria-labelledby="h-nothing">
     <h2 id="h-nothing">Nothing to show yet</h2>
@@ -237,11 +236,9 @@ const SESSION_KEY = "d7-session";
 // What /start saved: only the name is read, for the heading.
 const PERSON_KEY = "d7.person";
 const params = new URLSearchParams(location.search);
-// ?quiet=1 hides only the mock banner, for the recorded demo; nothing else changes.
-const QUIET = params.get("quiet") === "1";
-// Every link keeps the demo flags, so a quiet demo stays quiet. Opened from
+// Every link keeps the mock flag, so the demo stays in mock mode. Opened from
 // disk there is no route, so the links fall back to the files.
-const FLAGS = [params.get("mock") === "1" && "mock=1", QUIET && "quiet=1"].filter(Boolean).join("&");
+const FLAGS = [params.get("mock") === "1" && "mock=1"].filter(Boolean).join("&");
 const asRoute = (route, file) => (location.protocol === "file:" ? file : route) + (FLAGS ? "?" + FLAGS : "");
 
 const FIELD_LABELS = {
@@ -686,7 +683,6 @@ function render() {
 }
 
 // ---------------------------------------------------------------- wiring
-$("mock-banner").hidden = !(params.get("mock") === "1" || (session && session.mock)) || QUIET;
 $("home").href = asRoute("/", "home.html");
 $("nothing-link").href = asRoute("/start/path", "path.html");
 

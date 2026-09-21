@@ -160,7 +160,6 @@ button:disabled { background: #d1d5db; border-color: #9ca3af; color: #333; curso
   <span id="progress" class="progress" aria-live="polite"></span>
 </header>
 <main>
-  <p id="mock-banner" class="banner mock" hidden>Mock mode: scripted answers from a fictional cook, no backend. Nothing is recorded or sent.</p>
   <p id="offline" class="banner offline" role="status" hidden></p>
   <p id="error" class="banner error" role="alert" hidden></p>
 
@@ -238,8 +237,6 @@ button:disabled { background: #d1d5db; border-color: #9ca3af; color: #333; curso
 // request at all: the demo video is recorded in it.
 const params = new URLSearchParams(location.search);
 const MOCK = params.get("mock") === "1";
-// ?quiet=1 hides the mock banner for the demo video; nothing else changes with it.
-const QUIET = params.get("quiet") === "1";
 
 // Read by /review. sessionStorage keeps the answers to this tab.
 const INTERVIEW_KEY = "d7.interview";
@@ -249,8 +246,8 @@ const PERSON_KEY = "d7.person";
 // this tab would otherwise show the uploaded resume instead of this interview.
 const SECTIONS_KEY = "d7.sections";
 const LANGUAGE = "zh";
-// Both flags ride along, so a demo opened quiet stays quiet on /review.
-const FLAGS = [MOCK && "mock=1", QUIET && "quiet=1"].filter(Boolean).join("&");
+// The mock flag rides along, so a demo stays in mock mode on /review.
+const FLAGS = [MOCK && "mock=1"].filter(Boolean).join("&");
 const REVIEW_URL = (location.protocol === "file:" ? "review.html" : "/review") + (FLAGS ? "?" + FLAGS : "");
 
 // ---------------------------------------------------------------- fixtures
@@ -702,7 +699,6 @@ function render() {
 }
 
 // ---------------------------------------------------------------- start
-$("mock-banner").hidden = !MOCK || QUIET;
 $("play").innerHTML = ICONS.play;
 $("consent").addEventListener("change", event => { state.consent = event.target.checked; render(); });
 $("begin").addEventListener("click", () => {

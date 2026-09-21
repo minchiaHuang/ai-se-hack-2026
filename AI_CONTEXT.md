@@ -481,5 +481,9 @@ When continuing this project:
 4. Do not contact interviewees, organisers, or partners without explicit action-time approval.
 5. Do not collect, copy, or expose personal or sensitive data unnecessarily.
 6. Do not claim the team has completed interviews, validation, testing, or implementation without evidence.
-7. Prefer one narrow, testable problem and one complete workflow.
-8. Preserve this file as the project context; update it only when new evidence is verified.
+7. The demo runs on fixture data, and that is stated in the README and said out loud when it is
+   shown. Tommy decided on 2026-09-22 that the pages themselves carry no "mock mode" banner: the
+   demo is presented as the product. Never let a page imply that the fictional client, the drafted
+   resume, or a submitted application is real.
+8. Prefer one narrow, testable problem and one complete workflow.
+9. Preserve this file as the project context; update it only when new evidence is verified.

@@ -49,7 +49,6 @@ header.top nav { margin-left: auto; display: flex; gap: 28px; font-size: 14px; f
 header.top nav a { text-decoration: none; }
 header.top nav a:hover { text-decoration: underline; }
 
-.banner { margin: 0; padding: .5rem 40px; background: var(--card); border: 2px dashed var(--line); }
 
 .btn {
   display: inline-flex; align-items: center; justify-content: center; padding: 14px 24px; border-radius: 8px;
@@ -145,7 +144,6 @@ footer small { display: block; padding-top: 20px; border-top: 1px solid rgba(255
   .brand img { width: 44px; height: 40px; }
   .wordmark { font-size: 24px; }
   header.top .btn { margin-left: auto; }
-  .banner { padding: .5rem 16px; }
   .hero { min-height: 0; padding: 72px 16px; }
   .hero::before { background: rgba(12,40,48,.82); }
   .hero h1 { font-size: 36px; }
@@ -171,7 +169,6 @@ footer small { display: block; padding-top: 20px; border-top: 1px solid rgba(255
   </nav>
   <a class="btn small primary" href="/start" data-route>Start a resume</a>
 </header>
-<p id="mock-banner" class="banner" hidden>Mock mode: fixture data for a fictional cook, no backend. Nothing is recorded or sent.</p>
 
 <section class="hero">
   <div class="hero-copy">
@@ -181,7 +178,7 @@ footer small { display: block; padding-top: 20px; border-top: 1px solid rgba(255
     <div class="actions">
       <a class="btn primary" href="/start" data-route>Start a resume</a>
       <!-- No data-route: the demo sets ?mock=1 itself, whatever the page was opened with. -->
-      <a class="btn ghost-light" href="/start?mock=1&amp;quiet=1">Live demo</a>
+      <a class="btn ghost-light" href="/start?mock=1">Live demo</a>
     </div>
   </div>
 </section>
@@ -260,16 +257,14 @@ footer small { display: block; padding-top: 20px; border-top: 1px solid rgba(255
 </footer>
 
 <script>
-// ?mock=1 (and &quiet=1, which only hides the banner for the video) rides along
-// on every link, so the whole flow stays in mock mode from the first click.
+// ?mock=1 rides along on every link, so the whole flow stays in mock mode
+// from the first click.
 const params = new URLSearchParams(location.search);
 const MOCK = params.get("mock") === "1";
 const carried = new URLSearchParams();
 if (MOCK) carried.set("mock", "1");
-if (MOCK && params.get("quiet") === "1") carried.set("quiet", "1");
 const suffix = carried.toString() ? "?" + carried : "";
 document.querySelectorAll("a[data-route]").forEach(a => { a.href = a.getAttribute("href") + suffix; });
-document.getElementById("mock-banner").hidden = !MOCK || params.get("quiet") === "1";
 </script>
 </body>
 </html>

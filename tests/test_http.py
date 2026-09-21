@@ -132,8 +132,7 @@ class HttpRoundTrip(Server):
         # The demo button carries ?mock=1 itself, so it must not be rewritten
         # by the data-route script, which would drop mock mode on a live page.
         _, body = self.get("/")
-        self.assertIn(
-            '<a class="btn ghost-light" href="/start?mock=1&amp;quiet=1">Live demo</a>', body)
+        self.assertIn('<a class="btn ghost-light" href="/start?mock=1">Live demo</a>', body)
 
     def test_every_homepage_photo_serves_as_jpeg(self):
         _, body = self.get("/")
@@ -205,13 +204,15 @@ class HttpRoundTrip(Server):
             with self.subTest(href=href):
                 self.assertIn(href, body)
 
-    def test_quiet_hides_only_the_mock_banner_on_the_entry_pages(self):
-        # &quiet=1 is for the demo video: the banner goes, mock mode stays.
-        for path in ("/", "/start", "/start/path"):
+    def test_no_page_carries_a_mock_banner(self):
+        """The demo is shown as the product, so the fixture data is stated in
+        the README and said out loud, not stamped across every page."""
+        for path in ("/", "/start", "/start/path", "/interview", "/review",
+                     "/upload", "/jobs", "/intake"):
             with self.subTest(path=path):
-                _, body = self.get(path)
-                self.assertIn('id="mock-banner"', body)
-                self.assertIn('.hidden = !MOCK || params.get("quiet") === "1"', body)
+                _, body = self.get(path + "?mock=1")
+                self.assertNotIn("mock-banner", body)
+                self.assertNotIn("Mock mode:", body)
 
     def test_the_logo_serves_as_svg(self):
         status, headers = self.raw_get("/logo.svg")
