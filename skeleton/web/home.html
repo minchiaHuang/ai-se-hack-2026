@@ -180,7 +180,8 @@ footer small { display: block; padding-top: 20px; border-top: 1px solid rgba(255
     <p class="lede">BridgeWork helps caseworkers turn a client’s spoken story — in any language — into a clear, job-ready English resume, then shows which Sydney jobs it fits and why.</p>
     <div class="actions">
       <a class="btn primary" href="/start" data-route>Start a resume</a>
-      <a class="btn ghost-light" href="#how">See how it works</a>
+      <!-- No data-route: the demo sets ?mock=1 itself, whatever the page was opened with. -->
+      <a class="btn ghost-light" href="/start?mock=1">Live demo</a>
     </div>
   </div>
 </section>
