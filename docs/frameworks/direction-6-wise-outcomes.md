@@ -129,13 +129,16 @@ EPRI 亦然（2026-05 延長一年、770 萬澳幣）。錢有進來了，只是
 
 **RECOMMENDATION** —— 這是我們選的答法，不是已驗證的事實。誠實版本是三句：
 
-1. **有人做，但做的不是同一格。** ReadyTech 做的是就業服務體系內的成效申報，
-   而 WISE 基本上不在那個體系裡；SEA 的共享資料系統做的是部門層級統計，
-   不是單一 WISE 這一次要交的那份表。EVIDENCE 見上方兩段。
+1. **有人做，但做的不是同一格 —— 且這一句 2026-09-21 傍晚已被迫縮小。**
+   ⛔ **不可以再說「沒有人做資助方格式對映」**：Sopact、Knack、LiveImpact 都**自述**
+   已做「一份資料 → 多個資助方格式」（廠商宣稱，未獨立驗證）。
+   還站得住的說法只剩：**他們做的不是澳洲的格式**
+   （Social Traders 認證、SEDI、DSS 的 AWP／AWPR、PBO 里程碑、各州社會採購都沒人支援），
+   而且他們的價位與導入模式不服務 **4–26 人**的組織。
 2. **我們不知道他們會不會補上這一格，而且不打算假裝知道。**
    「為什麼不是 ReadyTech 順手做」沒有已驗證的答案；
-   SEA 那邊有 peak body、大學與 Minderoo 的多年期支持，資源比我們多。
-   如果他們要做，他們做得到。
+   SEA 那邊有 peak body、大學與 Minderoo 的多年期支持，資源比我們多；
+   Sopact 已經有這個功能，只差在地化。如果他們要做，他們做得到。
 3. **所以我們不靠「沒人做過」站著。** 本場的七項加權評分標準裡
    **沒有新穎性這一項**（清單見 `AI_CONTEXT.md`〈Official event facts〉）。我們主張的是這一格該怎麼做才對：
    倫理紅線寫進程式（拋例外、擋在模型之前，不是條款）、
@@ -226,6 +229,58 @@ that does take more.」）——**這是目前最硬的一句「申報工作本�
 **④ 那個「開發中的工具」**：Impact Costs 報告結尾寫
 「A tool to assist WISEs to implement this framework is now under development」（2023-11）。
 2026-09-21 遍尋不著上線跡象。⚠️ 這是 **NOT FOUND，不是「確定沒做」**。
+
+## 市面產品地圖（2026-09-21 傍晚盤點，分五層）
+
+完整版與出處見 `docs/research-brief-2026-09-21.md` 第 5 節方向 6「第三輪研究」。
+
+| 層 | 佔位者 | 一句話 |
+|---|---|---|
+| 澳洲部門層（免費） | **Seedkit**（維州 100 萬澳幣、墨大託管）、~~Amplify~~（已關閉） | 同一批使用者，**無資助方格式範本** |
+| 商業 SaaS | **Socialsuite**（墨爾本，社會影響力業務 75+ 非營利）、**Sopact**、UpMetrics、Makerble、Clear Impact、Bonterra | ⛔ Sopact／Knack／LiveImpact **自述已做資助方格式對映** |
+| 補助流程層 | **SmartyGrants**（澳紐最多撥款方在用，但那是**撥款方**的系統）、GrantConnect | 社企是在它的表單裡填答的那一方 |
+| AI 寫申請書 | Grantable、Instrumentl、GrantCopilot（全是美國市場） | 做找資助方＋草擬文字，**不做把營運紀錄算成數字** |
+| 個案管理 | ReadyTech Job Ready、Bonterra、CHARMS、SupportAbility／Lumary／Brevity | 已飽和，不碰 |
+| **人力聚合者** | **White Box Enterprises** | **真正的在位者，用人做不是用軟體做** |
+
+⚠️ 商業 SaaS 那一列多數描述來自各家自家或競品比較行銷內容（尤其 sopact.com 的「比較」頁面
+是 Sopact 自己寫的），**屬廠商宣稱，未經獨立驗證**。被追問時要講明這一點。
+
+## 申報格式清單 —— demo 要對映的目標就從這裡挑
+
+⭐ **首選：Social Traders 認證／重新認證**（強制、週期性、格式穩定）
+- 最近**兩個**財政年度損益表與資產負債表；法人章程；ABN
+- **少量影響力指標＋社會成本**，對齊最近一個完整財政年度，指標依影響力模式而定
+- 整體收集**逾 200 個資料點**；申請到結果 **4–5 週**；未滿兩年**每年**、滿兩年**每三年**重認證
+- ⚠️ 完整指引 PDF 兩度下載失敗（S3 AccessDenied），欄位全表仍未取得
+
+其餘同時並行的格式（**「多格式」本身就是問題陳述**）：
+- **ACNC AIS**（每年強制）：含**員工人數與志工人數**必填；依規模決定財報層級
+- **DSS／Community Grants Hub**：**AWP**（打算怎麼做）＋ **AWPR**（做到什麼），
+  申報項目寫在協議 **Item E. Reporting**。
+  ⭐ **範本每個文字欄位建議 300 字以內 —— 直接當成產品的輸出長度約束**
+- **SEDI**：EOI 問卷 → 電話 → 正式申請 → 專家小組
+- **PBO／WorkFoundations**：滿 **6／12／18 個月**觸發付款，一人最多 5 個里程碑
+- EPRI、各州社會採購申報
+
+⚠️ 找不到任何量化澳洲 WISE「面對幾個資助方／花幾小時申報」的研究。
+唯一主題吻合的 Misbauddin (2026) 是**孟加拉**樣本且只有摘要，**不可當澳洲證據引用**。
+
+## ⭐ 最強的付費論證：SEDI 把錢直接指向我們這一格
+
+- **SEDI Capability Building Grants 2026–27**：每家最高 **12 萬澳幣**，**2026-05-08 已開放**，
+  用途**明文包含 evaluation and impact measurement**
+- **SEDI First Nations**：**5–12 萬澳幣**，**2026-07-22 開放**，滾動審查至 2027 初；
+  門檻為年營收 > 5 萬、交易收入 > 3.5 萬澳幣，補助金額不得超過年營收
+- ⭐ **獲補助者須在補助期間建立「Impact Measurement Framework」與「Business Plan」**
+
+→ **付費意願不需要論證，它寫在補助條款裡。** 這比「顧問收費存在」強得多，
+講方向 6 的商業模式就講這一條。
+
+其他現在開著或即將開的（**開關狀態與金額須點官網確認，不要在 pitch 直接報**）：
+Outcomes Fund 第 2、3 輪（州政府 2026-05～2027-02 提案，社企非直接申請人）、
+WorkFoundations、EPRI、**Westpac Inclusive Employment Grant（5 萬澳幣／2 年，2026 年開放）**、
+QLD Social Enterprise Jobs Fund、VIC 設備補助、地方議會小額補助。
 
 ## demo 資料來源與誠實邊界
 
