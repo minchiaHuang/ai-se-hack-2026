@@ -6,7 +6,9 @@
 方向 7 的一輪研究已完成（三個 agent 平行），框架、交接文件第 8 節、spec 皆已落檔。
 **現場優先原則仍凌駕一切。**
 
-最後驗證：2026-09-22（`bash bin/verify.sh` → GREEN，含 327 個骨架測試，於 `b7ed5e3`）
+最後驗證：2026-09-22（`bash bin/verify.sh` → GREEN，含 329 個骨架測試，於 `feat/d7-photo-homepage`）
+
+- `feat/d7-photo-homepage`（待合入）：首頁 `/` 改成 Figma「V3 / 01b — Homepage (photo-led)」(127:2)：滿版照片主視覺、三個產品保證（不放沒有來源的影響力數字）、附照片的三步驟、四格工作現場照片、顧問／雇主（雇主仍是 Coming soon）、CTA。9 張 Unsplash 照片（Unsplash License）放在 `skeleton/web/img/`，共 1.2 MB，由 `/img/<name>.jpg` 提供，只讀該資料夾。照片是模特兒不是難民，四格上的技能是示意。Figma 另有 `ref` page：8 個難民就業組織首頁截圖。
 
 - PR #35 d7-occupation（`b7ed5e3`）：`/review` 不再寫死廚師。`POST /api/occupation` 由模型從三個職業中選一個或回 `none`，顧問可在選單改；不支援的職業不推職缺並說明原因。實測：廚師→cookery、IT→none、焊工→welding、長照→aged_care。
 
