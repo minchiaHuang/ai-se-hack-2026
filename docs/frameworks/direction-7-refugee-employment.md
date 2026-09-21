@@ -17,7 +17,7 @@
 
 ## ⛔ 倫理紅線 —— 這條寫進程式，不只寫在文件
 
-**不對人評分、不改名字、不評口音、不存可識別的難民資料。**
+**不對人評分、不改名字、不評口音、不存結構化的身分欄位。**
 
 對應 `skeleton/directions/d7_credentials.py` 的 `guard()`，
 由 `skeleton/core/pipeline.py` **在呼叫模型之前**執行（與方向 6 的 `check_aggregate()` 同一個位置）。
@@ -29,12 +29,31 @@
 3. 使用者選的語言不在支援清單 → 回傳明確拒絕，**不靜默退回英文**
 4. 任何對「人」本身的評分欄位（而非對「職缺吻合度」的分數）→ 拒絕
 
+> ### ⚠️ 涵蓋範圍 —— 2026-09-21 計畫審查時發現，上台前必讀
+>
+> `guard()` 檢查的是**結構化欄位名稱**，不是口述內容。
+> 求職者開口講出的原籍國、簽證、庇護細節**會進逐字稿、會送進模型**，
+> 而且**音檔會先送到 ElevenLabs 這個第三方**。
+>
+> | 可以講 | 不能講 |
+> |---|---|
+> | 系統不設、也拒收任何身分欄位（原籍國、簽證狀態、庇護聲請、生物特徵） | 「我們不蒐集原籍國」 |
+> | 我們的伺服器不落地保存逐字稿或音檔 | 「音檔當場刪除」「音檔不離開本機」 |
+> | 送出給雇主必須求職者親手按下 | 「資料完全不外流」 |
+>
+> **ElevenLabs 的音檔保留設定**：計畫 Task 9 Step 4b 要求上台前查清楚，
+> 查清楚之前**不得**宣稱零保留。
+
 **最強的那句話（HRW 2021，EVIDENCE）**：孟加拉把**至少 83 萬筆**羅興亞人姓名與生物特徵
 交給他們逃離的緬甸，難民發現後躲了起來。
 https://www.hrw.org/news/2021/06/15/un-shared-rohingya-data-without-informed-consent
 
 > 上台照念：*"For an asylum seeker, a database row is not a privacy inconvenience —
-> it is a route back to the people they fled. We designed for the day we get breached."*
+> it is a route back to the people they fled. So our system has no field for where
+> someone came from, and it refuses one if you try to add it."*
+>
+> （原句「We designed for the day we get breached」已撤下：音檔會經過第三方，
+> 這句話講得比我們實際做到的多。）
 
 ---
 

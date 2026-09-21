@@ -43,7 +43,7 @@
 | 檔案 | 建立／修改 | 職責 |
 |---|---|---|
 | `skeleton/demo_data/reference/occupations.json` | 建立 | 三個職業的 ANZSCO 2022 ＋ OSCA 2024 ＋ 資格 ＋ 單元 ＋ 評估機構 ＋ 閘門，全部已驗證 |
-| `skeleton/core/registry.py` | 建立 | 讀參考資料；查資格現行狀態；不知道方向 7 的存在 |
+| `skeleton/core/registry.py` | 建立 | 讀參考資料；檢查資格來源可達；不知道方向 7 的存在 |
 | `skeleton/directions/d7_credentials.py` | 建立 | 方向模組：四條紅線的 `guard()`、`prepare()`、`target_fields()`、`metric()` |
 | `skeleton/core/live.py` | 建立 | `urllib` 打 ElevenLabs 與 LLM；失敗一律回退 stub |
 | `skeleton/web/intake.html` | 建立 | 共桌單頁介面：左逐字稿、右佐證包 |
@@ -51,11 +51,16 @@
 | `skeleton/demo_data/payloads.json` | 修改 | 新增四個 d7 情境（黃金路徑 ＋ 三條失敗路徑） |
 | `skeleton/demo_data/canned/d7*.json` | 建立 | 對應的罐頭模型輸出 |
 | `tests/test_d7_guard.py` | 建立 | 四條紅線各自的回歸測試 |
-| `tests/test_d7_registry.py` | 建立 | 參考資料完整性與現行狀態查詢 |
+| `tests/test_d7_registry.py` | 建立 | 參考資料完整性與來源檢查 |
 | `tests/test_d7_pipeline.py` | 建立 | 黃金路徑與信心分流 |
 
 **切線**：**Task 1–6 是必須完成的最小可上台版本。** Task 7–9 是 stretch，
 主線沒跑通、備援影片沒錄好之前不要碰（`AI_CONTEXT.md`「Avoid」第五條）。
+
+> ⚠️ **切線前的 demo 是「真實語音轉文字 → 罐頭佐證包」。** 佐證包不會隨口述內容改變，
+> 評審若上前講一段焊接經歷，畫面仍會吐出烹飪的結果。
+> **Tommy 2026-09-21 決定維持此順序，以錄影 demo 為準**：錄影必須照罐頭情境
+> （阿拉伯語、三年營區廚房、食品安全）講，現場不開放評審自由口述。
 
 ---
 
@@ -110,7 +115,7 @@ class ReferenceData(unittest.TestCase):
         for key in registry.load_occupations():
             for unit in registry.all_units(key):
                 with self.subTest(key=key, unit=unit.get("code")):
-                    self.assertRegex(unit["code"], r"^[A-Z]{3,6}\d{3,6}$")
+                    self.assertRegex(unit["code"], r"^[A-Z]{3,7}\d{3,6}$")
                     self.assertTrue(unit["title"].strip())
 
     def test_cookery_carries_the_nsw_food_safety_supervisor_units(self):
@@ -357,15 +362,18 @@ class RedLines(unittest.TestCase):
 
 
 class Shape(unittest.TestCase):
-    def test_target_fields_cover_both_classifications_and_the_gate(self):
+    def test_target_fields_cover_both_classifications(self):
         fields = d7.target_fields(payload())
-        for expected in ("anzsco_code", "osca_code", "qualification", "gate"):
+        for expected in ("anzsco_code", "osca_code", "qualification", "units_evidenced"):
             self.assertIn(expected, fields)
 
-    def test_prepare_keeps_the_transcript_and_drops_control_keys(self):
-        prepared = d7.prepare(payload())
-        self.assertIn("transcript", prepared)
-        self.assertNotIn("consent", prepared)
+    def test_the_gate_is_never_asked_of_the_model(self):
+        """It is reference data. Asking the model would render it as a guess."""
+        self.assertNotIn("gate", d7.target_fields(payload()))
+
+    def test_prepare_sends_exactly_the_transcript_and_the_occupational_frame(self):
+        prepared = d7.prepare(payload(label="demo"))
+        self.assertEqual(set(prepared), {"transcript", "candidate_units", "anzsco", "osca"})
 
 
 if __name__ == "__main__":
@@ -456,7 +464,9 @@ def prepare(payload):
 
 
 def target_fields(payload):
-    return ("anzsco_code", "osca_code", "qualification", "units_evidenced", "gate")
+    """What the model is asked for. The gate is not here: it is reference data
+    about the occupation, looked up, never guessed."""
+    return ("anzsco_code", "osca_code", "qualification", "units_evidenced")
 
 
 def metric(accepted, payload):
@@ -467,7 +477,7 @@ def metric(accepted, payload):
 - [ ] **Step 4: 跑測試確認通過**
 
 Run: `python3 -m unittest tests.test_d7_guard -v`
-Expected: PASS（8 個測試）
+Expected: PASS（9 個測試）
 
 - [ ] **Step 5: 跑完整驗證**
 
@@ -518,6 +528,9 @@ CANNED = [
     {"field": "anzsco_code", "value": "351411 Cook",
      "reason": "Three years cooking for 200 people a day in a camp kitchen.",
      "confidence": 0.86, "sources": [["transcript", "t=00:12"]]},
+    {"field": "osca_code", "value": "322331 Cook",
+     "reason": "Same testimony; OSCA 2024 code for the same occupation.",
+     "confidence": 0.84, "sources": [["transcript", "t=00:12"]]},
     {"field": "units_evidenced", "value": "SITXFSA005; SITXFSA006",
      "reason": "Describes separating raw and cooked food and logging fridge temperatures.",
      "confidence": 0.78, "sources": [["transcript", "t=02:41"]]},
@@ -540,7 +553,7 @@ class GoldenPath(unittest.TestCase):
 
     def test_confident_suggestions_are_shown_and_cite_the_transcript(self):
         result = run(d7, PAYLOAD, self.model)
-        self.assertEqual(len(result.suggestions), 2)
+        self.assertEqual(len(result.suggestions), 3)
         for suggestion in result.suggestions:
             self.assertTrue(suggestion.sources)
             self.assertEqual(suggestion.sources[0].label, "transcript")
@@ -552,13 +565,17 @@ class GoldenPath(unittest.TestCase):
         for suggestion in result.needs_human:
             self.assertIsNone(suggestion.displayed_value())
 
-    def test_unanswered_target_fields_are_reported_as_gaps(self):
-        result = run(d7, PAYLOAD, self.model)
-        self.assertIn("gate", result.gaps)
+    def test_a_complete_answer_leaves_no_gaps(self):
+        self.assertEqual(run(d7, PAYLOAD, self.model).gaps, ())
+
+    def test_a_field_the_model_did_not_answer_is_reported_as_a_gap(self):
+        partial = [item for item in CANNED if item["field"] != "osca_code"]
+        result = run(d7, PAYLOAD, StubModel({d7.KEY: partial}))
+        self.assertEqual(result.gaps, ("osca_code",))
 
     def test_metric_counts_only_sourced_items(self):
         result = run(d7, PAYLOAD, self.model)
-        self.assertEqual(result.metric_value, 2)
+        self.assertEqual(result.metric_value, 3)
         self.assertEqual(result.metric_name, d7.METRIC)
 
 
@@ -672,11 +689,15 @@ Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>"
 
 ---
 
-### Task 4: 現行狀態即時查核（demo 的關鍵橋段）
+### Task 4: 資格來源檢查 —— 以及它**不能**證明什麼
 
-**為什麼這個 task 存在**：`MEM31922` 在 **2025-09-04**（十六天前）被 `MEM31925` 取代。
-一份寫死的代碼表當天就是錯的。**當場查登錄庫並演給評審看**，
-這把「為什麼不是一張靜態對照表」從說辭變成可展示的行為。
+**為什麼這個 task 存在**：佐證包要附上每個資格的官方出處，而且要能當場點開。
+
+**⚠️ 審查時實測的限制（2026-09-21）**：已被取代的 `MEM31922_R1.pdf` **照樣回 HTTP 200、
+是有效 PDF**。所以「網址連得上」**不等於**「資格仍有效」。
+這個 task 因此只宣稱它做得到的事：**來源可達**。
+被取代的事實（`MEM31922` → `MEM31925`，2025-09-04）來自種子資料，
+台上說法是：**「已於 2026-09-21 對國家登錄庫查核」**，不是「即時查核」。
 
 **Files:**
 - Modify: `skeleton/core/registry.py`
@@ -684,42 +705,52 @@ Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>"
 
 **Interfaces:**
 - Consumes: Task 1 的 `occupation()`
-- Produces: `registry.currency_check(key, fetch=None) -> dict`
-  回傳 `{"code", "status", "checked", "source"}`；`fetch` 未給時走離線種子值
+- Produces: `registry.source_check(key, fetch=None) -> dict`，回傳
+  `{"code", "status", "superseded_code", "reachable", "source"}`；
+  `registry.fetch_pdf_head(url) -> bytes`（預設抓取器）。
+  `fetch` 未給時不碰網路，`reachable=False`。
 
 - [ ] **Step 1: 追加失敗的測試**
 
 ```python
 # 追加到 tests/test_d7_registry.py
-class CurrencyCheck(unittest.TestCase):
-    def test_offline_falls_back_to_the_seeded_status(self):
-        checked = registry.currency_check("cookery")
+class SourceCheck(unittest.TestCase):
+    def test_offline_reports_the_seeded_record_unchecked(self):
+        checked = registry.source_check("cookery")
         self.assertEqual(checked["code"], "SIT30821")
         self.assertEqual(checked["status"], "Current")
-        self.assertFalse(checked["checked"])
+        self.assertFalse(checked["reachable"])
 
-    def test_a_live_fetch_marks_the_result_as_checked(self):
+    def test_the_seeded_record_names_what_was_superseded(self):
+        checked = registry.source_check("welding")
+        self.assertEqual(checked["code"], "MEM31925")
+        self.assertEqual(checked["superseded_code"], "MEM31922")
+
+    def test_a_pdf_response_marks_the_source_reachable(self):
         def fake_fetch(url):
             self.assertTrue(url.endswith("MEM31925_R1.pdf"))
-            return b"%PDF-1.4 MEM31925 Certificate III in Engineering"
+            return b"%PDF-1.4"
 
-        checked = registry.currency_check("welding", fetch=fake_fetch)
-        self.assertTrue(checked["checked"])
-        self.assertEqual(checked["code"], "MEM31925")
+        self.assertTrue(registry.source_check("welding", fetch=fake_fetch)["reachable"])
 
-    def test_a_failed_fetch_degrades_to_the_seed_instead_of_raising(self):
+    def test_a_non_pdf_response_is_not_reachable(self):
+        """An error page served with 200 must not count."""
+        checked = registry.source_check("welding", fetch=lambda url: b"<html>")
+        self.assertFalse(checked["reachable"])
+
+    def test_a_failed_fetch_degrades_instead_of_raising(self):
         def broken_fetch(url):
             raise OSError("no network at the venue")
 
-        checked = registry.currency_check("welding", fetch=broken_fetch)
-        self.assertFalse(checked["checked"])
+        checked = registry.source_check("welding", fetch=broken_fetch)
+        self.assertFalse(checked["reachable"])
         self.assertEqual(checked["code"], "MEM31925")
 ```
 
 - [ ] **Step 2: 跑測試確認失敗**
 
 Run: `python3 -m unittest tests.test_d7_registry -v`
-Expected: FAIL — `AttributeError: module 'skeleton.core.registry' has no attribute 'currency_check'`
+Expected: FAIL — `AttributeError: module 'skeleton.core.registry' has no attribute 'source_check'`
 
 - [ ] **Step 3: 實作**
 
@@ -731,55 +762,62 @@ import urllib.request
 def fetch_pdf_head(url):
     """Default fetcher. Kept separate so tests never touch the network."""
     with urllib.request.urlopen(url, timeout=6) as response:
-        return response.read(4096)
+        return response.read(8)
 
 
-def currency_check(key, fetch=None):
-    """Confirm the qualification PDF still exists at its published address.
+def source_check(key, fetch=None):
+    """Confirm the qualification's published source is reachable right now.
 
-    training.gov.au serves every qualification at
-    /assets/<PACKAGE>/<CODE>_R<n>.pdf without authentication, so this needs no
-    key and no dependency. A failure degrades to the seeded value rather than
-    raising: at a venue with bad wifi the demo must still run.
+    This proves the document is there, NOT that it is current: a superseded
+    qualification's PDF still returns 200 (MEM31922 did on 2026-09-21). Currency
+    comes from the seeded record, verified against the national register that
+    day. Degrades to unchecked rather than raising, so bad venue wifi is fine.
     """
     qualification = occupation(key)["qualification"]
     result = {
         "code": qualification["code"],
         "status": qualification["status"],
-        "checked": False,
+        "superseded_code": qualification["superseded_code"],
+        "reachable": False,
         "source": qualification["pdf"],
     }
     if fetch is None:
         return result
     try:
-        body = fetch(qualification["pdf"])
+        head = fetch(qualification["pdf"])
     except Exception:
         return result
-    if qualification["code"].encode() in body or body.startswith(b"%PDF"):
-        result["checked"] = True
+    result["reachable"] = head.startswith(b"%PDF")
     return result
 ```
 
 - [ ] **Step 4: 跑測試確認通過**
 
 Run: `python3 -m unittest tests.test_d7_registry -v`
-Expected: PASS（8 個測試）
+Expected: PASS（10 個測試）
 
-- [ ] **Step 5: 手動確認真實網址活著**（一次就好，不要放進自動測試）
+- [ ] **Step 5: 手動確認一次，並親眼看到這個限制**（不要放進自動測試）
 
-Run: `python3 -c "import urllib.request;print(urllib.request.urlopen('https://training.gov.au/assets/MEM/MEM31925_R1.pdf',timeout=10).status)"`
-Expected: `200`
+```bash
+python3 -c "
+import urllib.request
+for c in ('MEM31925','MEM31922'):
+    r=urllib.request.urlopen(f'https://training.gov.au/assets/MEM/{c}_R1.pdf',timeout=10)
+    print(c, r.status, r.read(4))"
+```
+
+Expected: **兩個都是 `200 b'%PDF'`**。第二行就是為什麼這個檢查不能叫「現行狀態查核」。
 
 - [ ] **Step 6: 跑完整驗證並 commit**
 
 ```bash
 bash bin/verify.sh
 git add skeleton/core/registry.py tests/test_d7_registry.py
-git commit -m "feat(d7): check qualification currency against the live register
+git commit -m "feat(d7): check that each qualification's source is reachable
 
-MEM31922 was superseded on 2025-09-04, which is the argument for reading
-the register instead of hardcoding a table. Degrades to the seeded value
-when the network is down, so the demo survives the venue.
+Reachability, not currency: the superseded MEM31922 PDF still returns 200.
+Supersession comes from the seeded record, verified against the national
+register on 2026-09-21. Degrades to unchecked when the network is down.
 
 Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>"
 ```
@@ -796,8 +834,9 @@ Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>"
 **Interfaces:**
 - Consumes: Task 3 的 `REFUSALS` 與管線
 - Produces: `app.extract(payload) -> dict`；`GET /intake` 回頁面；
-  `POST /api/extract` 回 `{suggestions, needs_human, gaps, metric_name, metric_value}`
-  或 `{refused: "<reason>"}`
+  `POST /api/extract` 回 `{suggestions, needs_human, gaps, gate, metric_name, metric_value}`
+  或 `{refused: "<reason>"}`。**`gate` 來自 registry，不經過模型**——
+  那是關於職業的參考資料，查表而得，不是猜的。
 
 **版面**：兩欄。左欄逐字稿（母語原文 ＋ 英文對照，每句可點）；
 右欄佐證包（confidence chip、`needs_human` 標紅、gate 列為具名下一步）。
@@ -815,6 +854,13 @@ class IntakeEndpoint(unittest.TestCase):
         })
         self.assertIn("suggestions", body)
         self.assertTrue(all(s["sources"] for s in body["suggestions"]))
+
+    def test_extract_attaches_the_gate_from_the_registry(self):
+        """The strongest demo line must never render as a blank."""
+        from skeleton.app import extract
+        body = extract({"occupation": "cookery", "language": "ar", "consent": True,
+                        "transcript": [{"t": "00:12", "text": "x"}]})
+        self.assertIn("Food Safety Supervisor", body["gate"]["text"])
 
     def test_extract_reports_a_refusal_as_data_not_an_exception(self):
         from skeleton.app import extract
@@ -852,10 +898,13 @@ def extract(payload):
             for s in result.needs_human
         ],
         "gaps": list(result.gaps),
+        "gate": registry.occupation(payload["occupation"])["gate"],
         "metric_name": result.metric_name,
         "metric_value": result.metric_value,
     }
 ```
+
+import 區加上 `from skeleton.core import registry`。
 
 `Handler` 新增 `do_POST` 處理 `/api/extract`，`do_GET` 新增 `/intake` 回傳
 `skeleton/web/intake.html`。伺服器改成 `ThreadingHTTPServer`（標準函式庫），
@@ -877,6 +926,9 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 3. 錄音鈕（`MediaRecorder`；Task 6 接真 API，此時先送預設逐字稿）
 4. 左欄逐字稿、右欄佐證包，`fetch('/api/extract')` 後重繪
 5. 收到 `refused` 時整頁換成拒絕畫面，**不得靜默退回英文**
+6. **閘門獨立成一塊顯示**（取自回應的 `gate`，不是 `gaps`）。
+   烹飪情境要看得到 NSW 食品安全主管那一句——那是整場最強的一幕
+7. 資格旁附官方 PDF 連結；若 `superseded_code` 非空，顯示「已取代 `MEM31922`」
 
 - [ ] **Step 5: 跑測試與離線煙霧測試**
 
@@ -1093,13 +1145,16 @@ Test `tests/test_d7_match.py`
 
 ### Task 9: 備援與彩排
 
-- [ ] **Step 1: 錄製完整 demo 影片**（黃金路徑 ＋ 三條失敗路徑 ＋ 現行狀態查核）
+- [ ] **Step 1: 錄製完整 demo 影片**（黃金路徑 ＋ 三條失敗路徑 ＋ 資格來源與取代紀錄）。
+      **照罐頭情境講**（阿拉伯語、三年營區廚房、食品安全），因為切線前佐證包不隨口述改變
 - [ ] **Step 2: 斷網實測**：關掉 wifi，跑 `python3 skeleton/app.py --check` 與 `/intake`，
       確認 offline 模式全程可用
 - [ ] **Step 3: 逐條複驗上台要念的數字**，打開原始 URL；
       對照框架檔「⛔ 不要引用的數字」一節
 - [ ] **Step 4: 確認 TIS 的 HSP 供應商資格那條推論**（官網），
       確認不了就改講已確認的部分
+- [ ] **Step 4b: 查清楚 ElevenLabs 的音檔保留設定**。音檔會送到這個第三方；
+      沒查清楚之前，台上**不得**說「零保留」或「音檔不離開本機」
 - [ ] **Step 5: 彩排三次**，含評審最可能問的那一題：
       *「澳洲證據說壞的是雇主那端，你為什麼修求職者？」*
 
@@ -1119,9 +1174,22 @@ Task 5 Step 4 與 Task 7–9 以條列規格取代完整程式碼，因為它們
 
 **3. 型別一致性**：`guard`／`prepare`／`target_fields`／`metric` 的簽章與
 `pipeline.run()` 的呼叫一致；`Suggestion.sources` 一律為 `(label, locator)` 對；
-`REFUSALS` 在 Task 3 定義、Task 5 使用；`registry.currency_check()` 在 Task 4 定義。
+`REFUSALS` 在 Task 3 定義、Task 5 使用；`registry.source_check()` 在 Task 4 定義；
+`gate` 不在 `target_fields()`，由 Task 5 的 `extract()` 從 registry 附上。
+
+**4. 實跑驗證（2026-09-21 審查）**：Task 1–5 的程式碼原封貼進拋棄式副本實際執行，
+**54 個測試全過**，`python3 skeleton/app.py --check` 與 `python3 -m skeleton.app --check`
+離線皆通過。審查修正了 1 個 BLOCKER（單元代碼格式檢查漏了 7 字母前綴 `SITHCCC`／`SITXFSA`）
+與 4 個 SERIOUS（閘門被渲染成空白、來源檢查被誤稱為現行狀態查核、切線前 demo 的限制、
+紅線措辭超出實際涵蓋）。
 
 ## 已知的未解事項
+
+- ⚠️ **紅線的實際涵蓋範圍比框架檔寫的窄（2026-09-21 審查發現）。**
+  `guard()` 只檢查**結構化欄位名稱**。求職者口述時講出的原籍國、簽證、庇護細節
+  會進逐字稿、送進模型，**音檔也會先送到 ElevenLabs**。
+  台上只能講實際做到的：**不存任何結構化身分欄位、我們的伺服器不落地保存**。
+  框架檔與 spec 的紅線措辭已同步修正。
 
 - **`live.suggest()` 的提示詞**在 Task 7 才定稿。抽取品質是整個佐證包的上限，
   但它依賴 Task 6 的真實逐字稿樣本，先寫會是猜的。

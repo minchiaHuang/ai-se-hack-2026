@@ -41,8 +41,20 @@
   但 **Dari／Tigrinya／Rohingya／Hazaragi 不在清單上**，普什圖語 WER 25–50%。
   demo 只上阿拉伯語／波斯語／史瓦希里語三種，其餘走明確拒絕畫面。
 
-- **待實作**：`skeleton/directions/d7_credentials.py`（唯一要新增的檔案）。
-  `pipeline.py` 與 `schema.py` **不改**，既有形狀完全吐合。
+- ⭐ **實作計畫已完成並經審查**：`docs/superpowers/plans/2026-09-21-direction-7-implementation.md`
+  九個 task、全程 TDD，**切線在 Task 6 之後**。計畫內的程式碼已原封貼進拋棄式副本實跑，
+  **54 個測試全過、離線 `--check` 兩種啟動方式皆通過**。
+  - 審查修掉 1 個 BLOCKER（單元代碼格式檢查漏了 7 字母前綴 `SITHCCC`／`SITXFSA`）
+    與 4 個 SERIOUS（閘門被渲染成空白、來源檢查被誤稱為現行狀態查核、
+    切線前 demo 的限制、紅線措辭超出實際涵蓋）。
+  - 審查 agent 本身撞到帳號用量上限（HTTP 429，19:10 重置）未完成，改由主 session 實跑審查。
+- **參考資料全部到齊且已驗證**（ANZSCO 2022 ＋ OSCA 2024 ＋ VET 資格與單元，三個職業）。
+  兩個要記住的：**ANZSCO 已被 OSCA 取代但移民系統仍用 ANZSCO → 兩組都帶**；
+  **`MEM31922` 於 2025-09-04 被 `MEM31925` 取代**。
+- **技術堆疊定案**：Python 標準函式庫 ＋ 一頁 vanilla JS，**零外部套件、零建置步驟**。
+  真實 API 用 `urllib.request` 直打，**因此不需要安裝核准**。
+- **Tommy 2026-09-21 的兩個決定**：AI 維持判斷職業與代碼（不收窄）；
+  工作順序維持先語音後抽取，**切線前 demo 以錄影為準、照罐頭情境講**。
 
 ## 已知問題
 
@@ -74,17 +86,14 @@ White Box Enterprises 與 Seedkit 的答案、SEDI 付費論證、Social Traders
 
 ## 下一步
 
-1. **實作 `skeleton/directions/d7_credentials.py`** —— guard() 四條紅線 ＋ prepare ＋
-   target_fields ＋ metric。詳見 spec §4。
-2. **整理三個職業的 ANZSCO／RPL 對映資料**（aged care／welding-fabrication／
-   commercial cookery）。沒有它佐證包是空的。
-3. **共桌雙語逐字稿畫面**（Usability 15% 的主場）。
-4. **三條失敗路徑**：低信心扣住值、ASR 聽錯可回放修正、語言不支援明確拒絕
-   （Working Prototype 15% 的主場）。
-5. ⭐ **錄製 demo 備援影片。** 場地網路與現場噪音是 prototype 的標準死法。
-6. **B 線（媒合與履歷）** —— 用同一份結構化資料生成，技術風險低。
-7. **上台前逐條複驗要念的 5–6 個數字**，打開原始 URL 確認。
-8. 確認要不要接真實模型 API；若要，先列出套件名稱與理由取得核准。
+1. **照計畫執行 Task 1–6**（`docs/superpowers/plans/2026-09-21-direction-7-implementation.md`）。
+   每個 task 以 `bash bin/verify.sh` GREEN ＋ commit 結束。
+2. ⭐ **錄製 demo 備援影片**（Task 9 Step 1）——**照罐頭情境講**。
+3. 主線與影片完成後才碰 Task 7–8（LLM 抽取、B 線媒合）。
+4. **母語逐字稿**交給隊友或母語者填寫（阿拉伯語／波斯語／史瓦希里語）。
+5. **上台前逐條複驗要念的 5–6 個數字**，打開原始 URL 確認。
+6. **查清楚 ElevenLabs 的音檔保留設定**；查清楚前不得宣稱零保留。
+7. 前端是否改由設計師用 React 寫尚未決定；若改，計畫 Task 5 需重寫。
 
 **現場優先**：現場出現的真實問題，一律優先於上述任何方向（判準見交接文件第 7 節）。
 現場那張要拿在手上的是 **`docs/frameworks/onsite-matching-sheet.md`**。
