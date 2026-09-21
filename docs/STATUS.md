@@ -6,7 +6,9 @@
 方向 7 的一輪研究已完成（三個 agent 平行），框架、交接文件第 8 節、spec 皆已落檔。
 **現場優先原則仍凌駕一切。**
 
-最後驗證：2026-09-22（`bash bin/verify.sh` → GREEN，含 309 個骨架測試，於 `142611c`）
+最後驗證：2026-09-22（`bash bin/verify.sh` → GREEN，含 313 個骨架測試，於 `47e5980`）
+
+- PR #31 合併點 `7fad17f`；PR #32 d7-back-links：`/upload` 返回改到 `/start/path`（原本回舊的 `/intake`），`/interview` 交給 `/review` 時保留 `?quiet=1`，新增連結測試 `tests/test_links.py`，合併點 `47e5980`。
 
 - **AI 電話面試（PR #30）怎麼跑**：Agent `agent_1901m32r6h09fa9t8ysyqcvycpy6`（環境變數 `ELEVENLABS_AGENT_ID`）。
   `/interview` → Start the phone interview → 求職者手機用 **Chrome** 開 ElevenLabs 連結通話（**iPhone Safari 會顯示找不到 Agent**）。
