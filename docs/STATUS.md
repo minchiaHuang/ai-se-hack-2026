@@ -1,12 +1,20 @@
 # STATUS
 
-單行狀態：2026-09-21 晚。**方向 7 共 26 個 PR 已合入 `docs/direction-7-refugee-employment`（第一波 #5 d7-core、#3 d7-match、#2 d7-live、#4 d7-intake-ui；第二波 #6 d7-wire；#7 d7-resume 職缺板與逐職缺履歷；#8 d7-docs 給評審的英文 README；#9 d7-entry 起始畫面：口述或帶履歷兩個入口；#10 d7-docs2 README 補上起始畫面；#11 d7-jobs 職缺頁：全部範例職缺、平台式版面、佐證與逐字稿分頁；#12 d7-adzuna Adzuna 雪梨職缺快照工具（30 筆、25 筆有單元、106 個單元）；#13 d7-validation-docs 問題驗證數字改用官方來源；#14 d7-flow 履歷入口一步完成、職缺板獨立成 `/jobs` 頁；#15 d7-adzuna-quotes 抓取重試與引文要指名單元；#16 d7-real-jobs 職缺板改用真實 Adzuna 廣告並附上每個單元的原文出處；#17 d7-pdf-upload 可讀取文字型 PDF 履歷（純標準函式庫）；#18 d7-quotes 同一段廣告引文最多對應兩個單元、`?mock=1` 改顯示真實 Adzuna 職缺板；#19 d7-iv-api 面試題目、翻譯與朗讀 API（新增選用環境變數 `ELEVENLABS_VOICE_ID`）；#20 d7-topcard 拿掉 demo 首張職缺卡（廣告 5870142114）較弱的食品安全引文；#21 d7-review 顧問用的履歷審閱頁 `/review` 與 `/api/resume-sections`；#22 d7-iv-page 面試頁 `/interview`：朗讀題目、錄音、原文＋英文，再交給 `/review`；#23 d7-upload 上傳頁 `/upload`：任何語言的既有履歷 → 翻譯潤飾、左右對照 → `/review`；#24 d7-apply `/jobs` 可收藏與一鍵應徵（模擬，不會真的送出）；#25 d7-figma-interview `/interview` 改成 Figma 面試畫面的樣式；#26 d7-figma-entry Figma 入口流程：首頁 `/`、個人資料 `/start`、選擇路徑 `/start/path`、共用 logo；#27 d7-figma-theme `/jobs` 套用 Figma 主題，`/jobs`、`/review`、`/upload` 加上 logo 標頭與 `?quiet=1`，合併點 `a54fdf4`），`/intake` 與三條 API 已接上。**
+單行狀態：2026-09-21 晚。**方向 7 共 26 個 PR 已合入 `docs/direction-7-refugee-employment`（第一波 #5 d7-core、#3 d7-match、#2 d7-live、#4 d7-intake-ui；第二波 #6 d7-wire；#7 d7-resume 職缺板與逐職缺履歷；#8 d7-docs 給評審的英文 README；#9 d7-entry 起始畫面：口述或帶履歷兩個入口；#10 d7-docs2 README 補上起始畫面；#11 d7-jobs 職缺頁：全部範例職缺、平台式版面、佐證與逐字稿分頁；#12 d7-adzuna Adzuna 雪梨職缺快照工具（30 筆、25 筆有單元、106 個單元）；#13 d7-validation-docs 問題驗證數字改用官方來源；#14 d7-flow 履歷入口一步完成、職缺板獨立成 `/jobs` 頁；#15 d7-adzuna-quotes 抓取重試與引文要指名單元；#16 d7-real-jobs 職缺板改用真實 Adzuna 廣告並附上每個單元的原文出處；#17 d7-pdf-upload 可讀取文字型 PDF 履歷（純標準函式庫）；#18 d7-quotes 同一段廣告引文最多對應兩個單元、`?mock=1` 改顯示真實 Adzuna 職缺板；#19 d7-iv-api 面試題目、翻譯與朗讀 API（新增選用環境變數 `ELEVENLABS_VOICE_ID`）；#20 d7-topcard 拿掉 demo 首張職缺卡（廣告 5870142114）較弱的食品安全引文；#21 d7-review 顧問用的履歷審閱頁 `/review` 與 `/api/resume-sections`；#22 d7-iv-page 面試頁 `/interview`：朗讀題目、錄音、原文＋英文，再交給 `/review`；#23 d7-upload 上傳頁 `/upload`：任何語言的既有履歷 → 翻譯潤飾、左右對照 → `/review`；#24 d7-apply `/jobs` 可收藏與一鍵應徵（模擬，不會真的送出）；#25 d7-figma-interview `/interview` 改成 Figma 面試畫面的樣式；#26 d7-figma-entry Figma 入口流程：首頁 `/`、個人資料 `/start`、選擇路徑 `/start/path`、共用 logo；#27 d7-figma-theme `/jobs` 套用 Figma 主題，`/jobs`、`/review`、`/upload` 加上 logo 標頭與 `?quiet=1`；#28 d7-pdf 逐字字距的 PDF 保留年份與數字；#29 d7-questions 面試改六題（拿掉聯絡方式）＋ Untitled UI token；#30 d7-phone AI 電話面試：ElevenLabs Agent 在求職者手機上用中文訪談，逐字稿分題後交給 `/review`，合併點 `142611c`），`/intake` 與三條 API 已接上。#31 d7-figma-jobs-template 與 #29 的 `/jobs` 設計衝突，退回待決定。**
 題目為方向 7：難民就業（口述經歷 → 佐證包 ＋ 媒合）。
 方向 6（WISE 就業成效申報）**正式放棄**，研究與證據原封保留為備案。
 方向 7 的一輪研究已完成（三個 agent 平行），框架、交接文件第 8 節、spec 皆已落檔。
 **現場優先原則仍凌駕一切。**
 
-最後驗證：2026-09-22（`bash bin/verify.sh` → GREEN，含 263 個骨架測試，於 `a54fdf4`）
+最後驗證：2026-09-22（`bash bin/verify.sh` → GREEN，含 309 個骨架測試，於 `142611c`）
+
+- **AI 電話面試（PR #30）怎麼跑**：Agent `agent_1901m32r6h09fa9t8ysyqcvycpy6`（環境變數 `ELEVENLABS_AGENT_ID`）。
+  `/interview` → Start the phone interview → 求職者手機用 **Chrome** 開 ElevenLabs 連結通話（**iPhone Safari 會顯示找不到 Agent**）。
+  Twilio 試用帳號買不到門號，所以走網頁通話；撥號路由保留給升級後的帳號。改題目或 prompt 後跑
+  `python3 -m skeleton.tools.phone_agent --update-agent`。ElevenLabs key 需開 ElevenAgents: Write。
+  2026-09-22 用真實通話實測：12 段回答全部分對題、中文原話一字不改。
+- ⚠️ **demo 後要做**：刪 ElevenLabs key、輪換 Twilio Auth Token（兩者都曾出現在 session 紀錄）。
+- ⚠️ **待決定**：`/jobs` 要用 #29 的 Untitled UI 卡片還是 #31 的 Figma Matched Jobs 版面；職業在 `/review` 寫死為 `cookery`，講 IT 等不支援職業仍推廚師職缺（計畫：自動判斷，不支援就明說）。
 
 ## 進行中
 
