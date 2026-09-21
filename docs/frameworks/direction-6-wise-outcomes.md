@@ -304,6 +304,9 @@ White Box 與 Seedkit 他一定知道。**先講，不要等他問。**
 > Every funder wants placements, retention and hours — each in a different format.
 > Nobody is paid to sit between those two things.
 
+中文：WISE 的營運主管手上有排班表、出勤紀錄和督導筆記。每一個資助方要的都是安置數、
+留任率和工時——而且每一家要的格式都不一樣。**沒有人被付錢來做中間那一段。**
+
 **證據，由強到弱：**
 
 1. ⭐ **最硬的一條**：CSI Swinburne《Understanding the Impact Costs of WISE》
@@ -311,6 +314,9 @@ White Box 與 Seedkit 他一定知道。**先講，不要等他問。**
    比一般組織更細的影響力衡量」**列為一項 Impact Cost**。可直接念的原話（WISE #1）：
    > "The reporting is different. If you're just producing financial reports,
    > that's pretty easy but to look at environmental and social outcomes, that does take more."
+
+   中文：「申報是不一樣的。如果你只是產出財務報表，那算簡單；
+   但要看環境和社會成效，那確實要花更多。」
 
    **這不是我們說申報有成本，是部門自己的研究把它算成成本。**
 2. **格式多重性是查出來的，不是講出來的**（每一份格式都不一樣，全部同時存在）：
@@ -342,12 +348,20 @@ White Box 與 Seedkit 他一定知道。**先講，不要等他問。**
   > Our question is not whether WISEs are drowning. It is what happens to the
   > 294 that do not have a White Box.
 
+  中文：這個負擔是真的，但它是**有條件的**。只要有聚合者存在，負擔就被人力吸收掉。
+  White Box 用人工替 17 家社企做這件事，WorkFoundations 裡是 8 家。
+  同一份評估報告把那個模式稱為「可擴大與複製的路徑」。
+  我們要問的不是 WISE 有沒有被淹沒——**而是那 294 家沒有 White Box 的，會怎麼樣。**
+
 ### 二、Problem–Solution Fit（20%）—— 權重最高，答得最具體
 
 **核心主張**：我們只解一個步驟，而且是成本最高的那一步。
 
 > We do not collect the data. We do not write the grant application.
 > We do one step: turn the records they already keep into the format this funder asks for.
+
+中文：我們不收集資料。我們不寫補助申請書。我們只做一個步驟：
+**把他們本來就在記的紀錄，變成這一個資助方要的格式。**
 
 **對位表（照著講，一條問題對一條解法）：**
 
@@ -382,6 +396,12 @@ White Box 與 Seedkit 他一定知道。**先講，不要等他問。**
 > We are not claiming the idea is new. We are claiming this is how it should be built:
 > the ethical limit enforced in code, and the mapping saved so the second report is cheaper.
 
+中文：已經有三樣東西存在，而我們應該主動講出來。Sopact 和 Knack 宣稱做了資助方範本對映
+——但不含澳洲格式。Seedkit 免費、由大學託管——但它完全沒有資助方範本。
+White Box 做得很好——用人做，服務 17 家社企。
+**我們不主張這個想法是新的。我們主張的是這件事該怎麼做才對**：
+倫理界線用程式強制執行，而且對映關係存檔，讓第二份報告更便宜。
+
 **接到 Pathway to Sustainability（10%）的橋**：
 SEDI 2026–27 輪最高 **12 萬澳幣**，用途**明文包含 evaluation and impact measurement**，
 且**獲補助者必須建立 Impact Measurement Framework**。
@@ -396,6 +416,9 @@ SEDI 2026–27 輪最高 **12 萬澳幣**，用途**明文包含 evaluation and 
 > and revenue between $200,000 and $4 million. There is no data team.
 > Every design decision follows from that one fact.
 
+中文：使用者是一個 **4 到 26 人**、年收入 **20 萬到 400 萬澳幣**的組織的營運主管。
+沒有資料團隊。**每一個設計決定都是從這一個事實推出來的。**
+
 | 設計決定 | 從哪個證據推出來 |
 |---|---|
 | **沒有導入專案、沒有資料遷移**：輸入是他們已經有的彙總匯出檔 | 4–26 FTE 撐不起導入期 |
@@ -409,6 +432,10 @@ SEDI 2026–27 輪最高 **12 萬澳幣**，用途**明文包含 evaluation and 
 > programme — and it closed for lower than anticipated take-up.
 > Free and correct is not enough. That is why we refuse to ask the user to adopt a new
 > system, migrate data, or learn a framework before they get their first output.
+
+中文：Amplify Social Impact Online 是免費的、有學術背書、屬於一個 1,200 萬澳幣專案的一部分
+——然後它因為**採用率低於預期**而關閉。免費而且正確，並不夠。
+所以我們拒絕要求使用者在拿到第一份產出之前，先導入一套新系統、先搬資料、或先學一套框架。
 
 **我們自己先講的三個 usability 風險：**
 - **沒有做過使用者測試。** demo 用的是合成資料，畫面上會明說是合成的
