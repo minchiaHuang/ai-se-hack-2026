@@ -1,0 +1,30 @@
+/* Figma "Template 50": name and headline centred, contacts beneath, then one
+   ruled row per section with the heading (and each entry's dates) in a narrow
+   left column and the content on the right. Shared by /review and /jobs. */
+.rt { color: #2b2b2b; font-size: .92rem; line-height: 1.55; overflow-wrap: anywhere; }
+.rt-head { text-align: center; padding-bottom: 1.1rem; }
+.rt-head h1 { margin: 0; font-size: 1.45rem; font-weight: 700; letter-spacing: -.01em; color: #1f1f1f; }
+.rt-head h1.empty { color: #8a8f96; font-style: italic; font-weight: 500; }
+.rt-head p { margin: .3rem 0 0; color: #6b7076; font-size: .88rem; }
+.rt-section { display: grid; grid-template-columns: 8.2rem minmax(0, 1fr); column-gap: 1.4rem;
+              padding: 1rem 0 .4rem; border-top: 1px solid #e3e0da; }
+.rt-section h2 { grid-column: 1; margin: 0 0 .6rem; font-size: 1rem; font-weight: 700; color: #1f1f1f;
+                 overflow-wrap: normal; }
+/* Profile, Skills and Certificates sit beside their heading; entry sections
+   put their entries on the rows below it. */
+.rt-section > .rt-body { grid-column: 2; margin: 0 0 .6rem; color: #5b6168; }
+.rt-entry { grid-column: 1 / -1; display: grid; grid-template-columns: subgrid; margin-bottom: .75rem; }
+.rt-dates { grid-column: 1; color: #8a8f96; font-size: .8rem; padding-top: .15rem; }
+.rt-entry > div { grid-column: 2; }
+.rt-entry h3 { margin: 0; font-size: .95rem; font-weight: 700; color: #1f1f1f; }
+.rt-entry .rt-where { margin: .1rem 0 0; color: #8a8f96; font-size: .82rem; }
+.rt-entry p { margin: .25rem 0 0; color: #5b6168; }
+.rt-list { grid-column: 2; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .35rem 1.4rem;
+           margin: 0 0 .6rem; padding: 0; list-style: none; font-weight: 700; color: #1f1f1f; }
+.rt-none { color: #8a8f96; font-style: italic; }
+@media (max-width: 560px) {
+  .rt-section { grid-template-columns: 1fr; }
+  .rt-section > *, .rt-entry, .rt-entry > *, .rt-dates { grid-column: 1; }
+  .rt-entry { display: block; }
+  .rt-list { grid-template-columns: 1fr; }
+}

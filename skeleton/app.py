@@ -50,6 +50,9 @@ HOME_PAGE = WEB / "home.html"
 START_PAGE = WEB / "start.html"
 PATH_PAGE = WEB / "path.html"
 LOGO = WEB / "logo.svg"
+# The Figma resume template, drawn the same way on /review and /jobs.
+RESUME_CSS = WEB / "resume-template.css"
+RESUME_JS = WEB / "resume-template.js"
 
 # A request past these is refused before it is read: a few minutes of webm
 # speech is well under 25 MB, and no JSON the page sends comes near 1 MB.
@@ -365,6 +368,10 @@ class Handler(BaseHTTPRequestHandler):
             return self._send(200, "text/html; charset=utf-8", PATH_PAGE.read_bytes())
         if parsed.path == "/logo.svg":
             return self._send(200, "image/svg+xml", LOGO.read_bytes())
+        if parsed.path == "/resume-template.css":
+            return self._send(200, "text/css; charset=utf-8", RESUME_CSS.read_bytes())
+        if parsed.path == "/resume-template.js":
+            return self._send(200, "text/javascript; charset=utf-8", RESUME_JS.read_bytes())
         if parsed.path == "/intake":
             return self._send(200, "text/html; charset=utf-8", INTAKE_PAGE.read_bytes())
         if parsed.path == "/jobs":
