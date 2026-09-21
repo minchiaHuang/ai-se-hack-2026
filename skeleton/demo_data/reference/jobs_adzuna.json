@@ -1,0 +1,990 @@
+{
+  "source": "Adzuna",
+  "fetched_at": "2026-09-21T10:40:50+00:00",
+  "attribution": "Jobs by Adzuna",
+  "jobs": [
+    {
+      "id": "5887149079",
+      "occupation": "cookery",
+      "title": "Cook",
+      "company": "Atlas Talents",
+      "location": "Sydney, Sydney Region",
+      "contract_type": "permanent",
+      "contract_time": "full_time",
+      "created": "2026-09-17T14:18:08Z",
+      "redirect_url": "https://www.adzuna.com.au/land/ad/5887149079?se=mlKGpKi18RGgyPAuug4ABg&utm_medium=api&utm_source=ab4db6e1&v=6A4C53C3468BD9CA5F7F26FBA6F0283E2DAF4741",
+      "snippet": "14th September, 2026 Pikkio is an Italian pizzeria and trattoria located in Panania, Sydney NSW. The venue is currently looking for an experienced Cook to join their team. The right candidate will be responsible for: Preparing and assembling ingredients for menu items Preparing high-quality meals and food items according to restaurant recipes Ensuring food portions and food presentation meet company standards Monitoring supplies and re-ordering stock as needed Ensuring cooking utensils, equipme…",
+      "required_units": [
+        {
+          "code": "SITHCCC027",
+          "quote": "Preparing high-quality meals and food items according to restaurant recipes",
+          "basis": "stated"
+        },
+        {
+          "code": "SITHCCC043",
+          "quote": "experienced Cook to join their team",
+          "basis": "stated"
+        },
+        {
+          "code": "SITXFSA005",
+          "quote": "experienced Cook to join their team",
+          "basis": "stated"
+        },
+        {
+          "code": "SITXFSA006",
+          "quote": "experienced Cook to join their team",
+          "basis": "stated"
+        }
+      ],
+      "mapped_by": "claude-sonnet-5"
+    },
+    {
+      "id": "5875677272",
+      "occupation": "cookery",
+      "title": "Cook",
+      "company": "St Vincent’s Health Australia",
+      "location": "Sydney, Sydney Region",
+      "contract_type": "permanent",
+      "contract_time": "part_time",
+      "created": "2026-09-09T01:21:59Z",
+      "redirect_url": "https://www.adzuna.com.au/land/ad/5875677272?se=mlKGpKi18RGgyPAuug4ABg&utm_medium=api&utm_source=ab4db6e1&v=B6113FDB1EF0A2E149B85A829372565232E126AE",
+      "snippet": "Job Description: We are looking for a special kind of person - a St Vincent's kind of person. Someone who puts compassion, connection and caring for other people at the heart of everything they do. As a Cook , you'll be part of an experienced, engaged and dedicated team helping to create a welcoming, professional and supportive care experience for the residents of our St Vincent's Care Services Bronte. St Vincent's Care Services Bronte is a boutique facility located in one of Sydney's beautiful…",
+      "required_units": [],
+      "mapped_by": "claude-sonnet-5"
+    },
+    {
+      "id": "5870153366",
+      "occupation": "cookery",
+      "title": "Cook",
+      "company": "Four Seasons",
+      "location": "Sydney, Sydney Region",
+      "contract_type": "permanent",
+      "contract_time": "part_time",
+      "created": "2026-09-04T15:53:34Z",
+      "redirect_url": "https://www.adzuna.com.au/land/ad/5870153366?se=mlKGpKi18RGgyPAuug4ABg&utm_medium=api&utm_source=ab4db6e1&v=21DFCD740460DFE4D4D44C030DED8A4D816AF4B3",
+      "snippet": "About Four Seasons: Four Seasons is powered by our people. We are a collective of individuals who crave to become better, to push ourselves to new heights and to treat each other as we wish to be treated in return. Our team members around the world create amazing experiences for our guests, residents, and partners through a commitment to luxury with genuine heart. We know that the best way to enable our people to deliver these exceptional guest experiences is through a world-class employee expe…",
+      "required_units": [],
+      "mapped_by": "claude-sonnet-5"
+    },
+    {
+      "id": "5880046787",
+      "occupation": "cookery",
+      "title": "Cook",
+      "company": "G8 Education Ltd",
+      "location": "Sydney, Sydney Region",
+      "contract_type": "permanent",
+      "contract_time": "full_time",
+      "created": "2026-09-12T04:07:18Z",
+      "redirect_url": "https://www.adzuna.com.au/land/ad/5880046787?se=mlKGpKi18RGgyPAuug4ABg&utm_medium=api&utm_source=ab4db6e1&v=76CD02266EB8FDB494107E969F27A45E7D6206D1",
+      "snippet": "Nurturing the greatness in every child - and in you. The Opportunity Are you seeking a greater work /life balance? Do you enjoy being creative in the kitchen and running your own operation? Do you enjoy working with children? We are looking for an experienced Cook to join the team at Jannali Kinder Haven 2 to produce high quality, nutritious meals and snacks for up to 36 children each day. This role is Part-Time working 27.5 hours per week. About Us Our children enjoy delightful indoor and outd…",
+      "required_units": [
+        {
+          "code": "SITHCCC043",
+          "quote": "experienced Cook",
+          "basis": "stated"
+        },
+        {
+          "code": "SITHCCC027",
+          "quote": "produce high quality, nutritious meals",
+          "basis": "stated"
+        },
+        {
+          "code": "SITXFSA005",
+          "quote": "produce high quality, nutritious meals and snacks",
+          "basis": "stated"
+        },
+        {
+          "code": "SITXFSA006",
+          "quote": "produce high quality, nutritious meals and snacks",
+          "basis": "stated"
+        }
+      ],
+      "mapped_by": "claude-sonnet-5"
+    },
+    {
+      "id": "5870142114",
+      "occupation": "cookery",
+      "title": "Cook",
+      "company": "G8 Education Ltd",
+      "location": "Sydney, Sydney Region",
+      "contract_type": "permanent",
+      "contract_time": "part_time",
+      "created": "2026-09-04T15:52:10Z",
+      "redirect_url": "https://www.adzuna.com.au/land/ad/5870142114?se=mlKGpKi18RGgyPAuug4ABg&utm_medium=api&utm_source=ab4db6e1&v=7774D64EA49108F86B25AA1DD6451E90D18599DC",
+      "snippet": "Nurturing the greatness in every child - and in you. The Opportunity Are you seeking a greater work /life balance? Do you enjoy being creative in the kitchen and running your own operation? Do you enjoy working with children? We are looking for an experienced Cook to join the team at First Grammar Bankstown to produce high quality, nutritious meals and snacks for up to 39 children each day. This role is Part-Time working 20 hours per week, on a 12 month contract, with the possibility to extend.…",
+      "required_units": [
+        {
+          "code": "SITHCCC027",
+          "quote": "produce high quality, nutritious meals and snacks",
+          "basis": "stated"
+        },
+        {
+          "code": "SITHCCC043",
+          "quote": "experienced Cook to join the team",
+          "basis": "stated"
+        },
+        {
+          "code": "SITXFSA005",
+          "quote": "produce high quality, nutritious meals",
+          "basis": "stated"
+        },
+        {
+          "code": "SITXFSA006",
+          "quote": "nutritious meals and snacks for up to 39 children",
+          "basis": "stated"
+        }
+      ],
+      "mapped_by": "claude-sonnet-5"
+    },
+    {
+      "id": "5879229446",
+      "occupation": "cookery",
+      "title": "Cook",
+      "company": "G8 Education Ltd",
+      "location": "Sydney, Sydney Region",
+      "contract_type": "permanent",
+      "contract_time": "part_time",
+      "created": "2026-09-11T13:39:30Z",
+      "redirect_url": "https://www.adzuna.com.au/land/ad/5879229446?se=mlKGpKi18RGgyPAuug4ABg&utm_medium=api&utm_source=ab4db6e1&v=5F00BD169AE5892A5D234B75D9AC06385B0A3472",
+      "snippet": "Nurturing the greatness in every child - and in you. The Opportunity Are you seeking a greater work /life balance? Do you enjoy being creative in the kitchen and running your own operation? Do you enjoy working with children? We are looking for an experienced Cook to join the team at Great Beginnings Hornsby to produce high quality, nutritious meals and snacks for up to 90 children each day. This role is Part-Time working 32 hours per week, on a contract for 10 months, with the possibility to e…",
+      "required_units": [
+        {
+          "code": "SITHCCC027",
+          "quote": "produce high quality, nutritious meals",
+          "basis": "stated"
+        },
+        {
+          "code": "SITHCCC043",
+          "quote": "experienced Cook to join the team",
+          "basis": "stated"
+        },
+        {
+          "code": "SITXFSA005",
+          "quote": "nutritious meals and snacks",
+          "basis": "stated"
+        },
+        {
+          "code": "SITXFSA006",
+          "quote": "nutritious meals and snacks",
+          "basis": "stated"
+        }
+      ],
+      "mapped_by": "claude-sonnet-5"
+    },
+    {
+      "id": "5887746625",
+      "occupation": "cookery",
+      "title": "Cook | Breakfast",
+      "company": "Accor",
+      "location": "Sydney, Sydney Region",
+      "contract_type": "permanent",
+      "contract_time": "full_time",
+      "created": "2026-09-18T00:19:44Z",
+      "redirect_url": "https://www.adzuna.com.au/land/ad/5887746625?se=mlKGpKi18RGgyPAuug4ABg&utm_medium=api&utm_source=ab4db6e1&v=98C5E76D37C5525443188E1FA71531CF639F2D21",
+      "snippet": "Company Description Discover the Sofitel Sydney Darling Harbour Sofitel Sydney Darling Harbour welcomes guests into a world of luxury blending French Art de Vivre and local culture. The Flagship hotel boasts 590 rooms and suites, four vibrant bars and restaurants, a stunning, award winning outdoor infinity pool, state of the art gym overlooking the city skyline, exclusive top floor Executive Lounge and our well renowned luxurious spa. Outstanding people make it all happen and we are committed t…",
+      "required_units": [
+        {
+          "code": "SITHCCC027",
+          "quote": "Cook | Breakfast",
+          "basis": "title"
+        },
+        {
+          "code": "SITHCCC029",
+          "quote": "Cook | Breakfast",
+          "basis": "title"
+        },
+        {
+          "code": "SITHCCC036",
+          "quote": "Cook | Breakfast",
+          "basis": "title"
+        },
+        {
+          "code": "SITHCCC043",
+          "quote": "Cook | Breakfast",
+          "basis": "title"
+        },
+        {
+          "code": "SITXFSA005",
+          "quote": "Cook | Breakfast",
+          "basis": "title"
+        },
+        {
+          "code": "SITXFSA006",
+          "quote": "Cook | Breakfast",
+          "basis": "title"
+        }
+      ],
+      "mapped_by": "claude-sonnet-5"
+    },
+    {
+      "id": "5882234546",
+      "occupation": "cookery",
+      "title": "SDN Pyrmont - Cook",
+      "company": "SDN Children's Services",
+      "location": "Pyrmont, Sydney",
+      "contract_type": "permanent",
+      "contract_time": "full_time",
+      "created": "2026-09-13T15:10:30Z",
+      "redirect_url": "https://www.adzuna.com.au/land/ad/5882234546?se=mlKGpKi18RGgyPAuug4ABg&utm_medium=api&utm_source=ab4db6e1&v=9052929F58B247CA05E87070FF0D6A918E9CD653",
+      "snippet": "Permanent Part-time opportunity | Fixed location Commercial Cookery Certificate IV or equivalent Career development opportunities Do you have experience working as a cook and a passion for providing exciting and nutritious food for children? If so, we have an exciting opportunity for you. As the cook you will take on the responsibility for planning and implementing a nutritious, fresh exciting menu. You will provide high quality, nutritious meals in a safe and hygienic environment and work with…",
+      "required_units": [
+        {
+          "code": "SITHCCC027",
+          "quote": "SDN Pyrmont - Cook",
+          "basis": "title"
+        },
+        {
+          "code": "SITHCCC043",
+          "quote": "experience working as a cook",
+          "basis": "stated"
+        },
+        {
+          "code": "SITXFSA005",
+          "quote": "safe and hygienic environment",
+          "basis": "stated"
+        },
+        {
+          "code": "SITXFSA006",
+          "quote": "safe and hygienic environment",
+          "basis": "stated"
+        }
+      ],
+      "mapped_by": "claude-sonnet-5"
+    },
+    {
+      "id": "5887141137",
+      "occupation": "cookery",
+      "title": "Salesperson - Cooking Appliances",
+      "company": "Harvey Norman",
+      "location": "Sydney, Sydney Region",
+      "contract_type": "permanent",
+      "contract_time": "full_time",
+      "created": "2026-09-17T14:16:45Z",
+      "redirect_url": "https://www.adzuna.com.au/land/ad/5887141137?se=mlKGpKi18RGgyPAuug4ABg&utm_medium=api&utm_source=ab4db6e1&v=951943E528B12B4A23A63C083700739910186C7C",
+      "snippet": "· Full Time Position · Guaranteed base earnings  attractive commission · Paths for career progression with a trusted national brand Discover a great place to work at Harvey Norman - an Australian Retail icon in the home and lifestyle space. The Harvey Norman Auburn Cooking Appliances Team is seeking a passionate, customer service focused Salesperson to join them in delivering Great Service, Always! to their customers. As a Salesperson, you will have an understanding of life at home solutions an…",
+      "required_units": [],
+      "mapped_by": "claude-sonnet-5"
+    },
+    {
+      "id": "5887149286",
+      "occupation": "cookery",
+      "title": "Casual Cook Westmead",
+      "company": "Guzman y Gomez",
+      "location": "Sydney, Sydney Region",
+      "contract_type": "permanent",
+      "contract_time": "part_time",
+      "created": "2026-09-17T14:18:10Z",
+      "redirect_url": "https://www.adzuna.com.au/land/ad/5887149286?se=mlKGpKi18RGgyPAuug4ABg&utm_medium=api&utm_source=ab4db6e1&v=B554527C0F9E1674BC04AA2FAC4A4BA5949595A9",
+      "snippet": "Job Description At Guzman y Gomez, we believe in authentic flavors and the power of food to bring people together. As a Cook at GYG, you will be at the heart of our mission to serve up the best Mexican food experience. Following the GYG recipe guide, your role will see you working with fresh ingredients and vibrant Mexican flavors, delivering quality creations for our new and loyal guests. ​ What's in it for me? ​ So much! Check out some of the benefits below: ​ Flexible rosters and employment …",
+      "required_units": [
+        {
+          "code": "SITHCCC027",
+          "quote": "working with fresh ingredients and vibrant Mexican flavors, delivering quality creations",
+          "basis": "stated"
+        },
+        {
+          "code": "SITHCCC043",
+          "quote": "As a Cook at GYG",
+          "basis": "stated"
+        },
+        {
+          "code": "SITXFSA005",
+          "quote": "working with fresh ingredients",
+          "basis": "stated"
+        },
+        {
+          "code": "SITXFSA006",
+          "quote": "working with fresh ingredients",
+          "basis": "stated"
+        }
+      ],
+      "mapped_by": "claude-sonnet-5"
+    },
+    {
+      "id": "5650803000",
+      "occupation": "welding",
+      "title": "Welder",
+      "company": "EPTEC Pty Ltd",
+      "location": "The Rocks, Sydney",
+      "contract_type": null,
+      "contract_time": "full_time",
+      "created": "2026-03-02T14:36:33Z",
+      "redirect_url": "https://www.adzuna.com.au/details/5650803000?utm_medium=api&utm_source=ab4db6e1",
+      "snippet": "We are seeking skilled Welders to be based out of Guildford initially on a long-term project. Eptec provides training and career development as well as a safe and enjoyable workplace. To be considered for this role you must: be trade qualified in welding or equivalent hold a valid NSW Driver's License hold a General Construction White Card Ideal candidates will also possess any of the following: HR Truck license Carpentry or roofing skills EWP, confined spaces, working at heights Team leader sk…",
+      "required_units": [
+        {
+          "code": "MEM13015",
+          "quote": "safe and enjoyable workplace",
+          "basis": "stated"
+        }
+      ],
+      "mapped_by": "claude-sonnet-5"
+    },
+    {
+      "id": "5884640087",
+      "occupation": "welding",
+      "title": "TIG Welder",
+      "company": "Fusion People Sydney",
+      "location": "Sydney, Sydney Region",
+      "contract_type": "contract",
+      "contract_time": "full_time",
+      "created": "2026-09-15T23:33:41Z",
+      "redirect_url": "https://www.adzuna.com.au/details/5884640087?utm_medium=api&utm_source=ab4db6e1",
+      "snippet": "We are currently looking for an experienced Stainless Steel TIG Welder to join our mechanical plumbing team, working on-site across commercial and industrial projects in Sydney. The role will involve TIG welding and fitting stainless-steel pipework on construction sites, working closely with mechanical plumbers and pipe fitters. About the Role On-site TIG welding of stainless-steel pipework Stainless-steel pipe fit-up, preparation and installation Welding pipework in position on active construc…",
+      "salary_min": 124800,
+      "salary_max": 124800,
+      "required_units": [
+        {
+          "code": "MEM05052",
+          "quote": "TIG welding and fitting stainless-steel",
+          "basis": "stated"
+        },
+        {
+          "code": "MEM18001",
+          "quote": "pipe fit-up, preparation and installation",
+          "basis": "stated"
+        }
+      ],
+      "mapped_by": "claude-sonnet-5"
+    },
+    {
+      "id": "5854382958",
+      "occupation": "welding",
+      "title": "Boilermaker/welder",
+      "company": "Stellar Recruitment",
+      "location": "Sydney, Sydney Region",
+      "contract_type": "permanent",
+      "contract_time": "full_time",
+      "created": "2026-08-24T23:43:44Z",
+      "redirect_url": "https://www.adzuna.com.au/details/5854382958?utm_medium=api&utm_source=ab4db6e1",
+      "snippet": "Our client is a well-established leader in the material handling industry and is seeking an experienced Boilermaker / Fabricator to join their workshop team in Fairfield East. This is an excellent opportunity to secure a long-term permanent position with a reputable business offering a supportive team environment and modern workshop facilities. What's on Offer $40.20 per hour Permanent full-time position with long-term job security Monday to Friday roster Modern workshop with quality equipment …",
+      "salary_min": 83616,
+      "salary_max": 83616,
+      "required_units": [
+        {
+          "code": "MEM05052",
+          "quote": "Boilermaker/welder",
+          "basis": "title"
+        },
+        {
+          "code": "MEM05012",
+          "quote": "Boilermaker/welder",
+          "basis": "title"
+        },
+        {
+          "code": "MEM09002",
+          "quote": "Boilermaker / Fabricator",
+          "basis": "stated"
+        },
+        {
+          "code": "MEM18001",
+          "quote": "Boilermaker / Fabricator",
+          "basis": "stated"
+        },
+        {
+          "code": "MEM13015",
+          "quote": "Boilermaker / Fabricator",
+          "basis": "stated"
+        }
+      ],
+      "mapped_by": "claude-sonnet-5"
+    },
+    {
+      "id": "5878957580",
+      "occupation": "welding",
+      "title": "Welder and Metal Fabcricator",
+      "company": "Global Talent Agency",
+      "location": "Pyrmont, Sydney",
+      "contract_type": "permanent",
+      "contract_time": "full_time",
+      "created": "2026-09-11T09:48:18Z",
+      "redirect_url": "https://www.adzuna.com.au/details/5878957580?utm_medium=api&utm_source=ab4db6e1",
+      "snippet": "Position Overview We are seeking a skilled Welder and Metal Fabricator to join our team. The successful applicant will be responsible for the fabrication, welding, assembly, finishing, and installation of stainless-steel commercial kitchen equipment and related metalwork. This is a hands-on position requiring technical welding and fabrication skills, attention to detail, and the ability to work both in a workshop environment and at commercial installation sites. Salary: 80K – 90K Employment typ…",
+      "salary_min": 80000,
+      "salary_max": 90000,
+      "required_units": null,
+      "mapped_by": null
+    },
+    {
+      "id": "5881208495",
+      "occupation": "welding",
+      "title": "Welder, Turrella, NSW",
+      "company": "1300Apprentice",
+      "location": "The Rocks, Sydney",
+      "contract_type": null,
+      "contract_time": "full_time",
+      "created": "2026-09-13T02:50:23Z",
+      "redirect_url": "https://www.adzuna.com.au/details/5881208495?utm_medium=api&utm_source=ab4db6e1",
+      "snippet": "Experienced Welder (Full-Time) – Immediate Start Turrella, Sydney NSW Trades & Services – Welders & Boilermakers $32 per hour  Overtime Immediate start available | Interviews happening now About the Opportunity A well-established and growing operation in Turrella is seeking a skilled and reliable Welder to join their team immediately. This is an excellent opportunity for an experienced tradesperson looking for consistent full-time work, overtime, and a stable environment . You’ll play a key rol…",
+      "required_units": [],
+      "mapped_by": "claude-sonnet-5"
+    },
+    {
+      "id": "5855610274",
+      "occupation": "welding",
+      "title": "Welders, Fabricators & Boilermakers Wanted | Sydney",
+      "company": "Labour Options",
+      "location": "The Rocks, Sydney",
+      "contract_type": null,
+      "contract_time": "full_time",
+      "created": "2026-08-26T02:39:56Z",
+      "redirect_url": "https://www.adzuna.com.au/details/5855610274?utm_medium=api&utm_source=ab4db6e1",
+      "snippet": "Fabricators / Welders/ Boilermakers Workers needed for busy workshop in the Bankstown area We are looking for 1st class metal trades people. Own transport an advantage as these locations are hard to access with public transport. The workshop works would include but not limited to structural steel and general fabrication and repairs General duties: Fabricators/ Boilermakers that can read basic drawings and be able to mark out Fabrication work MIG Welding 1st class Sheetmetal workers / Fabricator…",
+      "required_units": [
+        {
+          "code": "MEM09002",
+          "quote": "read basic drawings and be able to mark out",
+          "basis": "stated"
+        },
+        {
+          "code": "MEM05050",
+          "quote": "MIG Welding 1st class",
+          "basis": "stated"
+        },
+        {
+          "code": "MEM05052",
+          "quote": "Welders, Fabricators & Boilermakers Wanted",
+          "basis": "title"
+        },
+        {
+          "code": "MEM13015",
+          "quote": "Welders, Fabricators & Boilermakers Wanted",
+          "basis": "title"
+        },
+        {
+          "code": "MEM18001",
+          "quote": "Welders, Fabricators & Boilermakers Wanted",
+          "basis": "title"
+        }
+      ],
+      "mapped_by": "claude-sonnet-5"
+    },
+    {
+      "id": "5650835506",
+      "occupation": "welding",
+      "title": "Mechanical Fitter / Welder Apprentices Wanted",
+      "company": "IMEA Group",
+      "location": "The Rocks, Sydney",
+      "contract_type": null,
+      "contract_time": "full_time",
+      "created": "2026-03-02T14:44:46Z",
+      "redirect_url": "https://www.adzuna.com.au/details/5650835506?utm_medium=api&utm_source=ab4db6e1",
+      "snippet": "Work  Study = Nationally recognised qualification We are a wholly Australian owned post construction engineering, essential services and maintenance group of Companies operating in Sydney and the ACT. We value our people and are committed to our key values of quality, safety and integrity. At IMEA we are keen to grow Tradespeople with the skills, knowledge and capabilities required to provide quality products and services to our valued customers. Apprentices will be exposed to fabrication, manu…",
+      "required_units": [
+        {
+          "code": "MEM09002",
+          "quote": "Mechanical Fitter / Welder Apprentices",
+          "basis": "title"
+        },
+        {
+          "code": "MEM13015",
+          "quote": "Mechanical Fitter / Welder Apprentices",
+          "basis": "title"
+        },
+        {
+          "code": "MEM18001",
+          "quote": "Mechanical Fitter / Welder Apprentices",
+          "basis": "title"
+        },
+        {
+          "code": "MEM05052",
+          "quote": "Mechanical Fitter / Welder Apprentices",
+          "basis": "title"
+        },
+        {
+          "code": "MEM05012",
+          "quote": "Mechanical Fitter / Welder Apprentices",
+          "basis": "title"
+        }
+      ],
+      "mapped_by": "claude-sonnet-5"
+    },
+    {
+      "id": "5877124361",
+      "occupation": "welding",
+      "title": "Qualified Boilermaker, Fabricator & Welder | Sydney",
+      "company": "Harrison Barratt Group ",
+      "location": "Sydney, Sydney Region",
+      "contract_type": "contract",
+      "contract_time": "part_time",
+      "created": "2026-09-09T23:23:20Z",
+      "redirect_url": "https://www.adzuna.com.au/details/5877124361?utm_medium=api&utm_source=ab4db6e1",
+      "snippet": "Harrison Barratt Group is a leading labour hire & white collar recruitment company based in Sydney's Inner West. Due to high demand and expanding growth we are seeking experienced candidates with a proven work history in the industry to join our team. Opportunities are now available for experienced Boilermakers / Welders / Fabricators with a proven work history in the industry. To be successful for this role you will require the following qualifications: Boilermaker Trade Qualification Australi…",
+      "required_units": [
+        {
+          "code": "MEM05052",
+          "quote": "Boilermaker Trade Qualification",
+          "basis": "stated"
+        },
+        {
+          "code": "MEM05012",
+          "quote": "Welders / Fabricators",
+          "basis": "stated"
+        },
+        {
+          "code": "MEM09002",
+          "quote": "Boilermaker, Fabricator & Welder",
+          "basis": "title"
+        },
+        {
+          "code": "MEM13015",
+          "quote": "Boilermaker, Fabricator & Welder",
+          "basis": "title"
+        },
+        {
+          "code": "MEM18001",
+          "quote": "Boilermaker, Fabricator & Welder",
+          "basis": "title"
+        }
+      ],
+      "mapped_by": "claude-sonnet-5"
+    },
+    {
+      "id": "5879761736",
+      "occupation": "welding",
+      "title": "Coded Welder | Defence | Sydney | Great Rates!",
+      "company": "Shadbolt Group",
+      "location": "Sydney, Sydney Region",
+      "contract_type": "permanent",
+      "contract_time": "full_time",
+      "created": "2026-09-11T23:23:56Z",
+      "redirect_url": "https://www.adzuna.com.au/details/5879761736?utm_medium=api&utm_source=ab4db6e1",
+      "snippet": "Coded Welder - Sydney Shadbolt Group | Permanent Full-Time | Sydney, NSW Build the future with Shadbolt Group | Defence Work Shadbolt Group is a leading Australian engineering and manufacturing business delivering complex projects across Defence, infrastructure and industrial sectors. We are seeking an experienced Coded Welder to join our Sydney operations. This is a permanent, full-time opportunity for a highly skilled welder who is confident working across multiple welding procedures and take…",
+      "salary_min": 156000,
+      "salary_max": 156000,
+      "required_units": [
+        {
+          "code": "MEM05052",
+          "quote": "Coded Welder",
+          "basis": "stated"
+        },
+        {
+          "code": "MEM05012",
+          "quote": "confident working across multiple welding procedures",
+          "basis": "stated"
+        },
+        {
+          "code": "MEM05050",
+          "quote": "confident working across multiple welding procedures",
+          "basis": "stated"
+        },
+        {
+          "code": "MEM05049",
+          "quote": "confident working across multiple welding procedures",
+          "basis": "stated"
+        },
+        {
+          "code": "MEM09002",
+          "quote": "Coded Welder",
+          "basis": "stated"
+        }
+      ],
+      "mapped_by": "claude-sonnet-5"
+    },
+    {
+      "id": "5890016069",
+      "occupation": "welding",
+      "title": "Boilermaker/Welder - Day/Afternoon Shift | Bathurst NSW | $42ph | Permanent",
+      "company": "Northbridge Recruitment",
+      "location": "The Rocks, Sydney",
+      "contract_type": "permanent",
+      "contract_time": "full_time",
+      "created": "2026-09-19T11:01:00Z",
+      "redirect_url": "https://www.adzuna.com.au/details/5890016069?utm_medium=api&utm_source=ab4db6e1",
+      "snippet": "Job title: Boilermaker/Welder- Day/Afternoon Shift Permanent Full Time Location: Bathurst NSW Working Hours: Monday to Friday Morning Shift: 6am – 3pm Afternoon Shift: 3pm – 12am Base Rate: $42–$46 per hour, depends on relevant experience Afternoon Shift Loading: 20% shift loading applies from 3:00 PM – 12:00 AM, based on the applicable hourly rate. Job Responsibilities: Operating machinery, welding and assembling components, interpreting technical drawings, conducting quality checks, resolving…",
+      "required_units": [
+        {
+          "code": "MEM09002",
+          "quote": "interpreting technical drawings",
+          "basis": "stated"
+        },
+        {
+          "code": "MEM05052",
+          "quote": "Boilermaker/Welder",
+          "basis": "stated"
+        },
+        {
+          "code": "MEM05012",
+          "quote": "welding and assembling components",
+          "basis": "stated"
+        },
+        {
+          "code": "MEM18001",
+          "quote": "Boilermaker/Welder",
+          "basis": "stated"
+        }
+      ],
+      "mapped_by": "claude-sonnet-5"
+    },
+    {
+      "id": "5876985115",
+      "occupation": "aged_care",
+      "title": "Aged Care Worker",
+      "company": "IIQAF",
+      "location": "Sydney, Sydney Region",
+      "contract_type": null,
+      "contract_time": "full_time",
+      "created": "2026-09-09T20:49:49Z",
+      "redirect_url": "https://www.adzuna.com.au/details/5876985115?utm_medium=api&utm_source=ab4db6e1",
+      "snippet": "Company: IIQAF Group Location: Sydney, New South Wales, Australia Industry: Hospital / Health Care Employment Type: Full-Time Salary: Competitive salary based on experience Job Summary IIQAF Group is seeking a compassionate, reliable, and patient-focused Aged Care Worker to join our healthcare team in Sydney. The successful candidate will provide high-quality personal care, daily living support, companionship, and assistance to elderly residents and clients while promoting their dignity, indepe…",
+      "required_units": [
+        {
+          "code": "CHCCCS031",
+          "quote": "provide high-quality personal care, daily living support",
+          "basis": "stated"
+        },
+        {
+          "code": "CHCCCS040",
+          "quote": "promoting their dignity, indepe",
+          "basis": "stated"
+        },
+        {
+          "code": "CHCAGE013",
+          "quote": "Aged Care Worker",
+          "basis": "stated"
+        },
+        {
+          "code": "HLTWHS002",
+          "quote": "Aged Care Worker",
+          "basis": "stated"
+        }
+      ],
+      "mapped_by": "claude-sonnet-5"
+    },
+    {
+      "id": "5877797746",
+      "occupation": "aged_care",
+      "title": "Personal Care Workers - Aged Care - Daceyville",
+      "company": "Conexson",
+      "location": "The Rocks, Sydney",
+      "contract_type": null,
+      "contract_time": null,
+      "created": "2026-09-10T10:53:06Z",
+      "redirect_url": "https://www.adzuna.com.au/details/5877797746?utm_medium=api&utm_source=ab4db6e1",
+      "snippet": "Personal Care Worker - Aged Care - Daceyville Are you a Personal Care Worker looking for casual, flexible shifts within the Aged Care sector? GREAT! Join the Conexson family today to deliver quality care to Australia's leading Residential Aged Care facilities within your region. At Conexson you will get: Competitive casual rates - paid weekly, every Thursday Bonus shift incentive Multi-tier referral bonus that can give you $1000's every month - ASK US HOW Flexibility to pick shifts that suit yo…",
+      "required_units": [
+        {
+          "code": "CHCCCS031",
+          "quote": "Personal Care Worker - Aged Care",
+          "basis": "stated"
+        },
+        {
+          "code": "CHCCCS040",
+          "quote": "Personal Care Worker - Aged Care",
+          "basis": "stated"
+        },
+        {
+          "code": "HLTWHS002",
+          "quote": "Personal Care Worker - Aged Care",
+          "basis": "stated"
+        },
+        {
+          "code": "HLTINF006",
+          "quote": "Personal Care Worker - Aged Care",
+          "basis": "stated"
+        },
+        {
+          "code": "CHCAGE013",
+          "quote": "Aged Care sector? GREAT!",
+          "basis": "stated"
+        }
+      ],
+      "mapped_by": "claude-sonnet-5"
+    },
+    {
+      "id": "5859034880",
+      "occupation": "aged_care",
+      "title": "Community Aged Care Support Workers - South West",
+      "company": "Annecto",
+      "location": "The Rocks, Sydney",
+      "contract_type": "permanent",
+      "contract_time": "part_time",
+      "created": "2026-08-28T10:35:11Z",
+      "redirect_url": "https://www.adzuna.com.au/details/5859034880?utm_medium=api&utm_source=ab4db6e1",
+      "snippet": "Permanent part-time positions (minimum 20 hours per week) Salary between $32.21 - $35.14 per hour plus superannuation Generous salary packaging options - increase your take-home pay Located in Western Sydney, South West Sydney, South East Sydney, Nepean regions These positions are opportunities to be part of a team that is dedicated and focused on supporting people with disability to live independently in their own homes. Supports are provided in a home environment. We are looking for experienc…",
+      "required_units": [
+        {
+          "code": "CHCCCS031",
+          "quote": "supporting people with disability to live independently",
+          "basis": "stated"
+        },
+        {
+          "code": "CHCCCS040",
+          "quote": "supporting people with disability to live independently",
+          "basis": "stated"
+        },
+        {
+          "code": "HLTWHS002",
+          "quote": "supporting people with disability to live independently in their own homes",
+          "basis": "stated"
+        },
+        {
+          "code": "CHCAGE013",
+          "quote": "Community Aged Care Support Workers",
+          "basis": "title"
+        }
+      ],
+      "mapped_by": "claude-sonnet-5"
+    },
+    {
+      "id": "5870150104",
+      "occupation": "aged_care",
+      "title": "Travelling Healthcare Professionals",
+      "company": "Calvary Health Care",
+      "location": "Sydney, Sydney Region",
+      "contract_type": "permanent",
+      "contract_time": "full_time",
+      "created": "2026-09-04T15:53:00Z",
+      "redirect_url": "https://www.adzuna.com.au/land/ad/5870150104?se=wBYdpqi18RGMpYpufgr6mw&utm_medium=api&utm_source=ab4db6e1&v=30CEA548C39226F453EB1BE805F9335D946DEB2F",
+      "snippet": "Unleash your adventurous spirit while working by joining our Travelling Healthcare Professional program. This is an exciting and unique opportunity that offers Health Care Professionals to work with Calvary while immersing yourself in Australia’s breathtaking landscapes, vibrant culture and diverse experiences. Whether you’re a Registered Nurse, Registered Midwife, or experienced Aged Care Personal Care Worker or Residential Home Manager, or someone seeking a change of scenery, Calvary have opp…",
+      "required_units": [
+        {
+          "code": "CHCCCS031",
+          "quote": "Aged Care Personal Care Worker",
+          "basis": "stated"
+        },
+        {
+          "code": "CHCCCS040",
+          "quote": "Aged Care Personal Care Worker",
+          "basis": "stated"
+        },
+        {
+          "code": "HLTINF006",
+          "quote": "Registered Nurse, Registered Midwife",
+          "basis": "stated"
+        },
+        {
+          "code": "HLTWHS002",
+          "quote": "Aged Care Personal Care Worker",
+          "basis": "stated"
+        },
+        {
+          "code": "CHCAGE013",
+          "quote": "Aged Care Personal Care Worker",
+          "basis": "stated"
+        }
+      ],
+      "mapped_by": "claude-sonnet-5"
+    },
+    {
+      "id": "5764750407",
+      "occupation": "aged_care",
+      "title": "Personal Care worker - in home aged care - Cantonese or Mandarin speaking",
+      "company": "Australian Chinese Community Association ",
+      "location": "The Rocks, Sydney",
+      "contract_type": null,
+      "contract_time": "part_time",
+      "created": "2026-06-16T08:09:13Z",
+      "redirect_url": "https://www.adzuna.com.au/details/5764750407?utm_medium=api&utm_source=ab4db6e1",
+      "snippet": "Looking to make a difference in the Home Care sector? ACCA provides a wide range of government-funded home and community care services and are currently looking to hire Personal care workers.The type of services include the following companionship, shopping, light housework, transport to appointments, bill payments, personal care etc If you are looking for a flexible job with pathways for career growth and want to make a difference in the life of others, this is the right opportunity for you! S…",
+      "required_units": [
+        {
+          "code": "CHCCCS031",
+          "quote": "Personal care workers",
+          "basis": "stated"
+        },
+        {
+          "code": "CHCCCS040",
+          "quote": "Personal Care worker - in home aged care",
+          "basis": "title"
+        },
+        {
+          "code": "HLTWHS002",
+          "quote": "Personal care workers",
+          "basis": "stated"
+        },
+        {
+          "code": "CHCAGE013",
+          "quote": "in home aged care",
+          "basis": "title"
+        }
+      ],
+      "mapped_by": "claude-sonnet-5"
+    },
+    {
+      "id": "5646992645",
+      "occupation": "aged_care",
+      "title": "Personal Care Assistant",
+      "company": "IIQAF",
+      "location": "Sydney, Sydney Region",
+      "contract_type": null,
+      "contract_time": "full_time",
+      "created": "2026-02-27T17:27:28Z",
+      "redirect_url": "https://www.adzuna.com.au/details/5646992645?utm_medium=api&utm_source=ab4db6e1",
+      "snippet": "Company: IIQAF Group Location: Sydney, Australia Industry: Hospital / Health Care Salary: AUD 76,000 – AUD 80,000 per year Job Type: Full-Time Job Overview IIQAF Group is seeking a compassionate and experienced Personal Care Assistant in Sydney to support our hospital and healthcare team. The ideal candidate will have hands-on experience in patient care, aged care support, daily living assistance, and clinical support services . This role is ideal for candidates searching for Personal Care Assi…",
+      "required_units": [
+        {
+          "code": "CHCCCS031",
+          "quote": "patient care",
+          "basis": "stated"
+        },
+        {
+          "code": "CHCCCS040",
+          "quote": "daily living assistance",
+          "basis": "stated"
+        },
+        {
+          "code": "CHCAGE013",
+          "quote": "aged care support",
+          "basis": "stated"
+        },
+        {
+          "code": "HLTWHS002",
+          "quote": "Personal Care Assistant",
+          "basis": "stated"
+        },
+        {
+          "code": "HLTINF006",
+          "quote": "Hospital / Health Care",
+          "basis": "stated"
+        }
+      ],
+      "mapped_by": "claude-sonnet-5"
+    },
+    {
+      "id": "5859034830",
+      "occupation": "aged_care",
+      "title": "Community Support Worker - In Home Aged Care",
+      "company": "Catholic Healthcare",
+      "location": "The Rocks, Sydney",
+      "contract_type": null,
+      "contract_time": "part_time",
+      "created": "2026-08-28T10:35:11Z",
+      "redirect_url": "https://www.adzuna.com.au/details/5859034830?utm_medium=api&utm_source=ab4db6e1",
+      "snippet": "Job Description Community Support Worker - In Home Aged Care Generous New Pay Rates! $29.71 - $33.51 per hour  Super Flexible start & finish times - choose your own hours! Significant training & support provided No experience needed! The Position: We are currently recruiting passionate and caring individuals who are looking to make a difference in our Aged Care clients lives by assisting them to live at home independently for as long as possible. You do not need to have any previous experience …",
+      "required_units": [
+        {
+          "code": "CHCCCS040",
+          "quote": "assisting them to live at home independently",
+          "basis": "stated"
+        },
+        {
+          "code": "CHCCCS031",
+          "quote": "Community Support Worker - In Home Aged Care",
+          "basis": "stated"
+        },
+        {
+          "code": "CHCAGE013",
+          "quote": "In Home Aged Care",
+          "basis": "stated"
+        },
+        {
+          "code": "HLTWHS002",
+          "quote": "Community Support Worker - In Home Aged Care",
+          "basis": "stated"
+        }
+      ],
+      "mapped_by": "claude-sonnet-5"
+    },
+    {
+      "id": "5775443351",
+      "occupation": "aged_care",
+      "title": "Community Support Worker - In Home Aged Care",
+      "company": "Catholic Healthcare",
+      "location": "The Rocks, Sydney",
+      "contract_type": null,
+      "contract_time": "part_time",
+      "created": "2026-06-25T08:35:43Z",
+      "redirect_url": "https://www.adzuna.com.au/details/5775443351?utm_medium=api&utm_source=ab4db6e1",
+      "snippet": "Job Description Community Support Worker - In Home Aged Care Generous New Pay Rates! $29.71 - $33.51 per hour  Super Flexible start & finish times - choose your own hours! Significant training & support provided No experience needed! The Position: We are currently recruiting passionate and caring individuals who are looking to make a difference in our Aged Care clients lives by assisting them to live at home independently for as long as possible. You do not need to have any previous experience …",
+      "required_units": [
+        {
+          "code": "CHCCCS031",
+          "quote": "Community Support Worker",
+          "basis": "stated"
+        },
+        {
+          "code": "CHCCCS040",
+          "quote": "assisting them to live at home independently",
+          "basis": "stated"
+        },
+        {
+          "code": "HLTWHS002",
+          "quote": "In Home Aged Care",
+          "basis": "stated"
+        },
+        {
+          "code": "CHCAGE013",
+          "quote": "In Home Aged Care",
+          "basis": "stated"
+        }
+      ],
+      "mapped_by": "claude-sonnet-5"
+    },
+    {
+      "id": "5793439634",
+      "occupation": "aged_care",
+      "title": "Support Worker",
+      "company": "Hireup",
+      "location": "Redfern, Sydney",
+      "contract_type": null,
+      "contract_time": null,
+      "created": "2026-07-09T09:52:31Z",
+      "redirect_url": "https://www.adzuna.com.au/details/5793439634?utm_medium=api&utm_source=ab4db6e1",
+      "snippet": "Hello, nice to meet you! We are an online platform and community for people with disability and their families, anywhere in Australia, to find, book and manage local support workers who fit their needs and share their interests. By becoming a support worker with Hireup, you can connect with clients and other disability service providers near you. You will be able to search and message clients, and accept shifts that fit your level of expertise and schedule. Unlike with traditional disability se…",
+      "required_units": [
+        {
+          "code": "CHCCCS031",
+          "quote": "Support Worker",
+          "basis": "title"
+        },
+        {
+          "code": "CHCCCS038",
+          "quote": "Support Worker",
+          "basis": "title"
+        },
+        {
+          "code": "CHCCCS040",
+          "quote": "Support Worker",
+          "basis": "title"
+        },
+        {
+          "code": "HLTINF006",
+          "quote": "Support Worker",
+          "basis": "title"
+        },
+        {
+          "code": "HLTWHS002",
+          "quote": "Support Worker",
+          "basis": "title"
+        }
+      ],
+      "mapped_by": "claude-sonnet-5"
+    },
+    {
+      "id": "5764750618",
+      "occupation": "aged_care",
+      "title": "Disability Support Worker - Complex Support (Specialised Support)",
+      "company": "Hireup",
+      "location": "The Rocks, Sydney",
+      "contract_type": null,
+      "contract_time": null,
+      "created": "2026-06-16T08:09:17Z",
+      "redirect_url": "https://www.adzuna.com.au/details/5764750618?utm_medium=api&utm_source=ab4db6e1",
+      "snippet": "Hello, nice to meet you! Were Hireup, an online platform, and community for people with disability and their families, anywhere in Australia, to find, hire and manage local support workers who fit their needs and share their interests. We are growing our community nationally, so now is the perfect time to join the team. About Hireup At Hireup, youll become a critical part of an exciting team. Whether its support with personal care, getting to work or catching a footy game, we give individuals t…",
+      "required_units": [
+        {
+          "code": "CHCCCS031",
+          "quote": "Disability Support Worker",
+          "basis": "title"
+        },
+        {
+          "code": "CHCCCS038",
+          "quote": "Disability Support Worker",
+          "basis": "title"
+        },
+        {
+          "code": "CHCCCS040",
+          "quote": "support with personal care",
+          "basis": "stated"
+        },
+        {
+          "code": "HLTWHS002",
+          "quote": "support workers who fit their needs",
+          "basis": "stated"
+        }
+      ],
+      "mapped_by": "claude-sonnet-5"
+    }
+  ]
+}
