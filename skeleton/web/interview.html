@@ -1,0 +1,504 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BridgeWork interview</title>
+<style>
+/* BridgeWork theme from the Figma "Design Theme" frame, the same tokens as
+   review.html. Inline and without external fonts: the page must render
+   offline from the stdlib server. */
+:root {
+  --primary: #1B4B5A;
+  --accent: #E8874A;
+  --success: #4C9A6B;
+  --bg: #F7F5F1;
+  --text: #2B2B2B;
+  --muted: #5b6168;
+  --card: #fff;
+  --line: #d9d4cb;
+  --warn: #7a4a00;
+  --warn-bg: #fff3d6;
+  --stop: #9b1111;
+  --stop-bg: #fdecec;
+  --focus: #ffbf00;
+}
+* { box-sizing: border-box; }
+html { font-size: 18px; }
+body {
+  margin: 0; background: var(--bg); color: var(--text);
+  font: 1rem/1.5 system-ui, -apple-system, "Segoe UI", "PingFang SC", "Noto Sans CJK SC", sans-serif;
+}
+header.top { display: flex; align-items: baseline; gap: 1.25rem; padding: 14px 24px;
+             border-bottom: 1px solid var(--line); background: var(--card); }
+.wordmark { font-size: 1.4rem; margin: 0; letter-spacing: -.01em; }
+.wordmark b { color: var(--text); }
+.wordmark span { color: var(--primary); font-weight: 400; }
+.step { color: var(--muted); font-weight: 600; }
+.progress { margin-left: auto; color: var(--primary); font-weight: 700; }
+main { max-width: 1280px; margin: 0 auto; padding: 16px 24px 48px; }
+h2 { font-size: 1.2rem; margin: 0 0 .25rem; }
+p { margin: .3rem 0; }
+.muted { color: var(--muted); }
+.small { font-size: .88rem; }
+button, textarea { font: inherit; }
+:focus-visible { outline: 4px solid var(--focus); outline-offset: 2px; }
+button {
+  min-height: 44px; padding: .35rem 1rem; border-radius: 8px; cursor: pointer;
+  border: 2px solid var(--primary); background: var(--primary); color: #fff; font-weight: 600;
+}
+button.secondary { background: var(--card); color: var(--primary); }
+button.go { background: var(--accent); border-color: var(--accent); color: #1f1a15; }
+button:disabled { background: #d1d5db; border-color: #9ca3af; color: #333; cursor: not-allowed; }
+[hidden] { display: none !important; }
+
+.banner { padding: .5rem .8rem; border-radius: 6px; margin: 0 0 .75rem; font-weight: 600; }
+.banner.mock { background: var(--card); border: 2px dashed var(--line); font-weight: 500; }
+.banner.offline { background: var(--warn-bg); color: var(--warn); border: 2px solid var(--warn); }
+.banner.error { background: var(--stop-bg); color: var(--stop); border: 2px solid var(--stop); }
+
+.start { max-width: 640px; margin: 8vh auto; background: var(--card); border: 1px solid var(--line);
+         border-radius: 10px; padding: 24px 28px; }
+.consent { display: flex; gap: .55rem; align-items: flex-start; margin: 1rem 0; cursor: pointer; }
+.consent input { width: 22px; height: 22px; flex: none; margin-top: .15rem; accent-color: var(--primary); }
+
+/* Figma frame "2": the question across the top, English left and Mandarin right. */
+.question { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px; margin: 8px 0 20px; }
+.label { color: var(--accent); font-weight: 800; font-size: .85rem; letter-spacing: .06em; text-transform: uppercase; margin: 0; }
+.q-en { font-size: 1.35rem; font-weight: 700; line-height: 1.35; margin: .25rem 0 0; }
+.q-zh { font-size: 1.25rem; line-height: 1.5; margin: 1.35rem 0 0; }
+
+/* The two transcript cards with the voice controls between them. */
+.stage { display: grid; grid-template-columns: minmax(0, 1fr) 220px minmax(0, 1fr); gap: 24px; align-items: stretch; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px;
+        display: flex; flex-direction: column; gap: .4rem; }
+.card label { font-weight: 700; color: var(--primary); }
+.card textarea { flex: 1; min-height: 280px; width: 100%; padding: .5rem .6rem; border: 2px solid var(--line);
+                 border-radius: 6px; background: #fff; color: var(--text); resize: vertical; }
+.card .hint { color: var(--muted); font-size: .8rem; }
+.centre { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; }
+.voice { width: 170px; height: 170px; border-radius: 50%; display: grid; place-items: center; position: relative;
+         background: #e4ded3; transition: background .2s; }
+.voice::before, .voice::after { content: ""; position: absolute; inset: 0; border-radius: 50%; opacity: 0; }
+.voice .core { width: 96px; height: 96px; border-radius: 50%; background: var(--card); display: grid; place-items: center;
+               font-size: .8rem; font-weight: 700; color: var(--muted); text-align: center; z-index: 1; }
+.voice.speaking { background: var(--primary); }
+.voice.recording { background: var(--accent); }
+.voice.speaking .core { color: var(--primary); }
+.voice.recording .core { color: #8a4515; }
+.voice.speaking::before, .voice.recording::before { animation: ring 1.4s ease-out infinite; }
+.voice.speaking::after, .voice.recording::after { animation: ring 1.4s ease-out .7s infinite; }
+.voice.speaking::before, .voice.speaking::after { border: 4px solid var(--primary); }
+.voice.recording::before, .voice.recording::after { border: 4px solid var(--accent); }
+@keyframes ring { from { transform: scale(1); opacity: .7; } to { transform: scale(1.35); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .voice::before, .voice::after { animation: none !important; } }
+.buttons { display: flex; gap: 12px; }
+.round { width: 60px; height: 60px; padding: 0; border-radius: 50%; font-size: 1.3rem; line-height: 1; }
+.round.rec { background: var(--accent); border-color: var(--accent); color: #1f1a15; }
+.round.rec.on { background: var(--stop); border-color: var(--stop); color: #fff; }
+.status { min-height: 2.8rem; font-weight: 600; text-align: center; font-size: .9rem; }
+.next { min-width: 160px; }
+
+@media (max-width: 900px) {
+  .question, .stage { grid-template-columns: 1fr; gap: 16px; }
+  .q-zh { margin-top: 0; }
+  .centre { order: -1; }
+  .card textarea { min-height: 140px; }
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <p class="wordmark"><b>Bridge</b><span>Work</span></p>
+  <span class="step">Interview</span>
+  <span id="progress" class="progress" aria-live="polite"></span>
+</header>
+<main>
+  <p id="mock-banner" class="banner mock" hidden>Mock mode: scripted answers from a fictional cook, no backend. Nothing is recorded or sent.</p>
+  <p id="offline" class="banner offline" role="status" hidden></p>
+  <p id="error" class="banner error" role="alert" hidden></p>
+
+  <section id="start" class="start" hidden>
+    <h2>Seven questions for the resume</h2>
+    <p class="muted">Each question is read aloud in Mandarin. The jobseeker answers in their own words; the answer is
+      transcribed and translated into English. You can correct both before moving on, and nothing is final until you
+      confirm the resume on the next page.</p>
+    <!-- NEEDS DECISION: the brief asks for no consent step here. This one mirrors
+         intake.html's, because recording someone's voice without asking is not a
+         call a page should make on its own. -->
+    <label class="consent">
+      <input type="checkbox" id="consent">
+      <span>The jobseeker agrees that their answers are recorded, transcribed by a speech service and translated into English.</span>
+    </label>
+    <button id="begin" class="go" disabled>Start the interview</button>
+  </section>
+
+  <section id="interview" hidden>
+    <div class="question">
+      <div>
+        <p class="label">Current Question · <span id="section"></span></p>
+        <p id="q-en" class="q-en"></p>
+      </div>
+      <p id="q-zh" class="q-zh" lang="zh-Hans"></p>
+    </div>
+
+    <div class="stage">
+      <div class="card">
+        <label for="answer-en">Translated contents</label>
+        <textarea id="answer-en" lang="en"></textarea>
+        <span class="hint">English draft. Correct it with the jobseeker before moving on.</span>
+      </div>
+
+      <div class="centre">
+        <div id="voice" class="voice" aria-hidden="true"><div class="core" id="voice-label">Ready</div></div>
+        <div class="buttons">
+          <button id="play" class="round secondary" title="Play the question again" aria-label="Play the question again">&#9654;</button>
+          <button id="record" class="round rec" title="Record the answer" aria-label="Record the answer">&#9679;</button>
+        </div>
+        <p id="status" class="status" aria-live="polite"></p>
+        <button id="next" class="next">Next &rarr;</button>
+      </div>
+
+      <div class="card">
+        <label for="answer-zh" lang="zh-Hans">原文</label>
+        <textarea id="answer-zh" lang="zh-Hans"></textarea>
+        <span class="hint">What was said, as transcribed. Several recordings are added one after another.</span>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+"use strict";
+
+// ?mock=1 runs the whole interview against the fixtures below and makes no /api/
+// request at all: the demo video is recorded in it.
+const params = new URLSearchParams(location.search);
+const MOCK = params.get("mock") === "1";
+
+// Read by /review. sessionStorage keeps the answers to this tab.
+const INTERVIEW_KEY = "d7.interview";
+const LANGUAGE = "zh";
+const REVIEW_URL = (location.protocol === "file:" ? "review.html" : "/review") + (MOCK ? "?mock=1" : "");
+
+// ---------------------------------------------------------------- fixtures
+// The team's questions exactly as GET /api/interview/questions serves them.
+const FIXTURE_QUESTIONS = {"questions": [{"id": "profile", "section": "Profile", "en": "Could you tell me a little bit about yourself? What are you most proud of, and what kind of work are you hoping to do here?", "zh": "可以简单介绍一下你自己吗？你最引以为傲的是什么？你希望在这里找什么样的工作？"}, {"id": "contacts", "section": "Contacts", "en": "What is the best phone number and email address for employers to reach you?", "zh": "雇主联系你最好用哪个电话号码和电子邮箱？"}, {"id": "education", "section": "Education", "en": "Let's talk about your education. What did you study, and what was the name of your school or university? Where was it located, and which years did you attend? Is there anything specific you'd like to highlight about what you learned there?", "zh": "我们来谈谈你的教育背景。你学的是什么专业？学校或大学叫什么名字？在哪里？哪几年就读？在那里学到的东西，有没有什么特别想强调的？"}, {"id": "employment", "section": "Employment", "en": "I'd love to hear about your past work. What was your most recent job title, and what was the name of the company? Where was this job located? How long did you work there, and what were your main daily tasks?", "zh": "我想听听你过去的工作经历。你最近一份工作的职位是什么？公司叫什么名字？在哪里？你在那里工作了多久？每天主要做哪些工作？"}, {"id": "volunteer", "section": "Volunteer Experience", "en": "Have you ever done any unpaid work or volunteered to help your community? If so, what was your role, and where and when did you do this? Could you describe what you actually did to help out?", "zh": "你有没有做过无偿工作，或者当志愿者帮助你的社区？如果有，你的角色是什么？在哪里、什么时候？可以说说你具体做了哪些事情吗？"}, {"id": "skills", "section": "Technical Skills", "en": "What practical skills do you have? For example, are you good with any computer programs, specific tools, driving certain vehicles, or speaking multiple languages?", "zh": "你有哪些实用技能？比如会用哪些电脑软件、特定工具，会驾驶哪些车辆，或者会说几种语言？"}, {"id": "certificates", "section": "Certificate", "en": "Do you have any official certificates, licenses, or special training records? This could be a driver's license, a safety card, or any professional training you completed.", "zh": "你有没有正式的证书、执照或者专业培训记录？比如驾照、安全证（safety card），或者你完成过的任何职业培训。"}]};
+// The mock interviewee's answers: exactly the team's mock_interview_answers.json
+// (fictional cook Li Wei), the same answers review.html's MOCK_INTERVIEW carries.
+const MOCK_ANSWERS = [{"id": "profile", "answer_zh": "我叫李伟，做了六年厨师，一直是餐厅的主厨。我最自豪的是每天能给一百五十个客人做饭，从来没有出过食品安全问题。我希望在这里继续在厨房工作。", "answer_en": "My name is Li Wei. I have worked as a cook for six years, always as the head cook of a restaurant. What I am most proud of is cooking for 150 guests a day without ever having a food safety problem. I hope to keep working in a kitchen here."}, {"id": "contacts", "answer_zh": "我的电话是 0400 000 000，邮箱是 liwei.cook@example.com。", "answer_en": "My phone number is 0400 000 000, and my email is liwei.cook@example.com."}, {"id": "education", "answer_zh": "我在成都的一所职业技术学校学烹饪，二零一二年到二零一四年读了两年。在那里学了中餐的基本功，还有厨房卫生。", "answer_en": "I studied cooking at a vocational school in Chengdu, for two years from 2012 to 2014. There I learned the basics of Chinese cooking, and kitchen hygiene."}, {"id": "employment", "answer_zh": "我最近的工作是在成都一家叫蓉香楼的餐厅当主厨，从二零一六年做到二零二二年，一共六年。每天早上从头熬高汤、做汤和酱汁，准备羊肉、牛肉和鸡肉的菜。生的和熟的食物分开放，每个班次都记录冷库的温度。", "answer_en": "My most recent job was head cook at a restaurant called Rongxiang Lou in Chengdu, from 2016 to 2022, six years in total. Every morning I made stocks, soups and sauces from scratch, and prepared lamb, beef and chicken dishes. I kept raw and cooked food apart, and recorded the cool-room temperature every shift."}, {"id": "volunteer", "answer_zh": "有。去年开始每个星期六在社区中心的食物分发站帮忙，大概做了一年。我负责整理捐来的食物，检查保质期，然后帮忙给大家做热饭。", "answer_en": "Yes. Since last year I have helped every Saturday at the food distribution point at the community centre, for about a year. I sort donated food, check the use-by dates, and help cook hot meals for people."}, {"id": "skills", "answer_zh": "我会用商用厨房的设备，像蒸烤箱、大炒锅和切片机。会说普通话和四川话，英语还在学。", "answer_en": "I can use commercial kitchen equipment, such as combi ovens, large woks and slicers. I speak Mandarin and Sichuanese, and I am still learning English."}, {"id": "certificates", "answer_zh": "我有中国的中式烹调师证书。在澳大利亚还没有考任何证书。", "answer_en": "I have a Chinese cook certificate for Chinese cuisine from China. I have not taken any certificate in Australia yet."}];
+
+// ---------------------------------------------------------------- state
+const state = {
+  questions: [],
+  index: 0,
+  answers: [],        // the contract's answers, one per question passed
+  consent: false,
+  audio: null,        // the <audio> playing the current question
+  audioUrls: {},      // question id -> object URL, so a replay costs no second call
+  recorder: null,
+  mockTimer: null,
+  mockAnswered: {},   // question id -> true once the scripted answer was given
+  speaking: false,
+  busy: false,
+};
+
+const $ = id => document.getElementById(id);
+const current = () => state.questions[state.index];
+
+function showError(message) {
+  $("error").textContent = message || "";
+  $("error").hidden = !message;
+}
+
+// Offline notices stack for the current question: one service may be down while
+// another answers, and the caseworker needs to know which part to type by hand.
+function addOffline(message) {
+  const box = $("offline");
+  box.textContent = box.hidden ? message : box.textContent + " " + message;
+  box.hidden = false;
+}
+
+function clearOffline() {
+  $("offline").textContent = "";
+  $("offline").hidden = true;
+}
+
+function setStatus(message) { $("status").textContent = message || ""; }
+
+// Offline and refused answers are both 200s; either one means nothing came back.
+function unanswered(body) {
+  if (body && body.refused) return body.refused;
+  if (body && body.offline) return body.reason || "the service is offline.";
+  return "";
+}
+
+// ---------------------------------------------------------------- network
+async function postJson(path, json) {
+  const response = await fetch(path, { method: "POST", headers: { "Content-Type": "application/json" },
+                                       body: JSON.stringify(json) });
+  if (!response.ok) throw new Error(path + " answered HTTP " + response.status);
+  return response;
+}
+
+async function loadQuestions() {
+  if (MOCK) return FIXTURE_QUESTIONS.questions;
+  const response = await fetch("/api/interview/questions");
+  if (!response.ok) throw new Error("the questions answered HTTP " + response.status);
+  return (await response.json()).questions;
+}
+
+// ---------------------------------------------------------------- speaking
+function stopSpeaking() {
+  clearTimeout(state.mockTimer);
+  if (state.audio) { state.audio.pause(); state.audio = null; }
+  state.speaking = false;
+}
+
+// Mock has no audio: the indicator "speaks" for about as long as reading takes,
+// capped so the video does not wait on the long questions.
+function mockSpeak(question) {
+  state.speaking = true; render();
+  setStatus("Reading the question aloud…");
+  state.mockTimer = setTimeout(() => {
+    state.speaking = false;
+    setStatus("");
+    render();
+  }, Math.min(6000, 1500 + 40 * question.zh.length));
+}
+
+async function audioFor(question) {
+  if (state.audioUrls[question.id]) return { url: state.audioUrls[question.id] };
+  const response = await postJson("/api/speak", { text: question.zh, language: LANGUAGE });
+  if ((response.headers.get("Content-Type") || "").startsWith("audio/")) {
+    state.audioUrls[question.id] = URL.createObjectURL(await response.blob());
+    return { url: state.audioUrls[question.id] };
+  }
+  return { missing: unanswered(await response.json()) || "no audio came back." };
+}
+
+async function speak() {
+  const question = current();
+  stopSpeaking();
+  if (MOCK) return mockSpeak(question);
+  state.speaking = true; render();
+  setStatus("Fetching the spoken question…");
+  let got;
+  try {
+    got = await audioFor(question);
+  } catch (err) {
+    got = { missing: err.message + "." };
+  }
+  // The caseworker may have moved on, or started recording, while the audio was on its way.
+  if (question !== current()) return;
+  if (state.recorder) { state.speaking = false; render(); return; }
+  if (got.missing) {
+    state.speaking = false; setStatus(""); render();
+    addOffline("Not read aloud: " + got.missing + " Read the Mandarin question to the jobseeker from the screen.");
+    return;
+  }
+  const audio = new Audio(got.url);
+  state.audio = audio;
+  audio.onended = () => { if (state.audio === audio) { state.audio = null; state.speaking = false; setStatus(""); render(); } };
+  setStatus("Reading the question aloud…");
+  try {
+    await audio.play();
+  } catch (err) {
+    // A browser that blocks autoplay still lets the play button work.
+    state.audio = null; state.speaking = false; render();
+    setStatus("Press ▶ to hear the question.");
+  }
+}
+
+// ---------------------------------------------------------------- answering
+function append(id, text) {
+  const box = $(id);
+  const kept = box.value.trim();
+  box.value = kept ? kept + "\n" + text.trim() : text.trim();
+}
+
+// One recorded segment: transcribed into 原文, then translated into English. Each
+// step that gets nothing back says so and leaves that box for the caseworker.
+async function handleSegment(blob) {
+  const question = current();
+  state.busy = true; render();
+  setStatus("Transcribing…");
+  let zh = "";
+  try {
+    if (MOCK) {
+      zh = await wait(900, mockAnswer(question).answer_zh);
+    } else {
+      const response = await fetch("/api/transcribe?language=" + LANGUAGE,
+                                   { method: "POST", headers: { "Content-Type": blob.type || "audio/webm" }, body: blob });
+      if (!response.ok) throw new Error("/api/transcribe answered HTTP " + response.status);
+      const body = await response.json();
+      // Offline transcribe hands back placeholder text; it is never shown as what was said.
+      const missing = body.refused || (body.offline ? "the speech service is offline." : "");
+      if (missing) {
+        addOffline("Not transcribed: " + missing + " Type what was said into 原文 and the English into Translated contents.");
+      } else if (!String(body.text || "").trim()) {
+        addOffline("Nothing was heard in that recording. Record again, or type the answer in.");
+      } else {
+        zh = body.text;
+      }
+    }
+    if (question !== current() || !zh) return;
+    append("answer-zh", zh);
+    setStatus("Translating…");
+    let en = "";
+    if (MOCK) {
+      en = await wait(900, mockAnswer(question).answer_en);
+    } else {
+      const body = await (await postJson("/api/translate", { text: zh, source: LANGUAGE })).json();
+      const missing = unanswered(body);
+      if (missing) addOffline("Not translated: " + missing + " Type the English into Translated contents.");
+      else en = body.en;
+    }
+    if (question === current() && en) append("answer-en", en);
+  } catch (err) {
+    showError("That recording was not processed: " + err.message + " Record again, or type the answer in.");
+  } finally {
+    state.busy = false;
+    setStatus("");
+    render();
+  }
+}
+
+const wait = (ms, value) => new Promise(resolve => setTimeout(() => resolve(value), ms));
+const mockAnswer = question => MOCK_ANSWERS.find(a => a.id === question.id);
+
+// Mock "record" runs as long as the answer would take to say, then goes through
+// the same transcribe and translate steps as real audio. Stop ends it early.
+function mockRecord() {
+  const question = current();
+  if (state.recorder) {
+    clearTimeout(state.recorder.timer);
+    state.recorder = null;
+    state.mockAnswered[question.id] = true;
+    return handleSegment(null);
+  }
+  stopSpeaking();
+  state.recorder = { timer: setTimeout(mockRecord, Math.min(7000, 1500 + 60 * mockAnswer(question).answer_zh.length)) };
+  setStatus("Recording… press ■ when the answer is finished.");
+  render();
+}
+
+async function toggleRecord() {
+  if (MOCK) return mockRecord();
+  if (state.recorder) {
+    state.recorder.stop();
+    return;
+  }
+  stopSpeaking();
+  showError("");
+  let stream;
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  } catch (err) {
+    showError("Microphone not available: " + err.message + ". Type the answer in instead.");
+    render();
+    return;
+  }
+  const chunks = [];
+  const recorder = new MediaRecorder(stream);
+  recorder.ondataavailable = event => { if (event.data.size) chunks.push(event.data); };
+  recorder.onstop = () => {
+    stream.getTracks().forEach(track => track.stop());
+    const discarded = recorder.discard;
+    state.recorder = null;
+    render();
+    if (!discarded) handleSegment(new Blob(chunks, { type: "audio/webm" }));
+  };
+  state.recorder = recorder;
+  recorder.start();
+  setStatus("Recording… press ■ when the answer is finished.");
+  render();
+}
+
+// ---------------------------------------------------------------- moving on
+function showQuestion() {
+  const question = current();
+  $("section").textContent = question.section;
+  $("q-en").textContent = question.en;
+  $("q-zh").textContent = question.zh;
+  $("answer-en").value = "";
+  $("answer-zh").value = "";
+  clearOffline();
+  showError("");
+  setStatus("");
+  render();
+  speak();
+}
+
+// What the caseworker left in the boxes is the answer, empty or not: skipping a
+// question is allowed, and /review drafts nothing for an empty one.
+function next() {
+  const question = current();
+  stopSpeaking();
+  state.answers[state.index] = {
+    id: question.id, section: question.section,
+    question_en: question.en, question_zh: question.zh,
+    answer_zh: $("answer-zh").value.trim(), answer_en: $("answer-en").value.trim(),
+  };
+  if (state.index < state.questions.length - 1) {
+    state.index += 1;
+    return showQuestion();
+  }
+  try {
+    sessionStorage.setItem(INTERVIEW_KEY, JSON.stringify({ language: LANGUAGE, answers: state.answers }));
+  } catch (err) {
+    showError("The answers could not be handed to the review page: " + err.message);
+    return;
+  }
+  location.href = REVIEW_URL;
+}
+
+// ---------------------------------------------------------------- render
+function render() {
+  const total = state.questions.length;
+  const recording = !!state.recorder;
+  const question = current();
+  $("progress").textContent = $("interview").hidden || !total ? "" : "Question " + (state.index + 1) + " of " + total;
+  $("begin").disabled = !state.consent;
+
+  const voice = $("voice");
+  voice.classList.toggle("speaking", state.speaking && !recording);
+  voice.classList.toggle("recording", recording);
+  $("voice-label").textContent = recording ? "Listening" : state.speaking ? "Speaking" : state.busy ? "Working" : "Ready";
+
+  const record = $("record");
+  record.classList.toggle("on", recording);
+  record.innerHTML = recording ? "&#9632;" : "&#9679;";
+  record.setAttribute("aria-label", recording ? "Stop recording" : "Record the answer");
+  record.title = record.getAttribute("aria-label");
+  // Mock has one scripted answer per question; a second take would repeat it.
+  record.disabled = state.busy || (MOCK && question && state.mockAnswered[question.id] && !recording);
+  $("play").disabled = state.busy || recording;
+  // Never blocked by a service being down; only by work still in flight.
+  $("next").disabled = state.busy || recording;
+  $("next").innerHTML = state.index === total - 1 ? "Finish and review &rarr;" : "Next &rarr;";
+}
+
+// ---------------------------------------------------------------- start
+$("mock-banner").hidden = !MOCK;
+$("consent").addEventListener("change", event => { state.consent = event.target.checked; render(); });
+$("begin").addEventListener("click", () => {
+  if (!state.consent) return;
+  $("start").hidden = true;
+  $("interview").hidden = false;
+  showQuestion();
+});
+$("play").addEventListener("click", speak);
+$("record").addEventListener("click", toggleRecord);
+$("next").addEventListener("click", next);
+
+loadQuestions().then(questions => {
+  state.questions = questions;
+  $("start").hidden = false;
+  render();
+}).catch(err => {
+  showError("The interview questions could not be loaded: " + err.message + ". Reload the page to try again.");
+});
+</script>
+</body>
+</html>

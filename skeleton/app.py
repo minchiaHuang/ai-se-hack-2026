@@ -40,6 +40,8 @@ INTAKE_PAGE = WEB / "intake.html"
 JOBS_PAGE = WEB / "jobs.html"
 # Where the caseworker edits the resume drafted from the interview.
 REVIEW_PAGE = WEB / "review.html"
+# The spoken interview that hands its answers to /review.
+INTERVIEW_PAGE = WEB / "interview.html"
 
 # A request past these is refused before it is read: a few minutes of webm
 # speech is well under 25 MB, and no JSON the page sends comes near 1 MB.
@@ -352,6 +354,8 @@ class Handler(BaseHTTPRequestHandler):
             return self._send(200, "text/html; charset=utf-8", JOBS_PAGE.read_bytes())
         if parsed.path == "/review":
             return self._send(200, "text/html; charset=utf-8", REVIEW_PAGE.read_bytes())
+        if parsed.path == "/interview":
+            return self._send(200, "text/html; charset=utf-8", INTERVIEW_PAGE.read_bytes())
         if parsed.path == "/api/interview/questions":
             return self._json(200, interview.questions())
         scenario = parse_qs(parsed.query).get("s", [None])[0]
