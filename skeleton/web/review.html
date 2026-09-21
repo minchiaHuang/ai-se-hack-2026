@@ -94,6 +94,10 @@ button:disabled { background: #d1d5db; border-color: #9ca3af; color: #333; curso
 .form fieldset { border: 1px solid var(--line); border-radius: 8px; padding: .4rem .6rem .6rem; margin: 0; display: grid; gap: .4rem; }
 .form legend { font-size: .85rem; font-weight: 700; padding: 0 .25rem; }
 .row { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; }
+label.occupation { display: block; margin-top: 1rem; font-weight: 600; }
+#occupation { width: 100%; min-height: 44px; margin-top: .3rem; padding: 0 .6rem; font: inherit;
+              border: 1px solid var(--line); border-radius: 8px; background: var(--card); }
+#occupation-note { margin: .35rem 0 0; }
 .consent { display: flex; gap: .55rem; align-items: flex-start; margin: .75rem 0; cursor: pointer; }
 .consent input { width: 22px; height: 22px; flex: none; margin-top: .15rem; accent-color: var(--primary); }
 .actions { display: flex; flex-wrap: wrap; gap: .6rem; justify-content: space-between; }
@@ -150,6 +154,17 @@ details.said dd { margin: 0; }
       <h2 id="h-panel">Caseworker Review</h2>
       <p class="muted small" id="panel-note">Drafted from the interview answers. Check each section with the jobseeker and edit anything that is wrong or missing.</p>
       <ul class="cards" id="cards"></ul>
+      <!-- The keys and labels are skeleton/demo_data/reference/occupations.json's;
+           tests/test_occupation.py keeps them the same. -->
+      <label class="occupation" for="occupation">Occupation to match jobs for</label>
+      <select id="occupation">
+        <option value="">Choose…</option>
+        <option value="cookery">Commercial cook</option>
+        <option value="welding">Welder / metal fabricator</option>
+        <option value="aged_care">Aged care / personal care worker</option>
+        <option value="none">Something else (not covered yet)</option>
+      </select>
+      <p id="occupation-note" class="muted small" aria-live="polite"></p>
       <label class="consent">
         <input type="checkbox" id="consent">
         <span>The jobseeker has checked this resume and agrees it is used to find matching jobs.</span>
@@ -192,9 +207,10 @@ const FLAGS = [MOCK && "mock=1", QUIET && "quiet=1"].filter(Boolean).join("&");
 const asRoute = (route, file) => (location.protocol === "file:" ? file : route) + (FLAGS ? "?" + FLAGS : "");
 const JOBS_URL = asRoute("/jobs", "jobs.html");
 
-// NEEDS DECISION: the extract contract requires an occupation and the brief gives
-// no selector, so this page uses the demo's frame, as intake.html does.
-const OCCUPATION = "cookery";
+// The reference data covers three occupations. Anything else matches no jobs
+// rather than the nearest wrong ones.
+const NOT_COVERED = "BridgeWork covers commercial cook, welder and aged care worker for now. " +
+                    "For other work it matches no jobs rather than the wrong ones.";
 
 const SECTIONS = [
   { key: "profile", label: "Profile" },
@@ -239,7 +255,12 @@ function mockApi(path, body) {
       if (!body.consent) return resolve({ refused: "consent was not given; nothing may be processed" });
       return resolve(mockExtract(body.resume));
     }
+    // The fixture board is the cook's: another occupation gets no cook jobs dressed as its own.
+    if (path === "/api/match" && body.occupation !== "cookery") {
+      return resolve({ refused: "mock mode has sample jobs for the commercial cook only" });
+    }
     if (path === "/api/match") return resolve(mockMatch(body.evidenced_units));
+    if (path === "/api/occupation") return resolve({ occupation: "cookery", label: "Commercial cook" });
     resolve({ refused: "unknown endpoint " + path });
   }, delay));
 }
@@ -284,6 +305,7 @@ const state = {
   editing: null,    // the key of the card open for editing
   selected: "profile", // what "Regenerate Section" redrafts
   consent: false,
+  occupation: "",   // a key of occupations.json, "none", or "" until chosen
   busy: false,
   leaving: false,
 };
@@ -394,6 +416,7 @@ async function start() {
     $("loading").hidden = true;
     $("review").hidden = false;
     render();
+    suggestOccupation();
     return;
   }
   state.interview = readInterview();
@@ -417,6 +440,26 @@ async function start() {
   $("loading").hidden = true;
   $("review").hidden = false;
   render();
+  suggestOccupation();
+}
+
+function setOccupation(key, note) {
+  state.occupation = key;
+  $("occupation").value = key;
+  $("occupation-note").textContent = key === "none" ? NOT_COVERED : note || "";
+}
+
+// A suggestion only: the caseworker sees it in the menu and can change it.
+async function suggestOccupation() {
+  const text = resumeLines(state.sections).map(l => l.text).join("\n");
+  if (!text) return;
+  try {
+    const body = await call("/api/occupation", { text });
+    if (body.offline) return setOccupation("", body.reason);
+    setOccupation(body.occupation, "Suggested from the resume. Change it if it is wrong.");
+  } catch (err) {
+    setOccupation("", "No occupation was suggested (" + err.message + "). Choose one.");
+  }
 }
 
 // ---------------------------------------------------------------- actions
@@ -483,6 +526,15 @@ async function confirmAndContinue() {
     $("consent").focus();
     return;
   }
+  if (!state.occupation) {
+    setStatus("Choose the occupation to match jobs for first.");
+    $("occupation").focus();
+    return;
+  }
+  if (state.occupation === "none") {
+    setStatus("No jobs are matched: see the note under the occupation.");
+    return;
+  }
   const lines = resumeLines(state.sections);
   if (!lines.length) {
     setStatus("The resume is empty. Fill in at least one section first.");
@@ -496,11 +548,11 @@ async function confirmAndContinue() {
     // exactly as intake.html sends an English resume.
     const resume = lines.map(({ line, text }) => ({ line, text, en: text }));
     setStatus("Mapping to Australian units…");
-    const extract = await call("/api/extract", { occupation: OCCUPATION, language: "en", consent: state.consent,
+    const extract = await call("/api/extract", { occupation: state.occupation, language: "en", consent: state.consent,
                                                  source: "resume", resume });
     if (typeof extract.refused === "string") throw new Error(extract.refused);
     setStatus("Matching jobs…");
-    const match = await call("/api/match", { occupation: OCCUPATION, evidenced_units: evidencedUnits(extract),
+    const match = await call("/api/match", { occupation: state.occupation, evidenced_units: evidencedUnits(extract),
                                              source: "resume", resume });
     if (typeof match.refused === "string") throw new Error(match.refused);
     handOff(lines, extract, match);
@@ -642,6 +694,10 @@ function render() {
 $("mock-banner").hidden = !MOCK || QUIET;
 $("to-interview").href = asRoute("/interview", "interview.html");
 $("back").href = asRoute("/start/path", "path.html");
+$("occupation").addEventListener("change", event => {
+  setOccupation(event.target.value, "");
+  setStatus("");
+});
 $("consent").addEventListener("change", event => { state.consent = event.target.checked; setStatus(""); });
 $("regenerate").addEventListener("click", regenerate);
 $("confirm").addEventListener("click", confirmAndContinue);

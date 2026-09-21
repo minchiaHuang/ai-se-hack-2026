@@ -20,7 +20,7 @@ from urllib.parse import parse_qs, urlparse
 if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from skeleton.core import interview, live, pdf_text, phone, registry
+from skeleton.core import interview, live, occupation, pdf_text, phone, registry
 from skeleton.core.model import CANNED, StubModel
 from skeleton.core.pipeline import run
 from skeleton.core.schema import AggregationError
@@ -356,6 +356,13 @@ def match(payload):
             "jobs_source": d7_match.snapshot_meta()}
 
 
+def suggest_occupation(payload):
+    text = payload.get("text")
+    if not isinstance(text, str) or not text.strip():
+        raise BadRequest("text must be a non-empty string")
+    return occupation.suggest(text.strip())
+
+
 def resume_sections(payload):
     try:
         return d7_sections.draft(payload)
@@ -441,6 +448,8 @@ class Handler(BaseHTTPRequestHandler):
                 body = extract(self._read_json())
             elif parsed.path == "/api/match":
                 body = match(self._read_json())
+            elif parsed.path == "/api/occupation":
+                body = suggest_occupation(self._read_json())
             elif parsed.path == "/api/resume-sections":
                 body = resume_sections(self._read_json())
             elif parsed.path == "/api/resume-polish":
