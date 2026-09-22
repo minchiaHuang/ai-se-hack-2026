@@ -29,26 +29,6 @@ and omits the phone link.
 
 2026-09-22: `bash bin/verify.sh` → GREEN, 337 tests.
 
-## Demo deployment in progress
-
-The phone-link fix at `c4b0d18` and deployment notes at `d11a7fe` were pushed to
-`main` on 2026-09-22. Before deployment, the live site was checked: it still
-served the old interview page, `/api/speak` reported no `ELEVENLABS_API_KEY`,
-and `/api/talk/link` reported that the Agent was not configured.
-After the push, the live `/interview?mock=1` response was verified to contain
-the phone-link fix. Render environment setup and real audio remain pending.
-
-Local browser verification of the fix: mock mode displayed the configured
-ElevenLabs Agent URL, completed 12 fixture turns, and showed Review the answers.
-This verifies link display and the simulated transcript, not a real phone call
-or live Mandarin audio playback.
-
-Next: manually add
-`ELEVENLABS_API_KEY` and `ELEVENLABS_AGENT_ID` to the existing Render service's
-Environment settings. Save with a redeploy, then verify both endpoints and tap
-the interview orb on the live site. `sync: false` only prompts during initial
-Blueprint creation; it does not add these values to an existing service.
-
 ## What is built
 
 - `/` → `/start` → `/start/path`: a photo-led homepage, the caseworker's entry, then two ways
