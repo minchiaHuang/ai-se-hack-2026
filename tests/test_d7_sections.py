@@ -282,6 +282,14 @@ class MockFixtures(unittest.TestCase):
         # Same sections, same lines, so the /jobs match fixtures stay valid for both paths.
         self.assertEqual(constant("FIXTURE_SECTIONS", app.UPLOAD_PAGE), constant("FIXTURE_SECTIONS"))
 
+    def test_the_sample_resume_file_is_the_upload_mock(self):
+        # The .txt a live demo drops on /upload is the resume ?mock=1 shows, so
+        # both routes land on the same sections and the same /jobs board.
+        path = app.Path(app.__file__).parent / "demo_data" / "sample_resume_zh.txt"
+        page = app.UPLOAD_PAGE.read_text(encoding="utf-8")
+        self.assertEqual(path.read_text(encoding="utf-8").strip(),
+                         page.split("const MOCK_RESUME = `")[1].split("`;")[0].strip())
+
     def test_the_mock_lines_are_built_from_the_mock_sections(self):
         self.assertEqual(resume_lines(constant("FIXTURE_SECTIONS")), constant("FIXTURE_REVIEW_LINES"))
 

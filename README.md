@@ -36,6 +36,11 @@ drafting), `ELEVENLABS_API_KEY` (speech to text, the spoken questions, the phone
 Without them every page still works and says on screen what it could not do — nothing is invented
 to fill the gap.
 
+`skeleton/demo_data/sample_resume_zh.txt` is the same fictional resume as a file, for demoing the
+real read-and-translate path instead of the fixtures. A PDF works too when its text is selectable,
+but a Chinese one usually stores glyph numbers rather than characters and is refused rather than
+read as nonsense.
+
 The phone interviewer needs an agent as well as the key. `python3 -m skeleton.tools.phone_agent`
 creates one and prints the ids to set (`ELEVENLABS_AGENT_ID`, and `ELEVENLABS_PHONE_NUMBER_ID` to
 dial out rather than hand over a link); re-run it with `--update-agent` after changing the
