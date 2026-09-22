@@ -115,13 +115,15 @@ const FIELDS = ["name", "phone", "email", "language"];
 // The same fictional cook as mock_interview_answers.json in interview.html and review.html.
 const MOCK_PERSON = {"name": "Li Wei", "phone": "0400 000 000", "email": "liwei.cook@example.com", "language": "zh"};
 
-function saved() {
-  try { return JSON.parse(sessionStorage.getItem(KEY)); } catch { return null; }
+// The form always opens empty: the next person at the kiosk must never see the
+// previous one's details. Only mock mode fills in the cook. pageshow covers
+// coming back through history, where the browser restores what was typed.
+function reset() {
+  try { sessionStorage.removeItem(KEY); } catch {}
+  FIELDS.forEach(f => { document.getElementById(f).value = MOCK ? MOCK_PERSON[f] : ""; });
 }
-
-// Coming back from /start/path shows what was typed; otherwise mock mode fills in the cook.
-const person = saved() || (MOCK ? MOCK_PERSON : null);
-if (person) FIELDS.forEach(f => { document.getElementById(f).value = person[f] || ""; });
+reset();
+addEventListener("pageshow", reset);
 
 document.getElementById("person").addEventListener("submit", event => {
   event.preventDefault();
