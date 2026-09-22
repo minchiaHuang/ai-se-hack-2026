@@ -147,6 +147,9 @@ class HttpRoundTrip(Server):
         self.assertNotIn("mandatory", body)
         self.assertIn("prefers-reduced-motion: no-preference", body)
         self.assertIn("min-width: 900px", body)
+        # A snap point is only worth having where a panel fills the window,
+        # otherwise it settles part way down one.
+        self.assertIn("min-height: 100svh", body)
 
     def test_the_homepage_offers_the_demo_in_mock_mode(self):
         # The demo button carries ?mock=1 itself, so it must not be rewritten

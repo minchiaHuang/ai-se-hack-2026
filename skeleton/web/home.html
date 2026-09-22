@@ -49,17 +49,6 @@ header.top nav { margin-left: auto; display: flex; gap: 28px; font-size: 14px; f
 header.top nav a { text-decoration: none; }
 header.top nav a:hover { text-decoration: underline; }
 
-
-/* Scrolling settles on the four full-height panels, the way a slider does.
-   "proximity" pulls only when a panel is already close, so a trackpad flick is
-   never caught mid-gesture and the short linking sections (stats, proof, cta)
-   scroll past as normal text. Off on a small or short window, where a panel is
-   taller than the viewport, and off for a reader who asks for less motion. */
-@media (min-width: 900px) and (min-height: 700px) and (prefers-reduced-motion: no-preference) {
-  html { scroll-snap-type: y proximity; scroll-behavior: smooth; }
-  .hero, .how, .skills, .who { scroll-snap-align: start; }
-}
-
 .btn {
   display: inline-flex; align-items: center; justify-content: center; padding: 14px 24px; border-radius: 8px;
   font: 600 16px Inter, system-ui, sans-serif; text-decoration: none; border: 1.5px solid transparent;
@@ -155,6 +144,24 @@ footer nav a { text-decoration: none; }
 footer nav a:hover { text-decoration: underline; }
 footer .country { max-width: 720px; margin: 28px auto; line-height: 1.6; }
 footer small { display: block; padding-top: 20px; border-top: 1px solid rgba(255,255,255,.15); color: rgba(255,255,255,.55); font-size: 13px; }
+
+/* Scrolling settles on the four full-height panels, the way a slider does.
+   "proximity" pulls only when a panel is already close, so a trackpad flick is
+   never caught mid-gesture and the short linking sections (stats, proof, cta)
+   scroll past as normal text. Off on a small or short window, where a panel is
+   taller than the viewport, and off for a reader who asks for less motion.
+   It sits below the panels' own rules on purpose: "min-height" here has the
+   same specificity as .hero's 680px, so only source order lets it win. */
+@media (min-width: 900px) and (min-height: 700px) and (prefers-reduced-motion: no-preference) {
+  html { scroll-snap-type: y proximity; scroll-behavior: smooth; }
+  /* One screen each, so a snap point lands on a page boundary rather than
+     part way down a panel. "min-height", never "height": a panel that
+     outgrows the window keeps growing instead of clipping its own content.
+     Only .how needs centring spelled out; the other three already centre
+     themselves, through flex or grid. */
+  .hero, .how, .skills, .who { scroll-snap-align: start; min-height: 100svh; }
+  .how { display: flex; flex-direction: column; justify-content: center; }
+}
 
 @media (max-width: 1100px) {
   .skills, .who { grid-template-columns: minmax(0, 1fr); }
