@@ -64,10 +64,11 @@ button:disabled { background: #d1d5db; border-color: #9ca3af; color: #333; curso
 .banner.offline { background: var(--warn-bg); color: var(--warn); border: 2px solid var(--warn); }
 .banner.error { background: var(--stop-bg); color: var(--stop); border: 2px solid var(--stop); }
 
-.start { max-width: 640px; margin: 8vh auto; background: var(--card); border-radius: 12px;
+.start { max-width: 900px; margin: 8vh auto; background: var(--card); border-radius: 12px;
          box-shadow: var(--shadow); padding: 28px 32px; }
 #start { min-height: 700px; }
 .start h2 { color: var(--primary); }
+.start .muted { font-size: .85rem; line-height: 1.4; }
 .consent { display: flex; gap: .55rem; align-items: flex-start; margin: 1rem 0; cursor: pointer; }
 .consent input { width: 22px; height: 22px; flex: none; margin-top: .15rem; accent-color: var(--primary); }
 .back { color: var(--muted); font-size: .88rem; font-weight: 600; text-decoration: none; }
@@ -84,17 +85,18 @@ button:disabled { background: #d1d5db; border-color: #9ca3af; color: #333; curso
 body.interviewing header.top { display: none; }
 body.interviewing main { max-width: none; padding-top: 46px; }
 
-/* Figma: "Current Question" in accent, then the question in primary, English on
-   the left and Mandarin right-aligned on the right, both the same size and weight. */
-.question { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 48px; align-items: start;
-            padding: 0 47px 0 60px; margin-bottom: 36px; }
+/* Figma: "Current Question" in accent, then the question in primary, English over
+   the left card and Mandarin over the right one. Same columns and inset as the
+   cards below, so each sentence starts where its card's text starts. */
+.question { display: grid; grid-template-columns: minmax(0, 467fr) minmax(220px, 346fr) minmax(0, 467fr);
+            align-items: start; margin-bottom: 36px; }
+.question > :first-child { padding: 0 44px; }
+.question > :last-child { grid-column: 3; padding: 0 48px 0 62px; }
 .label { color: var(--accent); font-weight: 700; font-size: 20px; line-height: 1.2; margin: 0 0 14px; }
-.q-en, .q-zh { color: var(--primary); font-size: 30px; font-weight: 700; line-height: 1.25; margin: 0; }
-.q-zh { text-align: right; }
+/* One size for every question and both languages: the team's longest (77
+   characters) still fits in two lines. */
+.q-en, .q-zh { color: var(--primary); font-size: 26px; font-weight: 700; line-height: 1.35; margin: 0; }
 .question-spacer { visibility: hidden; }
-/* Most of the team's questions are far longer than the Figma sample; at 30px they
-   would push the cards below the fold. */
-.question.long .q-en, .question.long .q-zh { font-size: 22px; line-height: 1.35; }
 
 /* The two transcript cards run to the page edges, as in Figma, with the voice
    controls between them. */
@@ -145,7 +147,7 @@ body.interviewing main { max-width: none; padding-top: 46px; }
 @media (max-width: 900px) {
   .question, .stage { grid-template-columns: 1fr; gap: 16px; }
   .question { padding: 12px 16px 0; }
-  .q-zh { text-align: left; }
+  .question > :first-child, .question > :last-child { grid-column: auto; padding: 0; }
   .question-spacer { display: none; }
   .centre { order: -1; padding-top: 0; }
   .card, .card.zh { min-height: 0; padding: 24px; }
@@ -638,7 +640,6 @@ function showQuestion() {
   const question = current();
   $("q-en").textContent = question.en;
   $("q-zh").textContent = question.zh;
-  $("question").classList.toggle("long", question.en.length > 60);
   $("answer-en").value = "";
   $("answer-zh").value = "";
   clearOffline();

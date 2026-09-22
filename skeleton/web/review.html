@@ -171,7 +171,6 @@ details.said dd { margin: 0; }
         <span>The jobseeker has checked this resume and agrees it is used to find matching jobs.</span>
       </label>
       <div class="actions">
-        <button type="button" class="secondary" id="regenerate"></button>
         <button type="button" class="go" id="confirm">Confirm and continue &rarr;</button>
       </div>
       <p class="status" id="status" role="status"></p>
@@ -216,14 +215,13 @@ const SECTIONS = [
   { key: "contacts", label: "Contacts" },
   { key: "employment", label: "Employment",
     fields: [["position", "Position"], ["company", "Company"], ["location", "Location"], ["dates", "Dates"], ["description", "Main tasks"]] },
-  { key: "volunteer", label: "Volunteer Experience",
+  { key: "volunteer", label: "Volunteer",
     fields: [["role", "Role"], ["location", "Location"], ["dates", "Dates"], ["description", "What was done"]] },
   { key: "education", label: "Education",
     fields: [["major", "Course or major"], ["school", "School"], ["location", "Location"], ["dates", "Dates"], ["description", "What was learned"]] },
-  { key: "skills", label: "Technical Skills" },
+  { key: "skills", label: "Skills" },
   { key: "certificates", label: "Certificates" },
 ];
-const LABEL = Object.fromEntries(SECTIONS.map(s => [s.key, s.label]));
 
 // ---------------------------------------------------------------- fixtures
 // The mock interviewee's answers: exactly the team's mock_interview_answers.json
@@ -302,7 +300,7 @@ const state = {
   sections: null,   // the contract's sections, as edited by the caseworker
   name: "",         // page-only: the contract carries no name
   editing: null,    // the key of the card open for editing
-  selected: "profile", // what "Regenerate Section" redrafts
+  selected: "profile", // the card last opened, outlined
   consent: false,
   occupation: "",   // a key of occupations.json, "none", or "" until chosen
   busy: false,
@@ -462,30 +460,6 @@ async function suggestOccupation() {
 }
 
 // ---------------------------------------------------------------- actions
-async function regenerate() {
-  const key = state.selected;
-  state.busy = true; render();
-  showError("");
-  setStatus("Redrafting " + LABEL[key] + " from the same answers…");
-  try {
-    // The contract has one endpoint for the whole resume; only this section is taken.
-    const drafted = await draftAll();
-    if (drafted.offline) {
-      setStatus("");
-      showOffline("Not redrafted: " + drafted.offline + " " + LABEL[key] + " was left as it was.");
-      return;
-    }
-    state.sections[key] = drafted.sections[key];
-    showOffline("");
-    setStatus(LABEL[key] + " redrafted. Check it again with the jobseeker.");
-  } catch (err) {
-    setStatus("");
-    showError("Could not redraft " + LABEL[key] + ": " + err.message + ". Nothing was changed.");
-  } finally {
-    state.busy = false; render();
-  }
-}
-
 const joinParts = (...parts) => parts.map(p => String(p || "").trim()).filter(Boolean).join(", ");
 
 // The confirmed resume as the numbered lines the existing resume path reads, one
@@ -681,11 +655,6 @@ function render() {
   renderPreview();
   renderCards();
   renderAnswers();
-  $("regenerate").textContent = "Regenerate Section: " + LABEL[state.selected];
-  // NEEDS DECISION: redrafting redrafts from interview answers, which an
-  // uploaded resume has none of, so the button is hidden on that path.
-  $("regenerate").hidden = !!state.upload;
-  $("regenerate").disabled = state.busy;
   $("confirm").disabled = state.busy;
 }
 
@@ -697,7 +666,6 @@ $("occupation").addEventListener("change", event => {
   setStatus("");
 });
 $("consent").addEventListener("change", event => { state.consent = event.target.checked; setStatus(""); });
-$("regenerate").addEventListener("click", regenerate);
 $("confirm").addEventListener("click", confirmAndContinue);
 start();
 </script>
