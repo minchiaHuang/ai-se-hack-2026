@@ -243,6 +243,16 @@ class HttpRoundTrip(Server):
         with urlopen(f"http://127.0.0.1:{self.port}/logo.svg", timeout=5) as response:
             self.assertTrue(response.read().startswith(b"<svg"))
 
+    def test_every_page_shows_the_logo_in_the_browser_tab(self):
+        """Without this link the tab falls back to the browser's own globe,
+        which is what a judge sees first. Every page, not just the homepage,
+        so a page added later cannot quietly miss it."""
+        for path in ("/", "/start", "/start/path", "/interview", "/review",
+                     "/upload", "/jobs", "/intake"):
+            with self.subTest(path=path):
+                _, body = self.get(path)
+                self.assertIn('<link rel="icon" href="/logo.svg"', body)
+
     def test_the_scenario_list_serves_at_scenarios(self):
         status, body = self.get("/scenarios")
         self.assertEqual(status, 200)
