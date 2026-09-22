@@ -10,13 +10,13 @@
     {"id": "employment", "section": "Employment",
      "en": "What was your last job, and what did you do each day?",
      "zh": "你最近一份工作是做什么的？每天做哪些事？"},
-    {"id": "volunteer", "section": "Volunteer Experience",
+    {"id": "volunteer", "section": "Volunteer",
      "en": "Have you done any unpaid work, or helped your community?",
      "zh": "你做过无偿的工作，或者帮助过你的社区吗？"},
-    {"id": "skills", "section": "Technical Skills",
+    {"id": "skills", "section": "Skills",
      "en": "What are you good at? Tools, machines, computers, languages. Anything counts.",
      "zh": "你擅长什么？工具、机器、电脑、语言，什么都可以。"},
-    {"id": "certificates", "section": "Certificate",
+    {"id": "certificates", "section": "Certificates",
      "en": "Do you have any certificates, licences, or training records?",
      "zh": "你有证书、执照，或者培训记录吗？"}
   ]
